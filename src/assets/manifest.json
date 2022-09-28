@@ -1,0 +1,25 @@
+{
+  "short_name": "Ham2k Marathon",
+  "name": "Ham2k Marathon",
+  "icons": [
+    {
+      "src": "radio-blue-64.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "radio-blue-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "radio-blue-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
