@@ -41,7 +41,8 @@
       "executor": "@nrwl/web:dev-server",
       "options": {
         "buildTarget": "marathon:build",
-        "hmr": true
+        "hmr": true,
+        "port": 4202
       },
       "configurations": {
         "production": {
