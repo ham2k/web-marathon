@@ -3,15 +3,17 @@ import { persistStore, persistReducer } from "redux-persist"
 import localforage from "localforage"
 
 import settingsReducer from "./settings"
+import logReducer from "./log"
 
 const rootReducer = combineReducers({
   settings: settingsReducer,
+  log: logReducer,
 })
 
 const persistConfig = {
   key: "root",
   storage: localforage,
-  whitelist: ["settings"],
+  whitelist: ["settings", "log"],
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

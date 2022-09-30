@@ -24,6 +24,9 @@ let baseTheme = createTheme({
     primary: {
       main: "#546e7a",
     },
+    secondary: {
+      main: "#757575",
+    },
   },
 
   // Ensure MUI Links use React-Router links as their underlying component
