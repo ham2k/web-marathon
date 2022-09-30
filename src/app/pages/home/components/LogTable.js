@@ -5,9 +5,9 @@ import { makeStyles } from "@mui/styles"
 import classNames from "classnames"
 
 import commonStyles from "../../../styles/common"
-import { fmtDateMonthYear, fmtMinutesAsHM, fmtContestTimestampZulu } from "../../../../utils/format/dateTime"
-import { fmtInteger, fmtOneDecimal } from "../../../../utils/format/number"
-import { camelCaseToTitleCase } from "apps/marathon/src/utils/format/string"
+import { fmtDateMonthYear } from "@ham2k/util/format"
+import { fmtInteger, fmtOneDecimal } from "@ham2k/util/format"
+import { camelCaseToTitleCase } from "@ham2k/util/format"
 
 const useStyles = makeStyles((theme) => ({
   ...commonStyles(theme),
@@ -80,7 +80,7 @@ export function LogTable({ qson }) {
         {qsos.map((qso, i) => (
           <tr key={i} className={classNames(`band-${qso.band}`)}>
             <td className="col-number">{fmtInteger(qso.number)}</td>
-            <td className="col-time">{fmtContestTimestampZulu(qso.startMillis)}</td>
+            <td className="col-time">{fmtDateMonthYear(qso.startMillis)}</td>
             <td className="col-call">{qso.their.call}</td>
             <td className={classNames("col-band", "band-color")}>{qso.band}</td>
             <td className={classNames("col-freq", "band-color")}>{fmtInteger(qso.freq)}</td>
