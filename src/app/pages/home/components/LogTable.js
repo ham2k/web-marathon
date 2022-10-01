@@ -6,7 +6,7 @@ import classNames from "classnames"
 
 import commonStyles from "../../../styles/common"
 import { fmtDateMonthYear } from "@ham2k/util/format"
-import { fmtInteger, fmtOneDecimal } from "@ham2k/util/format"
+import { fmtInteger } from "@ham2k/util/format"
 import { camelCaseToTitleCase } from "@ham2k/util/format"
 
 const useStyles = makeStyles((theme) => ({
@@ -56,7 +56,7 @@ export function LogTable({ qson }) {
 
   const qsos = useMemo(() => qson?.qsos || [], [qson])
 
-  if (!qsos || qsos.length == 0) {
+  if (!qsos || qsos.length === 0) {
     return <div></div>
   }
 
@@ -96,8 +96,8 @@ export function LogTable({ qson }) {
   )
 }
 
-function exchangeLabel(key) {
-  if (key === "cqZone") return "CQZ"
-  else if (key === "ituZone") return "ITUZ"
-  else return camelCaseToTitleCase(key)
-}
+// function exchangeLabel(key) {
+//   if (key === "cqZone") return "CQZ"
+//   else if (key === "ituZone") return "ITUZ"
+//   else return camelCaseToTitleCase(key)
+// }

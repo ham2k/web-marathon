@@ -21,7 +21,9 @@ export const settingsSlice = createSlice({
 
         return settings
       })
-      .addDefaultCase((state, action) => {})
+      .addDefaultCase((state, action) => {
+        return null
+      })
   },
 })
 
