@@ -51,10 +51,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export function LogTable({ qson }) {
+export function QsonTable({ qsos }) {
   const classes = useStyles()
-
-  const qsos = useMemo(() => qson?.qsos || [], [qson])
 
   if (!qsos || qsos.length === 0) {
     return <div></div>

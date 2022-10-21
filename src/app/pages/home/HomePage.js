@@ -1,11 +1,12 @@
 import * as React from "react"
 import { makeStyles } from "@mui/styles"
 import { useSelector } from "react-redux"
-import { selectCurrentLog } from "../../store/log"
+import { selectCurrentLog, selectYearQSOs } from "../../store/log"
 import commonStyles from "../../styles/common"
 import { LogLoader } from "./components/LogLoader"
 import { selectSettings } from "../../store/settings"
-import { LogTable } from "./components/LogTable"
+import { EntityList } from "./components/EntityList"
+import { fmtNumber } from "libs/util/format/src"
 
 const useStyles = makeStyles((theme) => ({
   ...commonStyles(theme),
@@ -22,14 +23,17 @@ export function HomePage() {
   const classes = useStyles()
   const settings = useSelector(selectSettings)
   const log = useSelector(selectCurrentLog)
+  const qsos = useSelector(selectYearQSOs)
 
   return (
     <div className={classes.root}>
-      <h1>Welcome to Ham2K Marathon Tools for {settings.year}</h1>
+      <h1>Welcome to Ham2K Marathon Tools for {settings?.year}</h1>
       {log && log.qsos.length > 0 && (
         <div>
-          <h2>{log.qsos.length} QSOs</h2>
-          <LogTable qson={log} />
+          <h2>
+            {fmtNumber(qsos.length)} QSOs in {settings?.year}
+          </h2>
+          <EntityList qson={log} />
         </div>
       )}
       <p>

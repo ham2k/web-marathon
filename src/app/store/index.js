@@ -4,16 +4,18 @@ import localforage from "localforage"
 
 import settingsReducer from "./settings"
 import logReducer from "./log"
+import entriesReducer from "./entries"
 
 const rootReducer = combineReducers({
   settings: settingsReducer,
   log: logReducer,
+  entries: entriesReducer,
 })
 
 const persistConfig = {
   key: "root",
   storage: localforage,
-  whitelist: ["settings", "log"],
+  whitelist: ["settings", "log", "entries"],
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
