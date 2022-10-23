@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
-  entities: {},
-  zones: {},
+  selections: {},
 }
 
 export const entriesSlice = createSlice({
@@ -11,23 +10,17 @@ export const entriesSlice = createSlice({
   initialState,
 
   reducers: {
-    setEntryForEntity: (state, action) => {
-      state.entities[action.payload.prefix] = action.payload.key
-    },
-    setEntryForZone: (state, action) => {
-      state.zones[action.payload.zone] = action.payload.key
+    setSelection: (state, action) => {
+      state.selections = state.selections || {}
+      state.selections[action.payload.prefix || action.payload.zone] = action.payload.key
     },
   },
 })
 
-export const { setEntryForEntity, setEntryForZone } = entriesSlice.actions
+export const { setSelection } = entriesSlice.actions
 
-export const selectEntityEntries = (state) => {
-  return state?.entries?.entities || {}
-}
-
-export const selectZoneEntries = (state) => {
-  return state?.entries?.zones || {}
+export const selectEntrySelections = (state) => {
+  return state?.entries?.selections || {}
 }
 
 export default entriesSlice.reducer

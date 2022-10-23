@@ -4,7 +4,7 @@ import { Button } from "@mui/material"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
 import ClearIcon from "@mui/icons-material/Clear"
 import { useDispatch, useSelector } from "react-redux"
-import { loadADIFLog, selectCurrentLog, setCurrentLog } from "../../../store/log"
+import { loadADIFLog, selectCurrentLog, setCurrentLogInfo } from "../../../store/log"
 
 export function LogLoader({ title, classes }) {
   const dispatch = useDispatch()
@@ -23,7 +23,7 @@ export function LogLoader({ title, classes }) {
   }
 
   const handleClearLog = (event) => {
-    dispatch(setCurrentLog(null))
+    dispatch(setCurrentLogInfo({}))
   }
 
   return (
