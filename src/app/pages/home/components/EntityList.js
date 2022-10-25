@@ -13,6 +13,7 @@ import { selectEntityGroups } from "../../../store/log"
 import { useSelector } from "react-redux"
 import { selectEntrySelections } from "../../../store/entries"
 import { EntityEntry } from "./EntityEntry"
+import { ExcelEntry } from "./ExcelEntry"
 
 // DX Marathon form has some entities out of order
 // * CE0X after CE0Z
@@ -134,6 +135,36 @@ export function EntityList({ qson }) {
 
   return (
     <>
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: -100,
+          height: "1",
+          width: "1",
+          opacity: 0,
+          overflow: "hidden",
+        }}
+      >
+        <table id="excel-table">
+          {CQWWEntities.map((entity, i) => (
+            <ExcelEntry
+              key={entity.entityPrefix}
+              qsos={entityGroups[entity.entityPrefix]}
+              entryKey={entrySelections[entity.entityPrefix]}
+            />
+          ))}
+          {CQZones.map((zone, i) => (
+            <ExcelEntry
+              key={zone.entityPrefix}
+              qsos={entityGroups[zone.entityPrefix]}
+              entryKey={entrySelections[zone.entityPrefix]}
+            />
+          ))}
+        </table>
+      </div>
+
       <h2>
         {counts.entities.qsl + counts.entities.qso} Entities
         {counts.entities.qso > 0 && <span>&nbsp;&nbsp;({counts.entities.qso} unconfirmed)</span>}

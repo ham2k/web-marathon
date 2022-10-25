@@ -6,7 +6,9 @@ import commonStyles from "../../styles/common"
 import { LogLoader } from "./components/LogLoader"
 import { selectSettings } from "../../store/settings"
 import { EntityList } from "./components/EntityList"
-import { fmtNumber } from "libs/util/format/src"
+import { fmtNumber } from "@ham2k/util/format"
+import { Button } from "@mui/material"
+import { ContentCopy } from "@mui/icons-material"
 
 const useStyles = makeStyles((theme) => ({
   ...commonStyles(theme),
@@ -25,6 +27,17 @@ export function HomePage() {
   const log = useSelector(selectCurrentLog)
   const qsos = useSelector(selectYearQSOs)
 
+  const handlePaste = (event) => {
+    let table = document.querySelector("#excel-table")
+    let range = document.createRange()
+    let sel = window.getSelection()
+    sel.removeAllRanges()
+    range.selectNodeContents(table)
+    sel.addRange(range)
+    document.execCommand("copy")
+    sel.removeAllRanges()
+  }
+
   return (
     <div className={classes.root}>
       <h1>Welcome to Ham2K Marathon Tools for {settings?.year}</h1>
@@ -32,6 +45,11 @@ export function HomePage() {
         <div>
           <h2>
             {fmtNumber(qsos.length)} QSOs in {settings?.year}
+            <span style={{ float: "right" }}>
+              <Button>
+                <ContentCopy onClick={handlePaste} />
+              </Button>
+            </span>
           </h2>
           <EntityList qson={log} />
         </div>
