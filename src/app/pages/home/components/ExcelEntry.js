@@ -19,8 +19,6 @@ export function ExcelEntry({ qsos, entryKey }) {
     entry = qsos && qsos[0]
   }
 
-  console.log(entry)
-
   if (entry) {
     return (
       <tr>
