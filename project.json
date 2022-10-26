@@ -15,7 +15,7 @@
         "main": "apps/marathon/src/main.js",
         "polyfills": "apps/marathon/src/polyfills.js",
         "tsConfig": "apps/marathon/tsconfig.app.json",
-        "assets": ["apps/marathon/src/favicon.ico", "apps/marathon/src/assets"],
+        "assets": ["apps/marathon/src/favicon.ico", "apps/marathon/src/assets", "apps/marathon/src/netlify.toml"],
         "styles": ["apps/marathon/src/styles.scss"],
         "scripts": [],
         "webpackConfig": "@nrwl/react/plugins/webpack"
