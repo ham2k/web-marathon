@@ -148,20 +148,22 @@ export function EntityList({ qson }) {
         }}
       >
         <table id="excel-table">
-          {CQWWEntities.map((entity, i) => (
-            <ExcelEntry
-              key={entity.entityPrefix}
-              qsos={entityGroups[entity.entityPrefix]}
-              entryKey={entrySelections[entity.entityPrefix]}
-            />
-          ))}
-          {CQZones.map((zone, i) => (
-            <ExcelEntry
-              key={zone.entityPrefix}
-              qsos={entityGroups[zone.entityPrefix]}
-              entryKey={entrySelections[zone.entityPrefix]}
-            />
-          ))}
+          <tbody>
+            {CQWWEntities.map((entity, i) => (
+              <ExcelEntry
+                key={entity.entityPrefix}
+                qsos={entityGroups[entity.entityPrefix]}
+                entryKey={entrySelections[entity.entityPrefix]}
+              />
+            ))}
+            {CQZones.map((zone, i) => (
+              <ExcelEntry
+                key={zone.entityPrefix}
+                qsos={entityGroups[zone.entityPrefix]}
+                entryKey={entrySelections[zone.entityPrefix]}
+              />
+            ))}
+          </tbody>
         </table>
       </div>
 
