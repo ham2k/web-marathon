@@ -1,14 +1,14 @@
 import * as React from "react"
 import { makeStyles } from "@mui/styles"
-import { useSelector } from "react-redux"
-import { selectCurrentLog, selectYearQSOs } from "../../store/log"
+import { useDispatch, useSelector } from "react-redux"
+import { selectCurrentLog, selectYearQSOs, setCurrentLogInfo } from "../../store/log"
 import commonStyles from "../../styles/common"
 import { LogLoader } from "./components/LogLoader"
 import { selectSettings } from "../../store/settings"
 import { EntityList } from "./components/EntityList"
 import { fmtNumber } from "@ham2k/util/format"
 import { Button } from "@mui/material"
-import { ContentCopy } from "@mui/icons-material"
+import { ContentCopy, Clear } from "@mui/icons-material"
 
 const useStyles = makeStyles((theme) => ({
   ...commonStyles(theme),
@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export function HomePage() {
+  const dispatch = useDispatch()
   const classes = useStyles()
   const settings = useSelector(selectSettings)
   const log = useSelector(selectCurrentLog)
@@ -38,6 +39,10 @@ export function HomePage() {
     sel.removeAllRanges()
   }
 
+  const handleClearLog = (event) => {
+    dispatch(setCurrentLogInfo({}))
+  }
+
   return (
     <div className={classes.root}>
       <h1>Welcome to Ham2K Marathon Tools for {settings?.year}</h1>
@@ -45,9 +50,14 @@ export function HomePage() {
         <div>
           <h2>
             {fmtNumber(qsos.length)} QSOs in {settings?.year}
+            <span>
+              <Button onClick={handleClearLog}>
+                <Clear />
+              </Button>
+            </span>
             <span style={{ float: "right" }}>
-              <Button>
-                <ContentCopy onClick={handlePaste} />
+              <Button onClick={handlePaste}>
+                <ContentCopy />
               </Button>
             </span>
           </h2>

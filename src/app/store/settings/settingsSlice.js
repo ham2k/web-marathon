@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { REHYDRATE } from "redux-persist"
+// import { REHYDRATE } from "redux-persist"
+import guessCurrentYear from "../../tools/guessCurrentYear"
 
 const initialState = {
   year: guessCurrentYear(),
@@ -10,33 +11,29 @@ export const settingsSlice = createSlice({
 
   initialState,
 
-  reducers: {},
-
-  extraReducers: (builder) => {
-    builder
-      .addCase(REHYDRATE, (state, action) => {
-        const settings = action.payload?.settings || initialState
-
-        if (!settings.year) settings.year = guessCurrentYear()
-
-        return settings
-      })
-      .addDefaultCase((state, action) => {
-        return null
-      })
+  reducers: {
+    setSettingsYear: (state, action) => {
+      if (!state) return { year: guessCurrentYear() }
+      state.year = action.payload.year || guessCurrentYear()
+    },
   },
+
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(REHYDRATE, (state, action) => {
+  //       const settings = action.payload?.settings || initialState
+
+  //       if (!settings.year) settings.year = guessCurrentYear()
+
+  //       return { ...state, ...settings }
+  //     })
+  //     .addDefaultCase((state, action) => {
+  //       return null
+  //     })
+  // },
 })
 
-function guessCurrentYear() {
-  const today = new Date()
-  const month = today.getMonth() + 1
-
-  if (month === 1 || month === 2) {
-    return today.getFullYear() - 1
-  } else {
-    return today.getFullYear()
-  }
-}
+export const { setSettingsYear } = settingsSlice.actions
 
 export const selectSettings = (state) => {
   return state?.settings

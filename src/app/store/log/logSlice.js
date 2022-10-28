@@ -6,6 +6,8 @@ import { qsoKey } from "@ham2k/qson/tools"
 import { createSlice } from "@reduxjs/toolkit"
 import qsoComparer from "../../tools/qsoComparer"
 import qslSourceComparer from "../../tools/qslSourceComparer"
+import guessCurrentYear from "../../tools/guessCurrentYear"
+import { setSettingsYear } from "../settings"
 
 // Not sure why ESLint thinks this is a hook 🤷
 useBuiltinCountryFile() // eslint-disable-line react-hooks/rules-of-hooks
@@ -32,8 +34,9 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
   const { settings } = getState()
   const qson = adifToQSON(data)
 
-  const yearStart = new Date(`${settings.year}-01-01T00:00:00Z`).valueOf()
-  const yearEnd = new Date(`${settings.year}-12-31T23:59:59Z`).valueOf()
+  const year = settings?.year || guessCurrentYear()
+  const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
+  const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
   const yearQSOs = qson.qsos.filter((qso) => qso.startMillis <= yearEnd && qso.endMillis >= yearStart)
 
@@ -75,6 +78,7 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
   })
 
   dispatch(setCurrentLogInfo({ qson, ourCalls, yearQSOs, entityGroups }))
+  dispatch(setSettingsYear({ year }))
 }
 
 function processOneQSO(qso) {

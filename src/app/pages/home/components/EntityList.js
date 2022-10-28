@@ -227,7 +227,7 @@ export function EntityList({ qson }) {
               selectedPrefix={selectedPrefix}
               setSelectedPrefix={setSelectedPrefix}
             />
-          ))}{" "}
+          ))}
         </tbody>
       </table>
     </>
