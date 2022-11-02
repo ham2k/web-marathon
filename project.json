@@ -1,10 +1,10 @@
 {
-  "root": "apps/marathon",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/marathon/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/web:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
@@ -34,11 +34,17 @@
           "namedChunks": false,
           "extractLicenses": true,
           "vendorChunk": false
+        },
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
         }
       }
     },
     "serve": {
-      "executor": "@nrwl/web:dev-server",
+      "executor": "@nrwl/webpack:dev-server",
       "options": {
         "buildTarget": "marathon:build",
         "hmr": true,
@@ -48,8 +54,12 @@
         "production": {
           "buildTarget": "marathon:build:production",
           "hmr": false
+        },
+        "development": {
+          "buildTarget": "marathon:build:development"
         }
-      }
+      },
+      "defaultConfiguration": "development"
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
@@ -60,9 +70,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/marathon"],
+      "outputs": ["{workspaceRoot}/coverage/apps/marathon"],
       "options": {
-        "jestConfig": "apps/marathon/jest.config.js",
+        "jestConfig": "apps/marathon/jest.config.ts",
         "passWithNoTests": true
       }
     }

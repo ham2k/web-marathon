@@ -11,6 +11,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles"
 import commonStyles from "./styles/common"
 
 import { ContentRoutes } from "./routes"
+import ErrorBoundary from "./components/ErrorBoundary"
 
 const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   const { href, ...other } = props
@@ -144,7 +145,9 @@ export function App() {
       </AppBar>
       <div className={classes.contentWrapper}>
         <Container className={classes.content}>
-          <ContentRoutes />
+          <ErrorBoundary>
+            <ContentRoutes />
+          </ErrorBoundary>
         </Container>
       </div>
       <footer className={classes.footer}>
