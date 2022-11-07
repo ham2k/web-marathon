@@ -6,45 +6,9 @@ import classNames from "classnames"
 
 import commonStyles from "../../../styles/common"
 
-import { ENTITIES } from "@ham2k/data/cqww"
-import { CQZONES } from "@ham2k/data/cqzones"
-
-import { selectEntityGroups } from "../../../store/log"
-import { useSelector } from "react-redux"
-import { selectEntrySelections } from "../../../store/entries"
+import { CQWWEntities, CQZones } from "../../../../data/entities"
 import { EntityEntry } from "./EntityEntry"
 import { ExcelEntry } from "./ExcelEntry"
-
-// DX Marathon form has some entities out of order
-// * CE0X after CE0Z
-// * FO after FO/c
-// * FR after FT/j
-// * FS after FT/t
-// * HK0/a after HK0/m
-// * VP8/h after VP8/s
-const REORDERED_PREFIXES = {
-  CE0X: "CE0Zzzz",
-  FO: "FO/czzz",
-  FR: "FT/jzzz",
-  FS: "FT/tzzz",
-  "HK0/a": "HK0/mzzz",
-  "VP8/h": "VP8/szzz",
-}
-
-const CQWWEntities = Object.values(ENTITIES).sort((a, b) => {
-  const attr = "entityPrefix"
-  let aValue = a[attr][0] === "*" ? a[attr].slice(1) : a[attr]
-  let bValue = b[attr][0] === "*" ? b[attr].slice(1) : b[attr]
-
-  aValue = REORDERED_PREFIXES[aValue] || aValue
-  bValue = REORDERED_PREFIXES[bValue] || bValue
-
-  return aValue.localeCompare(bValue)
-})
-
-const CQZones = Object.keys(CQZONES)
-  .map((k) => ({ ...CQZONES[k], zone: k, entityPrefix: `Zone ${k}` }))
-  .sort((a, b) => a.zone - b.zone)
 
 const useStyles = makeStyles((theme) => ({
   ...commonStyles(theme),
@@ -95,11 +59,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export function EntityList({ qson }) {
+export function EntityList({ qson, entityGroups, entrySelections }) {
   const [selectedPrefix, setSelectedPrefix] = useState("")
   const classes = useStyles()
-  const entityGroups = useSelector(selectEntityGroups)
-  const entrySelections = useSelector(selectEntrySelections)
 
   const counts = { entities: { qso: 0, qsl: 0, nil: 0 }, zones: { qso: 0, qsl: 0, nil: 0 } }
 
