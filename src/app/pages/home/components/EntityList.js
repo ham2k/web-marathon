@@ -1,68 +1,61 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react"
 
-import { makeStyles } from "@mui/styles"
-import classNames from "classnames"
-
-import commonStyles from "../../../styles/common"
-
 import { CQWWEntities, CQZones } from "../../../../data/entities"
 import { EntityEntry } from "./EntityEntry"
 import { ExcelEntry } from "./ExcelEntry"
 import { Typography } from "@mui/material"
+import { Box } from "@mui/system"
 
-const useStyles = makeStyles((theme) => ({
-  ...commonStyles(theme),
-
+const styles = {
   root: {
     "& h2": {
       marginTop: "1em",
       borderBottom: "2px solid #333",
     },
-  },
 
-  table: {
-    width: "inherit important!",
-    minWidth: "100%",
-    marginTop: "0.5em",
-    "& th": {
-      textAlign: "left",
-      paddingRight: "1em",
-    },
-    "& td": {
-      textAlign: "left",
-      paddingRight: "1em",
-    },
+    "& .table": {
+      width: "inherit important!",
+      minWidth: "100%",
+      marginTop: "0.5em",
+      "& th": {
+        textAlign: "left",
+        paddingRight: "1em",
+      },
+      "& td": {
+        textAlign: "left",
+        paddingRight: "1em",
+      },
 
-    "& .col-prefix": {
-      textAlign: "center",
-      maxWidth: "4em",
-      whiteSpace: "nowrap",
-    },
-    "& .col-name": {
-      minWidth: "5.5em",
-    },
-    "& .col-time": {
-      minWidth: "5.5em",
-    },
-    "& .col-band": {
-      textAlign: "right",
-    },
-    "& .col-call": {
-      fontWeight: "bold",
-    },
-    "& .col-freq": {
-      textAlign: "right",
-    },
-    "& .col-cqz, & .col-ituz, & .col-exch-cqZone, & .col-exch-ituZone": {
-      textAlign: "right",
+      "& .col-prefix": {
+        textAlign: "center",
+        maxWidth: "4em",
+        whiteSpace: "nowrap",
+      },
+      "& .col-name": {
+        minWidth: "5.5em",
+      },
+      "& .col-time": {
+        minWidth: "5.5em",
+      },
+      "& .col-band": {
+        textAlign: "right",
+      },
+      "& .col-call": {
+        fontWeight: "bold",
+      },
+      "& .col-freq": {
+        textAlign: "right",
+      },
+      "& .col-cqz, & .col-ituz, & .col-exch-cqZone, & .col-exch-ituZone": {
+        textAlign: "right",
+      },
     },
   },
-}))
+}
 
 export function EntityList({ qson, entityGroups, entrySelections }) {
   const [selectedPrefix, setSelectedPrefix] = useState("")
-  const classes = useStyles()
 
   const counts = { entities: { qso: 0, qsl: 0, nil: 0 }, zones: { qso: 0, qsl: 0, nil: 0 } }
 
@@ -97,7 +90,7 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
   })
 
   return (
-    <>
+    <Box sx={styles.root}>
       <div
         style={{
           position: "absolute",
@@ -143,7 +136,7 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
         </a>
       </Typography>
 
-      <table className={classNames(classes.niceTable, classes.table, classes.bandColors)}>
+      <table className="table nice-table band-colors">
         <thead>
           <tr>
             <th className="col-prefix">Prefix</th>
@@ -177,7 +170,7 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
           {counts.zones.qso > 0 && <span>&nbsp;&nbsp;({counts.zones.qso} unconfirmed)</span>}
         </a>
       </Typography>
-      <table className={classNames(classes.niceTable, classes.table, classes.bandColors)}>
+      <table className="table nice-table band-colors">
         <thead>
           <tr>
             <th className="col-prefix">Prefix</th>
@@ -204,6 +197,6 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
           ))}
         </tbody>
       </table>
-    </>
+    </Box>
   )
 }

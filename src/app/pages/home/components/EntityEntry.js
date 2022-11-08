@@ -1,9 +1,7 @@
 import React from "react"
 
-import { makeStyles } from "@mui/styles"
 import classNames from "classnames"
 
-import commonStyles from "../../../styles/common"
 import { fmtInteger } from "@ham2k/util/format"
 import { fmtDateTime } from "@ham2k/util/format"
 import { Button, Chip } from "@mui/material"
@@ -19,21 +17,18 @@ import {
 } from "@mui/icons-material"
 import { useDispatch } from "react-redux"
 import { setSelection } from "../../../store/entries"
+import { Box } from "@mui/system"
 
-const useStyles = makeStyles((theme) => ({
-  ...commonStyles(theme),
-  root: {},
-  odd: {
-    "& td": {
+const styles = {
+  root: {
+    "&.odd td": {
       backgroundColor: "#F0F0F0",
     },
-  },
-  even: {
-    "& td": {
+    "&.even td": {
       backgroundColor: "#FFF",
     },
   },
-}))
+}
 
 const DATE_FORMAT = {
   hourCycle: "h23",
@@ -52,7 +47,6 @@ const QSL_ICONS = {
 }
 
 export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSelectedPrefix }) {
-  const classes = useStyles()
   const dispatch = useDispatch()
 
   const prefix = entity.entityPrefix
@@ -165,25 +159,29 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
 
   return (
     <>
-      <tr
+      <Box
+        component="tr"
+        sx={styles.root}
         className={classNames(
-          classes.root,
           prefix && selectedPrefix === prefix && "selected",
-          num % 2 === 0 ? classes.even : classes.odd
+          num % 2 === 0 ? "even" : "odd",
+          `band-${entry?.band}`
         )}
       >
         {cols}
-      </tr>
+      </Box>
       {prefix && selectedPrefix === prefix
         ? qsos
             .filter((qso) => qso.key !== entry.key)
             .map((qso) => (
-              <tr
+              <Box
+                component="tr"
+                sx={styles.root}
                 key={qso.key}
                 className={classNames(
-                  classes.root,
                   prefix && selectedPrefix === prefix && "selected",
-                  num % 2 === 0 ? classes.even : classes.odd
+                  num % 2 === 0 ? "even" : "odd",
+                  `band-${qso.band}`
                 )}
               >
                 <td colSpan="2">&nbsp;</td>
@@ -223,7 +221,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                     <PushPinOutlined fontSize="small" />
                   </Button>
                 </td>
-              </tr>
+              </Box>
             ))
         : null}
     </>

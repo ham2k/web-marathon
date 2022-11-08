@@ -1,8 +1,8 @@
-export const BAND_COLORS = {
+export const BAND_DARK_COLORS = {
   "160m": "#0d47a1",
-  "80m": "#0288d1",
-  "40m": "#64b5f6",
-  "20m": "#fdd835",
-  "15m": "#ff9800",
-  "10m": "#e64a19",
+  "80m": "#006fab",
+  "40m": "#4c86b5",
+  "20m": "#cfb029",
+  "15m": "#ba7104",
+  "10m": "#ab3713",
 }

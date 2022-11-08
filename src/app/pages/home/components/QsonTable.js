@@ -1,64 +1,58 @@
 /* eslint-disable no-unused-vars */
 import React from "react"
 
-import { makeStyles } from "@mui/styles"
 import classNames from "classnames"
 
-import commonStyles from "../../../styles/common"
 import { fmtDateMonthYear } from "@ham2k/util/format"
 import { fmtInteger } from "@ham2k/util/format"
 
-const useStyles = makeStyles((theme) => ({
-  ...commonStyles(theme),
-
+const styles = {
   root: {
     "& h2": {
       marginTop: "1em",
       borderBottom: "2px solid #333",
     },
-  },
 
-  table: {
-    width: "inherit important!",
-    marginTop: "0.5em",
-    "& th": {
-      textAlign: "left",
-      paddingRight: "1em",
-    },
-    "& td": {
-      textAlign: "left",
-      paddingRight: "1em",
-    },
+    "& .table": {
+      width: "inherit important!",
+      marginTop: "0.5em",
+      "& th": {
+        textAlign: "left",
+        paddingRight: "1em",
+      },
+      "& td": {
+        textAlign: "left",
+        paddingRight: "1em",
+      },
 
-    "& .col-number": {
-      textAlign: "right",
-      maxWidth: "4em",
-    },
-    "& .col-time": {
-      minWidth: "5.5em",
-    },
-    "& .col-band": {
-      textAlign: "right",
-      fontWeight: "bold",
-    },
-    "& .col-freq": {
-      textAlign: "right",
-    },
-    "& .col-cqz, & .col-ituz, & .col-exch-cqZone, & .col-exch-ituZone": {
-      textAlign: "right",
+      "& .col-number": {
+        textAlign: "right",
+        maxWidth: "4em",
+      },
+      "& .col-time": {
+        minWidth: "5.5em",
+      },
+      "& .col-band": {
+        textAlign: "right",
+        fontWeight: "bold",
+      },
+      "& .col-freq": {
+        textAlign: "right",
+      },
+      "& .col-cqz, & .col-ituz, & .col-exch-cqZone, & .col-exch-ituZone": {
+        textAlign: "right",
+      },
     },
   },
-}))
+}
 
 export function QsonTable({ qsos }) {
-  const classes = useStyles()
-
   if (!qsos || qsos.length === 0) {
     return <div></div>
   }
 
   return (
-    <table className={classNames(classes.niceTable, classes.table, classes.bandColors)}>
+    <table className="table nice-table band-colors">
       <thead>
         <tr>
           <th className="col-number">#</th>
@@ -75,12 +69,12 @@ export function QsonTable({ qsos }) {
       </thead>
       <tbody>
         {qsos.map((qso, i) => (
-          <tr key={i} className={classNames(`band-${qso.band}`)}>
+          <tr key={i} className={`band-${qso.band}`}>
             <td className="col-number">{fmtInteger(qso.number)}</td>
             <td className="col-time">{fmtDateMonthYear(qso.startMillis)}</td>
             <td className="col-call">{qso.their.call}</td>
-            <td className={classNames("col-band", "band-color")}>{qso.band}</td>
-            <td className={classNames("col-freq", "band-color")}>{fmtInteger(qso.freq)}</td>
+            <td className="col-band band-color">{qso.band}</td>
+            <td className="col-freq band-color">{fmtInteger(qso.freq)}</td>
             <td className="col-prefix">{qso.their.entityPrefix}</td>
             <td className="col-entity">{qso.their.entityName}</td>
             <td className="col-continent">{qso.their.continent}</td>

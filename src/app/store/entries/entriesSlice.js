@@ -10,6 +10,9 @@ export const entriesSlice = createSlice({
   initialState,
 
   reducers: {
+    resetSelections: (state, action) => {
+      state.selections = {}
+    },
     setSelection: (state, action) => {
       state.selections = state.selections || {}
       state.selections[action.payload.prefix || action.payload.zone] = action.payload.key

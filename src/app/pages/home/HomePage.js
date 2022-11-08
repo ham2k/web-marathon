@@ -1,5 +1,4 @@
 import * as React from "react"
-import { makeStyles } from "@mui/styles"
 import { useDispatch, useSelector } from "react-redux"
 import {
   selectCurrentLog,
@@ -8,30 +7,26 @@ import {
   selectYearQSOs,
   setCurrentLogInfo,
 } from "../../store/log"
-import commonStyles from "../../styles/common"
 import { LogLoader } from "./components/LogLoader"
 import { selectSettings } from "../../store/settings"
 import { EntityList } from "./components/EntityList"
 import { fmtNumber } from "@ham2k/util/format"
-import { Button, Dialog, Typography } from "@mui/material"
+import { Box, Button, Dialog, Typography } from "@mui/material"
 import { Clear, FileDownload } from "@mui/icons-material"
 import { selectEntrySelections } from "../../store/entries"
 import { ExportDialog } from "./components/ExportDialog"
 
-const useStyles = makeStyles((theme) => ({
-  ...commonStyles(theme),
-
+const styles = {
   root: {
     "& h2": {
       marginTop: "1em",
       borderBottom: "2px solid #333",
     },
   },
-}))
+}
 
 export function HomePage() {
   const dispatch = useDispatch()
-  const classes = useStyles()
   const settings = useSelector(selectSettings)
   const log = useSelector(selectCurrentLog)
   const qsos = useSelector(selectYearQSOs)
@@ -46,7 +41,7 @@ export function HomePage() {
   }
 
   return (
-    <div className={classes.root}>
+    <Box sx={styles.root}>
       {log && log.qsos.length > 0 ? (
         <>
           <Typography component="h1" variant="h3">
@@ -84,6 +79,6 @@ export function HomePage() {
       <Dialog open={exportDialogOpen} onClose={() => setExportDialogOpen(false)}>
         <ExportDialog onClose={() => setExportDialogOpen(false)} />
       </Dialog>
-    </div>
+    </Box>
   )
 }
