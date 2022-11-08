@@ -59,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "space-between",
     "& header": {
+      zIndex: 1,
       "& .MuiToolbar-root div": {
         flexGrow: 1,
         display: "flex",
@@ -73,6 +74,10 @@ const useStyles = makeStyles((theme) => ({
         fontStyle: "normal",
         fontWeight: "300 !important",
       },
+    },
+    "& footer": {
+      zIndex: 1,
+      boxShadow: "0px 0px 10px 5px rgb(0 0 0 / 12%)",
     },
   },
   toolbar: {
