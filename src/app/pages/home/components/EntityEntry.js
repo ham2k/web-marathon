@@ -193,10 +193,22 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                 <td className="col-call">
                   {qso.their.call}&nbsp;
                   {qso.their.entityPrefix && qso.their.entityPrefix !== qso.their.guess.entityPrefix && (
-                    <Chip label={`${qso.their.guess.entityName}`} color="error" size="small" icon={<Error />} />
+                    <Chip
+                      label={`${qso.their.guess.entityName}`}
+                      color="error"
+                      size="small"
+                      icon={<Error />}
+                      title={`QSO claims ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`}
+                    />
                   )}
                   {qso.their.cqZone && qso.their.cqZone !== qso.their.guess.cqZone && (
-                    <Chip label={`Zone ${qso.their.guess.cqZone}`} color="error" size="small" icon={<Error />} />
+                    <Chip
+                      label={`Zone ${qso.their.guess.cqZone}`}
+                      color="error"
+                      size="small"
+                      icon={<Error />}
+                      title={`QSO claims Zone ${qso.their.cqZone}.\nWe believe it should be Zone ${qso.their.guess.cqZone}.`}
+                    />
                   )}
                 </td>
                 <td className="col-qsl">

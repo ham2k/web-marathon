@@ -143,7 +143,7 @@ export function App() {
               </Link>
             </Typography>
             <Typography component="div" color="inherit" noWrap className={classes.version}>
-              v0.1
+              &nbsp;&nbsp;ALPHA VERSION, NOT READY YET
             </Typography>
           </div>
         </Toolbar>
@@ -157,7 +157,7 @@ export function App() {
       </div>
       <footer className={classes.footer}>
         <b>Ham2K Marathon Tools</b> developed by <a href="https://www.qrz.com/db/KI2D">KI2D</a> Sebastian Delmont{" "}
-        <a href="https://twitter.com/sd">@sd</a> - v0.1
+        <a href="https://twitter.com/sd">@sd</a>
       </footer>
     </div>
   )
