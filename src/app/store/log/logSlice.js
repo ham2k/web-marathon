@@ -24,6 +24,7 @@ export const logSlice = createSlice({
       state.qson = action.payload.qson
       state.yearQSOs = action.payload.yearQSOs
       state.entityGroups = action.payload.entityGroups
+      state.ourCalls = action.payload.ourCalls
     },
   },
 })
@@ -42,7 +43,7 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
 
   const ourCalls = {}
   yearQSOs.forEach((qso) => {
-    ourCalls[qso.our.call] = ourCalls[qso.our.call] || 0 + 1
+    ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
   })
 
   yearQSOs.forEach((qso) => {
@@ -97,6 +98,10 @@ export const selectYearQSOs = (state) => {
 
 export const selectEntityGroups = (state) => {
   return state?.log?.entityGroups || {}
+}
+
+export const selectOurCalls = (state) => {
+  return state?.log?.ourCalls || {}
 }
 
 export default logSlice.reducer

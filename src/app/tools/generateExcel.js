@@ -4,7 +4,6 @@ import { fmtDateTime } from "@ham2k/util/format"
 import { CQWWEntities, CQZones } from "../../data/entities"
 import Scoresheet from "../../data/Scoresheet-2022.1.xls"
 
-console.log(Scoresheet)
 const MODE_TRANSLATION = {
   CW: "CW",
   SSB: "Phone",

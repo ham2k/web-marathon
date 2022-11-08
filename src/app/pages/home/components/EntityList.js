@@ -103,8 +103,8 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
           top: 0,
           left: 0,
           zIndex: -100,
-          height: "1",
-          width: "1",
+          height: 1,
+          width: 1,
           opacity: 0,
           overflow: "hidden",
         }}
