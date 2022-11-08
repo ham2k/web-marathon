@@ -69,8 +69,6 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
     entry = qsos && qsos[0]
   }
 
-  const QslIcon = (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) || QSL_ICONS.default
-
   const cols = []
   cols.push(
     <td key="prefix" className="col-prefix">
@@ -113,7 +111,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
     cols.push(
       <td key="qsl" className="col-qsl">
         {entry?.qsl?.sources?.length ? (
-          <Chip label={entry?.qsl?.sources[0].via} color="info" size="small" icon={<QslIcon />} />
+          <Chip label={entry?.qsl?.sources[0].via} color="info" size="small" icon={<QslIcon entry={entry} />} />
         ) : (
           <Chip label={"qso"} color="warning" size="small" icon={<Error />} />
         )}
@@ -210,10 +208,10 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                   )}
                 </td>
                 <td className="col-qsl">
-                  {bestQSLSource(qso) ? (
-                    <Chip label={bestQSLSource(qso)} color="info" size="small" icon={<CheckCircleRounded />} />
+                  {qso?.qsl?.sources?.length ? (
+                    <Chip label={qso.qsl.sources[0].via} color="info" size="small" icon={<QslIcon entry={qso} />} />
                   ) : (
-                    <Chip label={"???"} color="warning" size="small" icon={<Error />} />
+                    <Chip label={"qso"} color="warning" size="small" icon={<Error />} />
                   )}
                 </td>
                 <td>
@@ -226,6 +224,12 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
         : null}
     </>
   )
+}
+
+function QslIcon(params) {
+  const { entry } = params
+  const Icon = (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) || QSL_ICONS.default
+  return <Icon {...params} />
 }
 
 function bestQSLSource(entry) {
