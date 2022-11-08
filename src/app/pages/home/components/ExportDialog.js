@@ -99,9 +99,7 @@ export function ExportDialog({ onClose }) {
               <ol>
                 <li>Open the official score sheet in Excel</li>
                 <li>Click on cell D17 ("Day" for "SMO Malta")</li>
-                <li>Select "Paste Special" from the "Edit" menu</li>
-                <li>Select "Text" on the list of "As" options</li>
-                <li>Click "OK"</li>
+                <li>Select "Paste" from the "Edit" menu</li>
                 <li>Save the file</li>
               </ol>
               <p>You should now have an XLS score sheet ready to be submitted.</p>

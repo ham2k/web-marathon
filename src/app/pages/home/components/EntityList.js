@@ -9,6 +9,7 @@ import commonStyles from "../../../styles/common"
 import { CQWWEntities, CQZones } from "../../../../data/entities"
 import { EntityEntry } from "./EntityEntry"
 import { ExcelEntry } from "./ExcelEntry"
+import { Typography } from "@mui/material"
 
 const useStyles = makeStyles((theme) => ({
   ...commonStyles(theme),
@@ -129,10 +130,19 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
         </table>
       </div>
 
-      <h2>
-        {counts.entities.qsl + counts.entities.qso} Entities
-        {counts.entities.qso > 0 && <span>&nbsp;&nbsp;({counts.entities.qso} unconfirmed)</span>}
-      </h2>
+      <Typography component="div" variant="h5">
+        <b>{counts.entities.qsl + counts.entities.qso + counts.zones.qsl + counts.zones.qso} total points:&nbsp;</b>
+        <a href="#entities">{counts.entities.qsl + counts.entities.qso} Entities</a>&nbsp;+&nbsp;
+        <a href="#zones">{counts.zones.qsl + counts.zones.qso} Zones</a>
+      </Typography>
+
+      <Typography component="h2" variant="h5">
+        <a name="entities">
+          <b>{counts.entities.qsl + counts.entities.qso} Entities</b>
+          {counts.entities.qso > 0 && <span>&nbsp;&nbsp;({counts.entities.qso} unconfirmed)</span>}
+        </a>
+      </Typography>
+
       <table className={classNames(classes.niceTable, classes.table, classes.bandColors)}>
         <thead>
           <tr>
@@ -161,10 +171,12 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
         </tbody>
       </table>
 
-      <h2>
-        {counts.zones.qsl + counts.zones.qso} Entities
-        {counts.zones.qso > 0 && <span>&nbsp;&nbsp;({counts.zones.qso} unconfirmed)</span>}
-      </h2>
+      <Typography component="h2" variant="h5">
+        <a name="zones">
+          <b>{counts.zones.qsl + counts.zones.qso} Zones</b>
+          {counts.zones.qso > 0 && <span>&nbsp;&nbsp;({counts.zones.qso} unconfirmed)</span>}
+        </a>
+      </Typography>
       <table className={classNames(classes.niceTable, classes.table, classes.bandColors)}>
         <thead>
           <tr>
