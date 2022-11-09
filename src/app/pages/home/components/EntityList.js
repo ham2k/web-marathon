@@ -123,12 +123,6 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
         </table>
       </div>
 
-      <Typography component="div" variant="h5">
-        <b>{counts.entities.qsl + counts.entities.qso + counts.zones.qsl + counts.zones.qso} total points:&nbsp;</b>
-        <a href="#entities">{counts.entities.qsl + counts.entities.qso} Entities</a>&nbsp;+&nbsp;
-        <a href="#zones">{counts.zones.qsl + counts.zones.qso} Zones</a>
-      </Typography>
-
       <Typography component="h2" variant="h5">
         <a name="entities">
           <b>{counts.entities.qsl + counts.entities.qso} Entities</b>

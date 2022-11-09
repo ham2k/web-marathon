@@ -8,6 +8,7 @@ import {
   setCurrentLogInfo,
 } from "../../store/log"
 import { LogLoader } from "./components/LogLoader"
+import { PointsChart } from "./components/PointsChart"
 import { selectSettings } from "../../store/settings"
 import { EntityList } from "./components/EntityList"
 import { fmtNumber } from "@ham2k/util/format"
@@ -57,6 +58,8 @@ export function HomePage() {
               </Button>
             </span>
           </Typography>
+
+          <PointsChart qson={log} entityGroups={entityGroups} entrySelections={entrySelections} settings={settings} />
 
           <EntityList qson={log} entityGroups={entityGroups} entrySelections={entrySelections} />
         </>
