@@ -10,6 +10,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles"
 import { ContentRoutes } from "./routes"
 import ErrorBoundary from "./components/ErrorBoundary"
 import commonStyles from "./styles/common"
+import { GitHub, NoEncryption, Radio } from "@mui/icons-material"
 
 const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   const { href, ...other } = props
@@ -73,10 +74,6 @@ const styles = {
         fontWeight: "300 !important",
       },
     },
-    "& footer": {
-      zIndex: 1,
-      boxShadow: "0px 0px 10px 5px rgb(0 0 0 / 12%)",
-    },
   },
   toolbar: {
     justifyContent: "space-around",
@@ -91,6 +88,16 @@ const styles = {
     pr: { xs: 1, sm: 2 },
 
     textAlign: "center",
+    zIndex: 1,
+    boxShadow: "0px 0px 10px 5px rgb(0 0 0 / 12%)",
+    "& a, & a:link, & a:visited": {
+      color: "#0000AA",
+      textDecoration: "none",
+    },
+    "& a:hover, & a:active": {
+      color: "#0000CC",
+      textDecoration: "underline",
+    },
   },
   contentWrapper: {
     flex: 1,
@@ -122,7 +129,7 @@ export function App() {
               </Link>
             </Typography>
             <Typography component="div" color="inherit" noWrap sx={styles.version}>
-              &nbsp;&nbsp;ALPHA VERSION, NOT READY YET
+              &nbsp;&nbsp;ALPHA VERSION, FOR TESTING PURPOSES ONLY
             </Typography>
           </div>
         </Toolbar>
@@ -135,8 +142,15 @@ export function App() {
         </Container>
       </Box>
       <Box component="footer" sx={styles.footer}>
-        <b>Ham2K Marathon Tools</b> developed by <a href="https://www.qrz.com/db/KI2D">KI2D</a> Sebastian Delmont{" "}
+        <Radio fontSize="small" sx={{ verticalAlign: "baseline", position: "relative", top: "2px" }} /> Ham2k{" "}
+        <b>Marathon Tools</b>
+        &nbsp;&nbsp;•&nbsp;&nbsp; Developed by <a href="https://www.qrz.com/db/KI2D">KI2D</a> - Sebastian Delmont{" "}
         <a href="https://twitter.com/sd">@sd</a>
+        &nbsp;&nbsp;•&nbsp;&nbsp;
+        <GitHub fontSize="small" sx={{ verticalAlign: "baseline", position: "relative", top: "4px" }} />
+        &nbsp;
+        <a href="https://github.com/ham2k/ham2k">github.com/ham2k</a>
+        <div></div>
       </Box>
     </Box>
   )

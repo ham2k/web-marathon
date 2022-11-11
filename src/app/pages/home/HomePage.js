@@ -69,11 +69,17 @@ export function HomePage() {
             Welcome to Ham2K Marathon Tools for {settings?.year}
           </Typography>
 
-          <p>This tool can help you prepare your entry for DX Marathon by analyzing all your QSOs for the year.</p>
+          <p>
+            This tool can help you prepare your entry for <a href="https://www.dxmarathon.com/">DX Marathon</a> by
+            analyzing all your QSOs for the year. This is an unofficial tool, not endorsed in any way by the DX Marathon
+            Management Team or by CQ Magazine. It's meant to help you prepare your entry to the Marathon, but the final
+            result is your responsibility. We are not making any claims as to the accuracy of the results and cannot be
+            held liable for any impact they might have on your participation in the DX Marathon.
+          </p>
 
-          <p>This works best if you provide an ADIF file containing ALL of your QSOs with all possible fields.</p>
+          <p>This tool works best if you provide an ADIF file containing ALL of your QSOs with all possible fields.</p>
 
-          <p>Your files will be processed locally on your own browser, nothing will be uploaded anywhere.</p>
+          <p>Your files will be processed locally on your own browser. Nothing will be uploaded anywhere.</p>
 
           <Box sx={{ pt: 2 }}>
             <LogLoader title={"Load an ADIF file"} />{" "}
