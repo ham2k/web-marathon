@@ -32,56 +32,60 @@ export const logSlice = createSlice({
 export const { setCurrentLogInfo } = logSlice.actions
 
 export const loadADIFLog = (data) => (dispatch, getState) => {
-  const { settings } = getState()
-  const qson = adifToQSON(data)
+  return new Promise((resolve, reject) => {
+    const { settings } = getState()
 
-  const year = settings?.year || guessCurrentYear()
-  const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
-  const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
+    const qson = adifToQSON(data)
 
-  const yearQSOs = qson.qsos.filter((qso) => qso.startMillis <= yearEnd && qso.endMillis >= yearStart)
+    const year = settings?.year || guessCurrentYear()
+    const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
+    const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
-  const ourCalls = {}
-  yearQSOs.forEach((qso) => {
-    ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
+    const yearQSOs = qson.qsos.filter((qso) => qso.startMillis <= yearEnd && qso.endMillis >= yearStart)
+
+    const ourCalls = {}
+    yearQSOs.forEach((qso) => {
+      ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
+    })
+
+    yearQSOs.forEach((qso) => {
+      qso.our.guess = {}
+      qso.their.guess = {}
+
+      if (qso.our.call) {
+        parseCallsign(qso.our.call, qso.our.guess)
+        annotateFromCountryFile(qso.our.guess, { wae: true })
+      }
+
+      parseCallsign(qso.their.call, qso.their.guess)
+      if (qso.their.dxccCode) annotateFromCountryFile({ dxccCode: qso.their.dxccCode }, { wae: true })
+      annotateFromCountryFile(qso.their.guess, { wae: true })
+
+      qso.key = qsoKey(qso)
+    })
+
+    const entityGroups = {}
+    yearQSOs.forEach((qso) => {
+      qso = processOneQSO(qso)
+
+      const prefix = qso.their.entityPrefix || qso.their.guess.entityPrefix
+      const zone = qso.their.cqZone || qso.their.guess.cqZone
+
+      entityGroups[prefix] = entityGroups[prefix] || []
+      entityGroups[prefix].push(qso)
+
+      entityGroups[`Zone ${zone}`] = entityGroups[`Zone ${zone}`] || []
+      entityGroups[`Zone ${zone}`].push(qso)
+    })
+
+    Object.keys(entityGroups).forEach((key) => {
+      entityGroups[key] = entityGroups[key].sort(qsoComparer)
+    })
+
+    dispatch(setCurrentLogInfo({ qson, ourCalls, yearQSOs, entityGroups }))
+    dispatch(setSettingsYear({ year }))
+    resolve()
   })
-
-  yearQSOs.forEach((qso) => {
-    qso.our.guess = {}
-    qso.their.guess = {}
-
-    if (qso.our.call) {
-      parseCallsign(qso.our.call, qso.our.guess)
-      annotateFromCountryFile(qso.our.guess, { wae: true })
-    }
-
-    parseCallsign(qso.their.call, qso.their.guess)
-    if (qso.their.dxccCode) annotateFromCountryFile({ dxccCode: qso.their.dxccCode }, { wae: true })
-    annotateFromCountryFile(qso.their.guess, { wae: true })
-
-    qso.key = qsoKey(qso)
-  })
-
-  const entityGroups = {}
-  yearQSOs.forEach((qso) => {
-    qso = processOneQSO(qso)
-
-    const prefix = qso.their.entityPrefix || qso.their.guess.entityPrefix
-    const zone = qso.their.cqZone || qso.their.guess.cqZone
-
-    entityGroups[prefix] = entityGroups[prefix] || []
-    entityGroups[prefix].push(qso)
-
-    entityGroups[`Zone ${zone}`] = entityGroups[`Zone ${zone}`] || []
-    entityGroups[`Zone ${zone}`].push(qso)
-  })
-
-  Object.keys(entityGroups).forEach((key) => {
-    entityGroups[key] = entityGroups[key].sort(qsoComparer)
-  })
-
-  dispatch(setCurrentLogInfo({ qson, ourCalls, yearQSOs, entityGroups }))
-  dispatch(setSettingsYear({ year }))
 }
 
 function processOneQSO(qso) {
@@ -90,6 +94,7 @@ function processOneQSO(qso) {
 
   return qso
 }
+
 export const selectCurrentLog = (state) => {
   return state?.log?.qson
 }

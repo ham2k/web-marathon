@@ -71,11 +71,13 @@ export function HomePage() {
 
           <p>This tool can help you prepare your entry for DX Marathon by analyzing all your QSOs for the year.</p>
 
+          <p>This works best if you provide an ADIF file containing ALL of your QSOs with all possible fields.</p>
+
           <p>Your files will be processed locally on your own browser, nothing will be uploaded anywhere.</p>
 
-          <p>
-            <LogLoader title={"Load an ADIF file"} />
-          </p>
+          <Box sx={{ pt: 2 }}>
+            <LogLoader title={"Load an ADIF file"} />{" "}
+          </Box>
         </>
       )}
 

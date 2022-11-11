@@ -5,6 +5,7 @@ import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import { ContentCopy, FileDownload } from "@mui/icons-material"
 import generateExcel from "../../../tools/generateExcel"
 import { selectEntrySelections } from "../../../store/entries"
+import { Box } from "@mui/system"
 
 export function ExportDialog({ onClose }) {
   const qsos = useSelector(selectYearQSOs)
@@ -52,21 +53,24 @@ export function ExportDialog({ onClose }) {
       {!exportReady && (
         <>
           <DialogContent>
-            <DialogContentText>
+            <DialogContentText sx={{ textAlign: "center" }}>
               <p>You have two ways of preparing your score sheet:</p>
-
-              <p>Download a generated XLS file</p>
-              <p>
-                <Button onClick={handleDownload}>
-                  <FileDownload /> Download
-                </Button>
-              </p>
-
-              <p>Or copy the entries manually into Excel.</p>
+              <Box sx={{ pt: 3 }}>Copy the entries manually into Excel:</Box>
               <p>
                 <Button onClick={handlePaste}>
                   <ContentCopy /> Copy
                 </Button>
+              </p>
+              <Box sx={{ pt: 3 }}>Or Download a generated XLS file:</Box>
+              <p>
+                <Button onClick={handleDownload}>
+                  <FileDownload /> Download
+                </Button>{" "}
+              </p>
+              <p>
+                This method does not work correctly right now!!!
+                <br />
+                Use only for testing.
               </p>
             </DialogContentText>
           </DialogContent>
@@ -80,9 +84,15 @@ export function ExportDialog({ onClose }) {
           <DialogContent>
             <DialogContentText>
               <p>Your XLS score sheet has been generated and is being downloaded on your browser</p>
-              <p>
+              <p style={{ textDecoration: "line-through" }}>
                 Please note that while this file is a simplified version of the official score sheet, it is believed to
                 work just fine with the DX Marathon submission and scoring process
+              </p>
+              <p>
+                <b>
+                  Be warned that the file you downloaded will not work for direct submission. This feature is here so
+                  that we can continue testing it while we work on it!
+                </b>
               </p>
             </DialogContentText>
           </DialogContent>
