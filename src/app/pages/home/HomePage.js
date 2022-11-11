@@ -51,7 +51,13 @@ export function HomePage() {
                 <FileDownload /> Export
               </Button>
             </span>
-            <i>{fmtNumber(qsos.length)} QSOs for</i> {Object.keys(ourCalls).join(", ")} <i>in</i> {settings?.year}
+            <i>{fmtNumber(qsos.length)} QSOs</i>
+            {ourCalls?.length > 0 && (
+              <>
+                <i> for</i> {Object.keys(ourCalls).join(", ")}
+              </>
+            )}
+            <i> in</i> {settings?.year}
             <span>
               <Button onClick={handleClearLog}>
                 <Clear /> Reset
