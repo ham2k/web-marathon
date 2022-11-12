@@ -12,6 +12,7 @@ import {
   Key,
   Language,
   LocalPostOffice,
+  MoveToInbox,
   PushPin,
   PushPinOutlined,
 } from "@mui/icons-material"
@@ -42,6 +43,7 @@ const DATE_FORMAT = {
 const QSL_ICONS = {
   lotw: Key,
   qrz: Language,
+  eqsl: MoveToInbox,
   card: LocalPostOffice,
   default: CheckCircleRounded,
 }

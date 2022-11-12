@@ -2,6 +2,7 @@ const SOURCE_WEIGHTS = {
   lotw: 0,
   qsl: 1,
   qrz: 2,
+  eqsl: 3,
   default: 10,
 }
 export default function qslSourceComparer(a, b) {
