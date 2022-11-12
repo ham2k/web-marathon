@@ -23,7 +23,7 @@ export function LogLoader({ title, classes }) {
         reader.onload = () => {
           dispatch(loadADIFLog(reader.result)).then(() => setLoading(false))
         }
-        reader.readAsText(file)
+        reader.readAsText(file, "ISO-8859-1")
         event.target.value = null
       }, 500)
     }
