@@ -68,9 +68,11 @@ export function ExportDialog({ onClose }) {
                 </Button>{" "}
               </p>
               <p>
-                This method does not work correctly right now!!!
-                <br />
-                Use only for testing.
+                <b>
+                  This "download" method does not work correctly right now!!!
+                  <br />
+                  Use only for testing.
+                </b>
               </p>
             </DialogContentText>
           </DialogContent>
@@ -107,10 +109,18 @@ export function ExportDialog({ onClose }) {
             <DialogContentText>
               <p>Your entries have been copied to the clipboard. Now perform the following steps:</p>
               <ol>
-                <li>Open the official score sheet in Excel</li>
+                <li>
+                  Download the{" "}
+                  <a href="https://www.dxmarathon.com/Submission/2022/Submission2022.htm">
+                    official score sheet from dxmarathon.com
+                  </a>
+                </li>
+                <li>
+                  Open the official score sheet in Excel or <a href="https://www.openoffice.org/">OpenOffice</a>
+                </li>
                 <li>Click on cell D17 ("Day" for "SMO Malta")</li>
                 <li>Select "Paste" from the "Edit" menu</li>
-                <li>Save the file</li>
+                <li>Save the file, preserving the original file format options.</li>
               </ol>
               <p>You should now have an XLS score sheet ready to be submitted.</p>
             </DialogContentText>
