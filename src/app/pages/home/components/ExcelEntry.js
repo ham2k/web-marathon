@@ -30,7 +30,7 @@ export function ExcelEntry({ qsos, entryKey }) {
             minute: "2-digit",
             hour12: false,
             timeZone: "UTC",
-          })}
+          }).replace(":", "")}
         </td>
         <td>{entry.band.replace("m", "")}</td>
         <td>{MODE_TRANSLATION[entry.mode] || MODE_TRANSLATION.default}</td>

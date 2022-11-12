@@ -31,7 +31,7 @@ function generateExcel({ entityGroups, entrySelections, entrant }) {
               minute: "2-digit",
               hour12: false,
               timeZone: "UTC",
-            }),
+            }).replace(":", ""),
             entry.band.replace("m", ""),
             MODE_TRANSLATION[entry.mode] || MODE_TRANSLATION.default,
             entry.their.call,
@@ -89,7 +89,7 @@ function generateExcel({ entityGroups, entrySelections, entrant }) {
     origin: "I4",
   })
 
-  XLSX.writeFile(workbook, "DX Marathon.xls", { bookType: "biff8" })
+  XLSX.writeFile(workbook, `${entrant.call} DX Marathon.xls`, { bookType: "biff8" })
 }
 
 export default generateExcel
