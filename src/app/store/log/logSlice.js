@@ -45,7 +45,9 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
 
     const ourCalls = {}
     yearQSOs.forEach((qso) => {
-      ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
+      if (qso.our.call) {
+        ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
+      }
     })
 
     yearQSOs.forEach((qso) => {

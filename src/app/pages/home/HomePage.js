@@ -52,7 +52,7 @@ export function HomePage() {
               </Button>
             </span>
             <i>{fmtNumber(qsos.length)} QSOs</i>
-            {ourCalls?.length > 0 && (
+            {Object.keys(ourCalls).length > 0 && (
               <>
                 <i> for</i> {Object.keys(ourCalls).join(", ")}
               </>
