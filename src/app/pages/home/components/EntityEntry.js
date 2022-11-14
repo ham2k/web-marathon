@@ -233,11 +233,3 @@ function QslIcon(params) {
   const Icon = (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) || QSL_ICONS.default
   return <Icon {...params} />
 }
-
-function bestQSLSource(entry) {
-  const sources = (entry.qsl?.sources || []).map((s) => s.via)
-
-  if (sources.indexOf("lotw") >= 0) return "lotw"
-  else if (sources.indexOf("qrz") >= 0) return "qrz"
-  else return sources[0]
-}

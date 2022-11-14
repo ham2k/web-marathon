@@ -3,29 +3,24 @@ import React, { forwardRef } from "react"
 
 import { Link as RouterLink } from "react-router-dom"
 
-import { AppBar, Box, Container, CssBaseline, Link, responsiveFontSizes, Toolbar, Typography } from "@mui/material"
+import { Box, Container, CssBaseline, responsiveFontSizes } from "@mui/material"
 
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 
 import { ContentRoutes } from "./routes"
 import ErrorBoundary from "./components/ErrorBoundary"
 import commonStyles from "./styles/common"
-import { GitHub, NoEncryption, Radio } from "@mui/icons-material"
+import { VersionChecker } from "./components/VersionChecker"
+import { Footer } from "./components/Footer"
+import { Header } from "./components/Header"
 
-window.currentVersion = process.env.NX_COMMIT
-window.currentEnvironment = process.env.NODE_ENV
-window.currentURL = process.env.NX_URL
-console.log(window.currentVersion)
-console.log(window.currentEnvironment)
-console.log(window.currentURL)
-console.log(window.ENV)
-// window.currentVersion = window?.ENV?.COMMIT
-// window.currentEnvironment = window?.ENV?.NODE_ENV
-// window.currentURL = window?.ENV?.URL
+window.currentCommit = window?.ENV?.COMMIT
+window.currentEnv = window?.ENV?.NODE_ENV
+window.currentURL = window?.ENV?.URL
 
-// if (window.currentVersion === "%COMMIT%") window.currentVersion = ""
-// if (window.currentEnvironment === "%NODE_ENV%") window.currentEnvironment = "unknown"
-// if (window.currentURL === "%URL%") window.currentURL = ""
+if (window.currentCommit === "%COMMIT%") window.currentCommit = ""
+if (window.currentEnv === "%NODE_ENV%") window.currentEnv = "unknown"
+if (window.currentURL === "%URL%") window.currentURL = ""
 
 const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   const { href, ...other } = props
@@ -135,20 +130,10 @@ const styles = {
 export function App() {
   return (
     <Box sx={styles.root}>
-      <AppBar position="static" role="banner">
-        <Toolbar sx={styles.toolbar}>
-          <div>
-            <Typography component="h1" variant="h4" color="inherit" noWrap sx={styles.titleMain}>
-              <Link href="/" underline="hover" color="inherit" noWrap>
-                <i>Ham2K</i> Marathon Tools
-              </Link>
-            </Typography>
-            <Typography component="div" color="inherit" noWrap sx={styles.version}>
-              &nbsp;&nbsp;ALPHA VERSION, FOR TESTING PURPOSES ONLY
-            </Typography>
-          </div>
-        </Toolbar>
-      </AppBar>
+      <Header styles={styles} />
+
+      <VersionChecker />
+
       <Box sx={styles.contentWrapper}>
         <Container sx={styles.content}>
           <ErrorBoundary>
@@ -156,17 +141,8 @@ export function App() {
           </ErrorBoundary>
         </Container>
       </Box>
-      <Box component="footer" sx={styles.footer}>
-        <Radio fontSize="small" sx={{ verticalAlign: "baseline", position: "relative", top: "2px" }} /> Ham2k{" "}
-        <b>Marathon Tools</b>
-        &nbsp;&nbsp;•&nbsp;&nbsp; Developed by <a href="https://www.qrz.com/db/KI2D">KI2D</a> - Sebastian Delmont{" "}
-        <a href="https://twitter.com/sd">@sd</a>
-        &nbsp;&nbsp;•&nbsp;&nbsp;
-        <GitHub fontSize="small" sx={{ verticalAlign: "baseline", position: "relative", top: "4px" }} />
-        &nbsp;
-        <a href="https://github.com/ham2k/ham2k">github.com/ham2k</a>
-        <div></div>
-      </Box>
+
+      <Footer styles={styles} />
     </Box>
   )
 }

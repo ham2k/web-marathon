@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useSelector } from "react-redux"
 import { selectEntityGroups, selectYearQSOs } from "../../../store/log"
-import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material"
+import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
 import { ContentCopy, FileDownload } from "@mui/icons-material"
 import generateExcel from "../../../tools/generateExcel"
 import { selectEntrySelections } from "../../../store/entries"
