@@ -60,7 +60,8 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
       }
 
       parseCallsign(qso.their.call, qso.their.guess)
-      annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state })
+      const iotaRef = qso.refs && qso.refs.find((ref) => ref.type === "iota")
+      annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state, iota: iotaRef?.ref })
 
       qso.key = qsoKey(qso)
     })
