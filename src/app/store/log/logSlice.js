@@ -56,11 +56,11 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
 
       if (qso.our.call) {
         parseCallsign(qso.our.call, qso.our.guess)
-        annotateFromCountryFile(qso.our.guess, { wae: true })
+        annotateFromCountryFile(qso.our.guess, { wae: true, state: qso.our.state })
       }
 
       parseCallsign(qso.their.call, qso.their.guess)
-      annotateFromCountryFile(qso.their.guess, { wae: true })
+      annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state })
 
       qso.key = qsoKey(qso)
     })

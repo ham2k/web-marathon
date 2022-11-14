@@ -103,10 +103,16 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
       <td key="call" className="col-call">
         {entry.their.call}&nbsp;
         {entry.their.entityPrefix && entry.their.entityPrefix !== entry.their.guess.entityPrefix && (
-          <Chip label={`${entry.their.guess.entityName}`} color="error" size="small" icon={<Error />} />
+          <Chip label={`${entry.their.guess.entityName}?`} sx={{ ml: 2 }} color="error" size="small" icon={<Error />} />
         )}
         {entry.their.cqZone && entry.their.cqZone !== entry.their.guess.cqZone && (
-          <Chip label={`Zone ${entry.their.guess.cqZone}`} color="error" size="small" icon={<Error />} />
+          <Chip
+            label={`Zone ${entry.their.guess.cqZone}?`}
+            sx={{ ml: 2 }}
+            color="error"
+            size="small"
+            icon={<Error />}
+          />
         )}
       </td>
     )
@@ -189,10 +195,11 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                 <td className={classNames("col-band", "band-color")}>{qso.band}</td>
                 <td className="col-mode">{qso.mode}</td>
                 <td className="col-call">
-                  {qso.their.call}&nbsp;
+                  {qso.their.call}
                   {qso.their.entityPrefix && qso.their.entityPrefix !== qso.their.guess.entityPrefix && (
                     <Chip
-                      label={`${qso.their.guess.entityName}`}
+                      label={`${qso.their.guess.entityName}?`}
+                      sx={{ ml: 2 }}
                       color="error"
                       size="small"
                       icon={<Error />}
@@ -201,7 +208,8 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                   )}
                   {qso.their.cqZone && qso.their.cqZone !== qso.their.guess.cqZone && (
                     <Chip
-                      label={`Zone ${qso.their.guess.cqZone}`}
+                      label={`Zone ${qso.their.guess.cqZone}?`}
+                      sx={{ ml: 2 }}
                       color="error"
                       size="small"
                       icon={<Error />}
