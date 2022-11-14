@@ -3,7 +3,7 @@ import { Box } from "@mui/system"
 import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 
-const CHECK_PERIODICITY_IN_MILLIS = 30 * 1000 //  4 * 60 * 60 * 1000 // 4 hours
+const CHECK_PERIODICITY_IN_MILLIS = 4 * 60 * 60 * 1000 // 4 hours
 
 export function VersionChecker() {
   const [serverCommit, setServerCommit] = useState(false)
