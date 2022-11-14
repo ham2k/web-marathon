@@ -12,6 +12,21 @@ import ErrorBoundary from "./components/ErrorBoundary"
 import commonStyles from "./styles/common"
 import { GitHub, NoEncryption, Radio } from "@mui/icons-material"
 
+window.currentVersion = process.env.NX_COMMIT
+window.currentEnvironment = process.env.NODE_ENV
+window.currentURL = process.env.NX_URL
+console.log(window.currentVersion)
+console.log(window.currentEnvironment)
+console.log(window.currentURL)
+console.log(window.ENV)
+// window.currentVersion = window?.ENV?.COMMIT
+// window.currentEnvironment = window?.ENV?.NODE_ENV
+// window.currentURL = window?.ENV?.URL
+
+// if (window.currentVersion === "%COMMIT%") window.currentVersion = ""
+// if (window.currentEnvironment === "%NODE_ENV%") window.currentEnvironment = "unknown"
+// if (window.currentURL === "%URL%") window.currentURL = ""
+
 const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   const { href, ...other } = props
   // Map href (MUI) -> to (react-router)

@@ -9,6 +9,13 @@
     <link rel="icon" type="image/x-icon" href="assets/radio-blue-64.png" />
     <link rel="manifest" href="assets/manifest.json" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <script>
+      window.ENV = {
+        NODE_ENV: "%NODE_ENV%",
+        URL: "%NX_URL%",
+        COMMIT: "%NX_COMMIT%",
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
