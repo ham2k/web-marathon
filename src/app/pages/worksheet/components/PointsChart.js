@@ -5,6 +5,7 @@ import { EntitiesAndZones } from "../../../../data/entities"
 
 import { Typography } from "@mui/material"
 import { dateFormatterGenerator } from "@ham2k/util/format"
+import guessCurrentYear from "../../../tools/guessCurrentYear"
 
 const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000
 
@@ -35,21 +36,27 @@ export function PointsChart({ qson, entityGroups, entrySelections, settings }) {
   const bins = []
   let weekStart = yearStart
   let weekEnd
+
+  // We need to define these functions out here, instead of inline, to avoid scope problems
+  // See https://eslint.org/docs/latest/rules/no-loop-func
+  const entityPusher = (bin) => (entry) => {
+    if (entry.startMillis <= weekEnd && entry.endMillis >= weekStart) {
+      bin.entities.push(entry)
+    }
+  }
+  const zonePusher = (bin) => (entry) => {
+    if (entry.startMillis <= weekEnd && entry.endMillis >= weekStart) {
+      bin.zones.push(entry)
+    }
+  }
+
   // debugger
   while (weekStart <= yearEnd) {
     weekEnd = weekStart + ONE_WEEK_IN_MILLIS
 
     const bin = { entities: [], zones: [], startMillis: weekStart, endMillis: weekEnd }
-    entityEntries.forEach((entry) => {
-      if (entry.startMillis <= weekEnd && entry.endMillis >= weekStart) {
-        bin.entities.push(entry)
-      }
-    })
-    zoneEntries.forEach((entry) => {
-      if (entry.startMillis <= weekEnd && entry.endMillis >= weekStart) {
-        bin.zones.push(entry)
-      }
-    })
+    entityEntries.forEach(entityPusher(bin))
+    zoneEntries.forEach(zonePusher(bin))
     bins.push(bin)
     weekStart = weekEnd
   }

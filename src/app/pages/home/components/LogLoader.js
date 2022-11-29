@@ -6,9 +6,11 @@ import { Box } from "@mui/system"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
 
 import { loadADIFLog, setCurrentLogInfo } from "../../../store/log"
+import { useNavigate } from "react-router-dom"
 
 export function LogLoader({ title, classes }) {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
   const handleFileSelected = (event) => {
@@ -21,7 +23,10 @@ export function LogLoader({ title, classes }) {
         const file = event.target.files[0]
         const reader = new FileReader()
         reader.onload = () => {
-          dispatch(loadADIFLog(reader.result)).then(() => setLoading(false))
+          dispatch(loadADIFLog(reader.result)).then(() => {
+            setLoading(false)
+            navigate(`/worksheet`)
+          })
         }
         reader.readAsText(file, "ISO-8859-1")
         event.target.value = null

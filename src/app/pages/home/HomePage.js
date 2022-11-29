@@ -1,21 +1,8 @@
 import * as React from "react"
-import { useDispatch, useSelector } from "react-redux"
-import {
-  selectCurrentLog,
-  selectEntityGroups,
-  selectOurCalls,
-  selectYearQSOs,
-  setCurrentLogInfo,
-} from "../../store/log"
+import { useSelector } from "react-redux"
 import { LogLoader } from "./components/LogLoader"
-import { PointsChart } from "./components/PointsChart"
 import { selectSettings } from "../../store/settings"
-import { EntityList } from "./components/EntityList"
-import { fmtNumber } from "@ham2k/util/format"
-import { Box, Button, Dialog, Typography } from "@mui/material"
-import { Clear, FileDownload } from "@mui/icons-material"
-import { selectEntrySelections } from "../../store/entries"
-import { ExportDialog } from "./components/ExportDialog"
+import { Box, Typography } from "@mui/material"
 
 const styles = {
   root: {
@@ -27,75 +14,29 @@ const styles = {
 }
 
 export function HomePage() {
-  const dispatch = useDispatch()
   const settings = useSelector(selectSettings)
-  const log = useSelector(selectCurrentLog)
-  const qsos = useSelector(selectYearQSOs)
-  const entityGroups = useSelector(selectEntityGroups)
-  const entrySelections = useSelector(selectEntrySelections)
-  const ourCalls = useSelector(selectOurCalls)
-
-  const [exportDialogOpen, setExportDialogOpen] = React.useState(false)
-
-  const handleClearLog = (event) => {
-    dispatch(setCurrentLogInfo({}))
-  }
 
   return (
     <Box sx={styles.root}>
-      {log && log.qsos.length > 0 ? (
-        <>
-          <Typography component="h1" variant="h3">
-            <span style={{ float: "right" }}>
-              <Button onClick={() => setExportDialogOpen(true)}>
-                <FileDownload /> Export
-              </Button>
-            </span>
-            <i>{fmtNumber(qsos.length)} QSOs</i>
-            {Object.keys(ourCalls).length > 0 && (
-              <>
-                <i> for</i> {Object.keys(ourCalls).join(", ")}
-              </>
-            )}
-            <i> in</i> {settings?.year}
-            <span>
-              <Button onClick={handleClearLog}>
-                <Clear /> Reset
-              </Button>
-            </span>
-          </Typography>
+      <Typography component="h1" variant="h3">
+        Welcome to Ham2K Marathon Tools for {settings?.year}
+      </Typography>
 
-          <PointsChart qson={log} entityGroups={entityGroups} entrySelections={entrySelections} settings={settings} />
+      <p>
+        This tool can help you prepare your entry for <a href="https://www.dxmarathon.com/">DX Marathon</a> by analyzing
+        all your QSOs for the year. This is an unofficial tool, not endorsed in any way by the DX Marathon Management
+        Team or by CQ Magazine. It's meant to help you prepare your entry to the Marathon, but the final result is your
+        responsibility. We are not making any claims as to the accuracy of the results and cannot be held liable for any
+        impact they might have on your participation in the DX Marathon.
+      </p>
 
-          <EntityList qson={log} entityGroups={entityGroups} entrySelections={entrySelections} />
-        </>
-      ) : (
-        <>
-          <Typography component="h1" variant="h3">
-            Welcome to Ham2K Marathon Tools for {settings?.year}
-          </Typography>
+      <p>This tool works best if you provide an ADIF file containing ALL of your QSOs with all possible fields.</p>
 
-          <p>
-            This tool can help you prepare your entry for <a href="https://www.dxmarathon.com/">DX Marathon</a> by
-            analyzing all your QSOs for the year. This is an unofficial tool, not endorsed in any way by the DX Marathon
-            Management Team or by CQ Magazine. It's meant to help you prepare your entry to the Marathon, but the final
-            result is your responsibility. We are not making any claims as to the accuracy of the results and cannot be
-            held liable for any impact they might have on your participation in the DX Marathon.
-          </p>
+      <p>Your files will be processed locally on your own browser. Nothing will be uploaded anywhere.</p>
 
-          <p>This tool works best if you provide an ADIF file containing ALL of your QSOs with all possible fields.</p>
-
-          <p>Your files will be processed locally on your own browser. Nothing will be uploaded anywhere.</p>
-
-          <Box sx={{ pt: 2 }}>
-            <LogLoader title={"Load an ADIF file"} />{" "}
-          </Box>
-        </>
-      )}
-
-      <Dialog open={exportDialogOpen} onClose={() => setExportDialogOpen(false)}>
-        <ExportDialog onClose={() => setExportDialogOpen(false)} />
-      </Dialog>
+      <Box sx={{ pt: 2 }}>
+        <LogLoader title={"Load an ADIF file"} />{" "}
+      </Box>
     </Box>
   )
 }
