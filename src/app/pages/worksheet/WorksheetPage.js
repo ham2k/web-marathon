@@ -1,6 +1,8 @@
-import * as React from "react"
+import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
+  clearCurrentLog,
+  fetchCurrentLog,
   selectCurrentLog,
   selectEntityGroups,
   selectOurCalls,
@@ -38,8 +40,12 @@ export function WorksheetPage() {
 
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false)
 
+  useEffect(() => {
+    dispatch(fetchCurrentLog())
+  })
+
   const handleClearLog = (event) => {
-    dispatch(setCurrentLogInfo({}))
+    dispatch(clearCurrentLog({}))
     navigate(`/`)
   }
 

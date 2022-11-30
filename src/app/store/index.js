@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage: localforage,
-  whitelist: ["settings", "log", "entries"],
+  whitelist: ["settings", "entries"], // Do not persist "log", as it is too large
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

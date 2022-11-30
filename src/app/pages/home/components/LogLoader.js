@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { Button, CircularProgress } from "@mui/material"
 import { Box } from "@mui/system"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
 
-import { loadADIFLog, setCurrentLogInfo } from "../../../store/log"
+import { loadADIFLog, clearCurrentLog } from "../../../store/log"
 import { useNavigate } from "react-router-dom"
 
 export function LogLoader({ title, classes }) {
@@ -35,7 +35,7 @@ export function LogLoader({ title, classes }) {
   }
 
   const handleClearLog = (event) => {
-    dispatch(setCurrentLogInfo({}))
+    dispatch(clearCurrentLog())
   }
 
   if (loading) {
