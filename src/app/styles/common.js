@@ -1,6 +1,10 @@
 import { BAND_DARK_COLORS } from "./bandColors"
 
 const commonStyles = {
+  "& .callsign": {
+    fontFamily: "Monaco, Consolas, 'Courier New', monospace",
+    fontSize: "0.93em",
+  },
   "& .nice-table": {
     borderCollapse: "collapse",
     "& th": {

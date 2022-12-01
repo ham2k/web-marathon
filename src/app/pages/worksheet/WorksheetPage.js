@@ -48,6 +48,10 @@ export function WorksheetPage() {
     navigate(`/`)
   }
 
+  if (!log) {
+    return undefined
+  }
+
   return (
     <Box sx={styles.root}>
       <Typography component="h1" variant="h3">

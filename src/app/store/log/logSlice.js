@@ -1,5 +1,5 @@
 import { parseCallsign } from "@ham2k/data/callsigns"
-import { annotateFromCountryFile } from "@ham2k/data/country-file"
+import { annotateFromCountryFile, fillDXCCfromCountryFile } from "@ham2k/data/country-file"
 import { useBuiltinCountryFile } from "@ham2k/data/country-file/builtinData"
 import { adifToQSON } from "@ham2k/qson/adif"
 import { qsoKey } from "@ham2k/qson/tools"
@@ -9,7 +9,6 @@ import qslSourceComparer from "../../tools/qslSourceComparer"
 import guessCurrentYear from "../../tools/guessCurrentYear"
 import { setSettingsYear } from "../settings"
 import { logDB } from "./logDB"
-import { fillDXCCfromCountryFile } from "libs/data/country-file/src/lib/analyzeFromCountryFile"
 
 // Not sure why ESLint thinks this is a hook 🤷
 useBuiltinCountryFile() // eslint-disable-line react-hooks/rules-of-hooks
@@ -46,6 +45,28 @@ function processOneQSO(qso) {
   if (qso.their.dxccCode) fillDXCCfromCountryFile(qso.their.dxccCode, qso.their) // fill any missing dxcc info
   annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state, iota: iotaRef?.ref }) // guess dxcc from callsign
 
+  if (
+    qso.their.entityPrefix &&
+    qso.their.guess.entityPrefix &&
+    qso.their.entityPrefix !== qso.their.guess.entityPrefix
+  ) {
+    qso.notes = qso.notes || []
+    const note = {
+      about: "entityPrefix",
+      note: `Log says ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`,
+    }
+    qso.notes.push(note)
+  }
+
+  if (qso.their.cqZone && qso.their.guess.cqZone && qso.their.cqZone !== qso.their.guess.cqZone) {
+    qso.notes = qso.notes || []
+    const note = {
+      about: "cqZone",
+      note: `Log says Zone ${qso.their.cqZone}.\nWe believe it should be Zone ${qso.their.guess.cqZone}.`,
+    }
+    qso.notes.push(note)
+  }
+
   qso.key = qsoKey(qso)
 
   // Sort QSL info by trust level
@@ -77,14 +98,23 @@ export const loadADIFLog = (data) => (dispatch, getState) => {
           ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
         }
 
-        const prefix = qso.their.entityPrefix || qso.their.guess.entityPrefix
-        const zone = qso.their.cqZone || qso.their.guess.cqZone
+        if (qso.their.entityPrefix) {
+          entityGroups[qso.their.entityPrefix] = entityGroups[qso.their.entityPrefix] || []
+          entityGroups[qso.their.entityPrefix].push(qso)
+        }
+        if (qso.their.guess.entityPrefix && qso.their.guess.entityPrefix !== qso.their.entityPrefix) {
+          entityGroups[qso.their.guess.entityPrefix] = entityGroups[qso.their.guess.entityPrefix] || []
+          entityGroups[qso.their.guess.entityPrefix].push(qso)
+        }
 
-        entityGroups[prefix] = entityGroups[prefix] || []
-        entityGroups[prefix].push(qso)
-
-        entityGroups[`Zone ${zone}`] = entityGroups[`Zone ${zone}`] || []
-        entityGroups[`Zone ${zone}`].push(qso)
+        if (qso.their.cqZone) {
+          entityGroups[`Zone ${qso.their.cqZone}`] = entityGroups[`Zone ${qso.their.cqZone}`] || []
+          entityGroups[`Zone ${qso.their.cqZone}`].push(qso)
+        }
+        if (qso.their.guess.cqZone && qso.their.guess.cqZone !== qso.their.cqZone) {
+          entityGroups[`Zone ${qso.their.guess.cqZone}`] = entityGroups[`Zone ${qso.their.guess.cqZone}`] || []
+          entityGroups[`Zone ${qso.their.guess.cqZone}`].push(qso)
+        }
       })
 
       Object.keys(entityGroups).forEach((key) => {

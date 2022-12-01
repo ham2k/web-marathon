@@ -4,10 +4,11 @@ import classNames from "classnames"
 
 import { fmtInteger } from "@ham2k/util/format"
 import { fmtDateTime } from "@ham2k/util/format"
-import { Button, Chip } from "@mui/material"
+import { Button, Chip, Tooltip } from "@mui/material"
 import {
   CheckCircleRounded,
   Error,
+  ErrorOutline,
   HearingDisabled,
   Key,
   Language,
@@ -73,7 +74,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
 
   const cols = []
   cols.push(
-    <td key="prefix" className="col-prefix">
+    <td key="prefix" className="col-prefix callsign">
       {prefix}
     </td>
   )
@@ -101,18 +102,27 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
     )
     cols.push(
       <td key="call" className="col-call">
-        {entry.their.call}&nbsp;
-        {entry.their.entityPrefix && entry.their.entityPrefix !== entry.their.guess.entityPrefix && (
-          <Chip label={`${entry.their.guess.entityName}?`} sx={{ ml: 2 }} color="error" size="small" icon={<Error />} />
-        )}
-        {entry.their.cqZone && entry.their.cqZone !== entry.their.guess.cqZone && (
-          <Chip
-            label={`Zone ${entry.their.guess.cqZone}?`}
-            sx={{ ml: 2 }}
-            color="error"
-            size="small"
-            icon={<Error />}
-          />
+        <span class="callsign" style={{ verticalAlign: "middle", display: "inline-block" }}>
+          {entry.their.call}&nbsp;
+        </span>
+        {entry.notes && (
+          <Tooltip
+            arrow
+            title={
+              <>
+                {entry.notes.map((n) => (
+                  <p>{n.note}</p>
+                ))}
+              </>
+            }
+          >
+            <Error
+              fontSize="small"
+              sx={{ verticalAlign: "middle", display: "inline-block" }}
+              color="error"
+              size="small"
+            />
+          </Tooltip>
         )}
       </td>
     )
@@ -195,26 +205,27 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                 <td className={classNames("col-band", "band-color")}>{qso.band}</td>
                 <td className="col-mode">{qso.mode}</td>
                 <td className="col-call">
-                  {qso.their.call}
-                  {qso.their.entityPrefix && qso.their.entityPrefix !== qso.their.guess.entityPrefix && (
-                    <Chip
-                      label={`${qso.their.guess.entityName}?`}
-                      sx={{ ml: 2 }}
-                      color="error"
-                      size="small"
-                      icon={<Error />}
-                      title={`QSO claims ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`}
-                    />
-                  )}
-                  {qso.their.cqZone && qso.their.cqZone !== qso.their.guess.cqZone && (
-                    <Chip
-                      label={`Zone ${qso.their.guess.cqZone}?`}
-                      sx={{ ml: 2 }}
-                      color="error"
-                      size="small"
-                      icon={<Error />}
-                      title={`QSO claims Zone ${qso.their.cqZone}.\nWe believe it should be Zone ${qso.their.guess.cqZone}.`}
-                    />
+                  <span class="callsign" style={{ verticalAlign: "middle", display: "inline-block" }}>
+                    {qso.their.call}&nbsp;
+                  </span>
+                  {qso.notes && (
+                    <Tooltip
+                      arrow
+                      title={
+                        <>
+                          {qso.notes.map((n) => (
+                            <p>{n.note}</p>
+                          ))}
+                        </>
+                      }
+                    >
+                      <Error
+                        fontSize="small"
+                        sx={{ verticalAlign: "middle", display: "inline-block" }}
+                        color="error"
+                        size="small"
+                      />
+                    </Tooltip>
                   )}
                 </td>
                 <td className="col-qsl">

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 
 import { CQWWEntities, CQZones } from "../../../../data/entities"
 import { EntityEntry } from "./EntityEntry"
@@ -57,37 +57,39 @@ const styles = {
 export function EntityList({ qson, entityGroups, entrySelections }) {
   const [selectedPrefix, setSelectedPrefix] = useState("")
 
-  const counts = { entities: { qso: 0, qsl: 0, nil: 0 }, zones: { qso: 0, qsl: 0, nil: 0 } }
-
-  CQWWEntities.forEach((entity) => {
-    const key = entrySelections[entity.entityPrefix]
-    const qsos = entityGroups[entity.entityPrefix] || []
-    const entry = (key && qsos.find((qso) => qso.key === key)) || qsos[0]
-    if (entry) {
-      if (entry.qsl.sources.length > 0) {
-        counts.entities.qsl += 1
+  const counts = useMemo(() => {
+    const memoCounts = { entities: { qso: 0, qsl: 0, nil: 0 }, zones: { qso: 0, qsl: 0, nil: 0 } }
+    CQWWEntities.forEach((entity) => {
+      const key = entrySelections[entity.entityPrefix]
+      const qsos = entityGroups[entity.entityPrefix] || []
+      const entry = (key && qsos.find((qso) => qso.key === key)) || qsos[0]
+      if (entry) {
+        if (entry.qsl.sources.length > 0) {
+          memoCounts.entities.qsl += 1
+        } else {
+          memoCounts.entities.qso += 1
+        }
       } else {
-        counts.entities.qso += 1
+        memoCounts.entities.nil += 1
       }
-    } else {
-      counts.entities.nil += 1
-    }
-  })
+    })
 
-  CQZones.forEach((zone) => {
-    const key = entrySelections[zone.entityPrefix]
-    const qsos = entityGroups[zone.entityPrefix] || []
-    const entry = qsos.find((qso) => qso.key === key) || qsos[0]
-    if (entry) {
-      if (entry.qsl.sources.length > 0) {
-        counts.zones.qsl += 1
+    CQZones.forEach((zone) => {
+      const key = entrySelections[zone.entityPrefix]
+      const qsos = entityGroups[zone.entityPrefix] || []
+      const entry = qsos.find((qso) => qso.key === key) || qsos[0]
+      if (entry) {
+        if (entry.qsl.sources.length > 0) {
+          memoCounts.zones.qsl += 1
+        } else {
+          memoCounts.zones.qso += 1
+        }
       } else {
-        counts.zones.qso += 1
+        memoCounts.zones.nil += 1
       }
-    } else {
-      counts.zones.nil += 1
-    }
-  })
+    })
+    return memoCounts
+  }, [entrySelections, entityGroups])
 
   return (
     <Box sx={styles.root}>
