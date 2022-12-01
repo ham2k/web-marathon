@@ -7,7 +7,6 @@ import {
   selectEntityGroups,
   selectOurCalls,
   selectYearQSOs,
-  setCurrentLogInfo,
 } from "../../store/log"
 import { PointsChart } from "./components/PointsChart"
 import { selectSettings } from "../../store/settings"
@@ -42,7 +41,7 @@ export function WorksheetPage() {
 
   useEffect(() => {
     dispatch(fetchCurrentLog())
-  })
+  }, [dispatch])
 
   const handleClearLog = (event) => {
     dispatch(clearCurrentLog({}))

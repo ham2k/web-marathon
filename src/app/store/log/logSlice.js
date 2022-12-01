@@ -9,6 +9,7 @@ import qslSourceComparer from "../../tools/qslSourceComparer"
 import guessCurrentYear from "../../tools/guessCurrentYear"
 import { setSettingsYear } from "../settings"
 import { logDB } from "./logDB"
+import { fillDXCCfromCountryFile } from "libs/data/country-file/src/lib/analyzeFromCountryFile"
 
 // Not sure why ESLint thinks this is a hook 🤷
 useBuiltinCountryFile() // eslint-disable-line react-hooks/rules-of-hooks
@@ -35,7 +36,6 @@ export const { setCurrentLogInfo } = logSlice.actions
 function processOneQSO(qso) {
   qso.our.guess = {}
   qso.their.guess = {}
-
   if (qso.our.call) {
     parseCallsign(qso.our.call, qso.our.guess)
     annotateFromCountryFile(qso.our.guess, { wae: true, state: qso.our.state })
@@ -43,7 +43,8 @@ function processOneQSO(qso) {
 
   parseCallsign(qso.their.call, qso.their.guess)
   const iotaRef = qso.refs && qso.refs.find((ref) => ref.type === "iota")
-  annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state, iota: iotaRef?.ref })
+  if (qso.their.dxccCode) fillDXCCfromCountryFile(qso.their.dxccCode, qso.their) // fill any missing dxcc info
+  annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state, iota: iotaRef?.ref }) // guess dxcc from callsign
 
   qso.key = qsoKey(qso)
 

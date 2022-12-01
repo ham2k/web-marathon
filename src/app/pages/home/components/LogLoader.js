@@ -5,7 +5,7 @@ import { Button, CircularProgress } from "@mui/material"
 import { Box } from "@mui/system"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
 
-import { loadADIFLog, clearCurrentLog } from "../../../store/log"
+import { loadADIFLog } from "../../../store/log"
 import { useNavigate } from "react-router-dom"
 
 export function LogLoader({ title, classes }) {
@@ -32,10 +32,6 @@ export function LogLoader({ title, classes }) {
         event.target.value = null
       }, 500)
     }
-  }
-
-  const handleClearLog = (event) => {
-    dispatch(clearCurrentLog())
   }
 
   if (loading) {
