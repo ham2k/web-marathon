@@ -8,7 +8,6 @@ import { Button, Chip, Tooltip } from "@mui/material"
 import {
   CheckCircleRounded,
   Error,
-  ErrorOutline,
   HearingDisabled,
   Key,
   Language,
@@ -16,6 +15,7 @@ import {
   MoveToInbox,
   PushPin,
   PushPinOutlined,
+  Warning,
 } from "@mui/icons-material"
 import { useDispatch } from "react-redux"
 import { setSelection } from "../../../store/entries"
@@ -119,7 +119,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
             <Error
               fontSize="small"
               sx={{ verticalAlign: "middle", display: "inline-block" }}
-              color="error"
+              color="warning"
               size="small"
             />
           </Tooltip>
@@ -222,7 +222,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                       <Error
                         fontSize="small"
                         sx={{ verticalAlign: "middle", display: "inline-block" }}
-                        color="error"
+                        color="warning"
                         size="small"
                       />
                     </Tooltip>

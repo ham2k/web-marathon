@@ -158,12 +158,14 @@ export const fetchCurrentLog = () => (dispatch) => {
       dispatch(setCurrentLogInfo(request.result))
       dispatch(setSettingsYear({ year: request.result.year }))
     }
+    request.onerror = (event) => {
+      console.error("IndexedDB Error", event, transaction)
+    }
   })
 }
 
 export const clearCurrentLog = () => (dispatch) => {
   return new Promise((resolve, reject) => {
-    console.log("Clear current log")
     logDB().then((db) => {
       const transaction = db.transaction("logs", "readwrite")
       const request = transaction.objectStore("logs").put({ key: "current" })
@@ -171,14 +173,11 @@ export const clearCurrentLog = () => (dispatch) => {
         dispatch(
           setCurrentLogInfo({ qsos: undefined, ourCalls: undefined, yearQSOs: undefined, entityGroups: undefined })
         )
-        console.log("Clear resolve")
         resolve()
       }
       request.onerror = (event) => {
         console.error("IndexedDB Error", event, transaction)
-        reject("Error occured")
       }
-      console.log("Clear store")
     })
   })
 }
@@ -188,7 +187,7 @@ export const selectAllQSOs = (state) => {
 }
 
 export const selectYearQSOs = (state) => {
-  return state?.log?.yearQSOs ?? []
+  return state?.log?.yearQSOs
 }
 
 export const selectEntityGroups = (state) => {
