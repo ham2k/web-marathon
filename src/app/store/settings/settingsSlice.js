@@ -14,14 +14,14 @@ export const settingsSlice = createSlice({
   reducers: {
     setSettingsYear: (state, action) => {
       if (!state) return { year: guessCurrentYear() }
-      state.year = action.payload.year || guessCurrentYear()
+      state.year = action.payload.year ?? guessCurrentYear()
     },
   },
 
   // extraReducers: (builder) => {
   //   builder
   //     .addCase(REHYDRATE, (state, action) => {
-  //       const settings = action.payload?.settings || initialState
+  //       const settings = action.payload?.settings ?? initialState
 
   //       if (!settings.year) settings.year = guessCurrentYear()
 

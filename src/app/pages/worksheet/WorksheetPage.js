@@ -1,13 +1,6 @@
 import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import {
-  clearCurrentLog,
-  fetchCurrentLog,
-  selectCurrentQSOs,
-  selectEntityGroups,
-  selectOurCalls,
-  selectYearQSOs,
-} from "../../store/log"
+import { clearCurrentLog, fetchCurrentLog, selectEntityGroups, selectOurCalls, selectYearQSOs } from "../../store/log"
 import { PointsChart } from "./components/PointsChart"
 import { selectSettings } from "../../store/settings"
 import { EntityList } from "./components/EntityList"

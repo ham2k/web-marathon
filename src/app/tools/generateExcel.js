@@ -24,16 +24,16 @@ function generateExcel({ entityGroups, entrySelections, entrant }) {
         sheet,
         [
           [
-            fmtDateTime(entry.endMillis || entry.startMillis, { day: "2-digit", timeZone: "UTC" }),
-            fmtDateTime(entry.endMillis || entry.startMillis, { month: "2-digit", timeZone: "UTC" }),
-            fmtDateTime(entry.endMillis || entry.startMillis, {
+            fmtDateTime(entry.endMillis ?? entry.startMillis, { day: "2-digit", timeZone: "UTC" }),
+            fmtDateTime(entry.endMillis ?? entry.startMillis, { month: "2-digit", timeZone: "UTC" }),
+            fmtDateTime(entry.endMillis ?? entry.startMillis, {
               hour: "2-digit",
               minute: "2-digit",
               hour12: false,
               timeZone: "UTC",
             }).replace(":", ""),
             entry.band.replace("m", ""),
-            MODE_TRANSLATION[entry.mode] || MODE_TRANSLATION.default,
+            MODE_TRANSLATION[entry.mode] ?? MODE_TRANSLATION.default,
             entry.their.call,
           ],
         ],
@@ -63,8 +63,8 @@ function generateExcel({ entityGroups, entrySelections, entrant }) {
 
   CQWWEntities.forEach((entity) => {
     const key = entrySelections[entity.entityPrefix]
-    const qsos = entityGroups[entity.entityPrefix] || []
-    const entry = (key && qsos.find((qso) => qso.key === key)) || qsos[0]
+    const qsos = entityGroups[entity.entityPrefix] ?? []
+    const entry = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
 
     if (entry) {
       counts.entities += 1
@@ -75,8 +75,8 @@ function generateExcel({ entityGroups, entrySelections, entrant }) {
 
   CQZones.forEach((zone) => {
     const key = entrySelections[zone.entityPrefix]
-    const qsos = entityGroups[zone.entityPrefix] || []
-    const entry = (key && qsos.find((qso) => qso.key === key)) || qsos[0]
+    const qsos = entityGroups[zone.entityPrefix] ?? []
+    const entry = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
 
     if (entry) {
       counts.zones += 1

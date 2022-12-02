@@ -22,10 +22,10 @@ export function ExcelEntry({ qsos, entryKey }) {
   if (entry) {
     return (
       <tr>
-        <td>{fmtDateTime(entry.endMillis || entry.startMillis, { day: "2-digit", timeZone: "UTC" })}</td>
-        <td>{fmtDateTime(entry.endMillis || entry.startMillis, { month: "2-digit", timeZone: "UTC" })}</td>
+        <td>{fmtDateTime(entry.endMillis ?? entry.startMillis, { day: "2-digit", timeZone: "UTC" })}</td>
+        <td>{fmtDateTime(entry.endMillis ?? entry.startMillis, { month: "2-digit", timeZone: "UTC" })}</td>
         <td>
-          {fmtDateTime(entry.endMillis || entry.startMillis, {
+          {fmtDateTime(entry.endMillis ?? entry.startMillis, {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
@@ -33,7 +33,7 @@ export function ExcelEntry({ qsos, entryKey }) {
           }).replace(":", "")}
         </td>
         <td>{entry.band.replace("m", "")}</td>
-        <td>{MODE_TRANSLATION[entry.mode] || MODE_TRANSLATION.default}</td>
+        <td>{MODE_TRANSLATION[entry.mode] ?? MODE_TRANSLATION.default}</td>
         <td>{entry.their.call}</td>
       </tr>
     )

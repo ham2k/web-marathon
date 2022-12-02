@@ -22,8 +22,8 @@ export const CQWWEntities = Object.values(ENTITIES).sort((a, b) => {
   let aValue = a[attr][0] === "*" ? a[attr].slice(1) : a[attr]
   let bValue = b[attr][0] === "*" ? b[attr].slice(1) : b[attr]
 
-  aValue = REORDERED_PREFIXES[aValue] || aValue
-  bValue = REORDERED_PREFIXES[bValue] || bValue
+  aValue = REORDERED_PREFIXES[aValue] ?? aValue
+  bValue = REORDERED_PREFIXES[bValue] ?? bValue
 
   return aValue.localeCompare(bValue)
 })

@@ -55,7 +55,7 @@ export function LogLoader({ title, classes }) {
           component="label"
           size="medium"
         >
-          {title || "Load ADIF Log"}
+          {title ?? "Load ADIF Log"}
           <input type="file" hidden multiple onChange={(x) => handleFileSelected(x)} />
         </Button>
         <CircularProgress
@@ -73,7 +73,7 @@ export function LogLoader({ title, classes }) {
   } else {
     return (
       <Button variant="contained" startIcon={<FolderOpenIcon />} color="primary" component="label" size="medium">
-        {title || "Load ADIF Log"}
+        {title ?? "Load ADIF Log"}
         <input type="file" hidden multiple onChange={(x) => handleFileSelected(x)} />
       </Button>
     )

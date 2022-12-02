@@ -21,15 +21,15 @@ export function PointsChart({ qsos, entityGroups, entrySelections, settings }) {
 
   EntitiesAndZones.forEach((entity) => {
     const key = entrySelections[entity.entityPrefix]
-    const qsos = entityGroups[entity.entityPrefix] || []
-    const entry = (key && qsos.find((qso) => qso.key === key)) || qsos[0]
+    const qsos = entityGroups[entity.entityPrefix] ?? []
+    const entry = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
     if (entry) {
       if (entity.zone) zoneEntries.push(entry)
       else entityEntries.push(entry)
     }
   })
 
-  const year = settings?.year || guessCurrentYear()
+  const year = settings?.year ?? guessCurrentYear()
   const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
   const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
@@ -67,12 +67,12 @@ export function PointsChart({ qsos, entityGroups, entrySelections, settings }) {
     {
       type: "column",
       name: "Entities",
-      data: bins.map((bin, i) => ({ x: bin.startMillis, y: bin.entities.length || null, bin })),
+      data: bins.map((bin, i) => ({ x: bin.startMillis, y: bin.entities.length ?? null, bin })),
     },
     {
       type: "column",
       name: "Zones",
-      data: bins.map((bin, i) => ({ x: bin.startMillis, y: bin.zones.length || null, bin })),
+      data: bins.map((bin, i) => ({ x: bin.startMillis, y: bin.zones.length ?? null, bin })),
     },
   ]
 

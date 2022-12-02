@@ -15,7 +15,6 @@ import {
   MoveToInbox,
   PushPin,
   PushPinOutlined,
-  Warning,
 } from "@mui/icons-material"
 import { useDispatch } from "react-redux"
 import { setSelection } from "../../../store/entries"
@@ -80,7 +79,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
   )
   cols.push(
     <td key="name" className="col-name">
-      {entity.flag || "🏳"}&nbsp;
+      {entity.flag ?? "🏳"}&nbsp;
       {entity.name}
     </td>
   )
@@ -249,6 +248,6 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
 
 function QslIcon(params) {
   const { entry } = params
-  const Icon = (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) || QSL_ICONS.default
+  const Icon = (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) ?? QSL_ICONS.default
   return <Icon {...params} />
 }

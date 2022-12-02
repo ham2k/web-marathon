@@ -14,8 +14,8 @@ export const entriesSlice = createSlice({
       state.selections = {}
     },
     setSelection: (state, action) => {
-      state.selections = state.selections || {}
-      state.selections[action.payload.prefix || action.payload.zone] = action.payload.key
+      state.selections = state.selections ?? {}
+      state.selections[action.payload.prefix ?? action.payload.zone] = action.payload.key
     },
   },
 })
@@ -23,7 +23,7 @@ export const entriesSlice = createSlice({
 export const { setSelection } = entriesSlice.actions
 
 export const selectEntrySelections = (state) => {
-  return state?.entries?.selections || {}
+  return state?.entries?.selections ?? {}
 }
 
 export default entriesSlice.reducer

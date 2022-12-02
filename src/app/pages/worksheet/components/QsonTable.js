@@ -47,7 +47,7 @@ const styles = {
 }
 
 export function QsonTable({ qsos }) {
-  if (!qsos || qsos.length === 0) {
+  if (!qsos ?? qsos.length === 0) {
     return <div></div>
   }
 
