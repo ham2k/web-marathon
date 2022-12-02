@@ -35,7 +35,7 @@ export function HomePage() {
       <p>Your files will be processed locally on your own browser. Nothing will be uploaded anywhere.</p>
 
       <Box sx={{ pt: 2 }}>
-        <LogLoader title={"Load an ADIF file"} />{" "}
+        <LogLoader title={"Load ADIF file(s)"} />{" "}
       </Box>
     </Box>
   )

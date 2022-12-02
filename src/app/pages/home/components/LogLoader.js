@@ -5,7 +5,7 @@ import { Button, CircularProgress } from "@mui/material"
 import { Box } from "@mui/system"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
 
-import { loadADIFLog } from "../../../store/log"
+import { clearCurrentLog, loadADIFLog } from "../../../store/log"
 import { useNavigate } from "react-router-dom"
 
 export function LogLoader({ title, classes }) {
@@ -14,23 +14,33 @@ export function LogLoader({ title, classes }) {
   const [loading, setLoading] = useState(false)
 
   const handleFileSelected = (event) => {
-    if (event.target.value) {
+    if (event.target.value && event.target.files && event.target.files.length > 0) {
       setLoading(true)
+      dispatch(clearCurrentLog()).then(() => {
+        setTimeout(() => {
+          // without a short timeout, the MUI CircularProgress component fails to render properly.
+          let pendingFileCount = event.target.files.length
+          for (let i = 0; i < event.target.files.length; i++) {
+            const file = event.target.files[i]
 
-      setTimeout(() => {
-        // without a short timeout, the MUI CircularProgress component fails to render properly.
-
-        const file = event.target.files[0]
-        const reader = new FileReader()
-        reader.onload = () => {
-          dispatch(loadADIFLog(reader.result)).then(() => {
-            setLoading(false)
-            navigate(`/worksheet`)
-          })
-        }
-        reader.readAsText(file, "ISO-8859-1")
-        event.target.value = null
-      }, 500)
+            const reader = new FileReader()
+            /* eslint-disable no-loop-func */
+            /* We do mean to share `pendingFileCount` among all the anonymous functions created inside the loop */
+            reader.onload = () => {
+              dispatch(loadADIFLog(reader.result, { append: true })).then(() => {
+                pendingFileCount--
+                if (pendingFileCount === 0) {
+                  setLoading(false)
+                  navigate(`/worksheet`)
+                }
+              })
+            }
+            /* eslint-enable no-loop-func */
+            reader.readAsText(file, "ISO-8859-1")
+          }
+          event.target.value = null
+        }, 500)
+      })
     }
   }
 
@@ -46,7 +56,7 @@ export function LogLoader({ title, classes }) {
           size="medium"
         >
           {title || "Load ADIF Log"}
-          <input type="file" hidden onChange={(x) => handleFileSelected(x)} />
+          <input type="file" hidden multiple onChange={(x) => handleFileSelected(x)} />
         </Button>
         <CircularProgress
           size={24}
@@ -64,7 +74,7 @@ export function LogLoader({ title, classes }) {
     return (
       <Button variant="contained" startIcon={<FolderOpenIcon />} color="primary" component="label" size="medium">
         {title || "Load ADIF Log"}
-        <input type="file" hidden onChange={(x) => handleFileSelected(x)} />
+        <input type="file" hidden multiple onChange={(x) => handleFileSelected(x)} />
       </Button>
     )
   }

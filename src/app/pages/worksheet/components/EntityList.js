@@ -54,7 +54,7 @@ const styles = {
   },
 }
 
-export function EntityList({ qson, entityGroups, entrySelections }) {
+export function EntityList({ qsos, entityGroups, entrySelections }) {
   const [selectedPrefix, setSelectedPrefix] = useState("")
 
   const counts = useMemo(() => {

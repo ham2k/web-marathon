@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import {
   clearCurrentLog,
   fetchCurrentLog,
-  selectCurrentLog,
+  selectCurrentQSOs,
   selectEntityGroups,
   selectOurCalls,
   selectYearQSOs,
@@ -31,7 +31,6 @@ export function WorksheetPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const settings = useSelector(selectSettings)
-  const log = useSelector(selectCurrentLog)
   const qsos = useSelector(selectYearQSOs)
   const entityGroups = useSelector(selectEntityGroups)
   const entrySelections = useSelector(selectEntrySelections)
@@ -48,7 +47,7 @@ export function WorksheetPage() {
     navigate(`/`)
   }
 
-  if (!log) {
+  if (!qsos) {
     return undefined
   }
 
@@ -74,9 +73,9 @@ export function WorksheetPage() {
         </span>
       </Typography>
 
-      <PointsChart qson={log} entityGroups={entityGroups} entrySelections={entrySelections} settings={settings} />
+      <PointsChart qsos={qsos} entityGroups={entityGroups} entrySelections={entrySelections} settings={settings} />
 
-      <EntityList qson={log} entityGroups={entityGroups} entrySelections={entrySelections} />
+      <EntityList qsos={qsos} entityGroups={entityGroups} entrySelections={entrySelections} />
 
       <Dialog open={exportDialogOpen} onClose={() => setExportDialogOpen(false)}>
         <ExportDialog onClose={() => setExportDialogOpen(false)} />

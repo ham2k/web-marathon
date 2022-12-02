@@ -22,7 +22,7 @@ export const logSlice = createSlice({
 
   reducers: {
     setCurrentLogInfo: (state, action) => {
-      state.qson = action.payload.qson
+      state.qsos = action.payload.qsos
       state.yearQSOs = action.payload.yearQSOs
       state.entityGroups = action.payload.entityGroups
       state.ourCalls = action.payload.ourCalls
@@ -50,7 +50,7 @@ function processOneQSO(qso) {
     qso.their.guess.entityPrefix &&
     qso.their.entityPrefix !== qso.their.guess.entityPrefix
   ) {
-    qso.notes = qso.notes || []
+    qso.notes = qso.notes ?? []
     const note = {
       about: "entityPrefix",
       note: `Log says ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`,
@@ -59,7 +59,7 @@ function processOneQSO(qso) {
   }
 
   if (qso.their.cqZone && qso.their.guess.cqZone && qso.their.cqZone !== qso.their.guess.cqZone) {
-    qso.notes = qso.notes || []
+    qso.notes = qso.notes ?? []
     const note = {
       about: "cqZone",
       note: `Log says Zone ${qso.their.cqZone}.\nWe believe it should be Zone ${qso.their.guess.cqZone}.`,
@@ -70,73 +70,85 @@ function processOneQSO(qso) {
   qso.key = qsoKey(qso)
 
   // Sort QSL info by trust level
-  qso.qsl = qso.qsl || {}
-  qso.qsl.sources = (qso.qsl.sources || []).sort(qslSourceComparer)
+  qso.qsl = qso.qsl ?? {}
+  qso.qsl.sources = (qso.qsl.sources ?? []).sort(qslSourceComparer)
 
   return qso
 }
 
-export const loadADIFLog = (data) => (dispatch, getState) => {
-  return new Promise((resolve, reject) => {
-    logDB().then((db) => {
-      const { settings } = getState()
+export const loadADIFLog =
+  (data, options = {}) =>
+  (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      logDB().then((db) => {
+        const { settings } = getState()
 
-      const qson = adifToQSON(data)
+        const qson = adifToQSON(data)
+        let qsos = qson.qsos
 
-      const year = settings?.year || guessCurrentYear()
-      const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
-      const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
+        const year = settings?.year ?? guessCurrentYear()
+        const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
+        const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
-      const yearQSOs = qson.qsos.filter((qso) => qso.startMillis <= yearEnd && qso.endMillis >= yearStart)
+        let yearQSOs = qsos.filter((qso) => qso.startMillis <= yearEnd && qso.endMillis >= yearStart)
+        yearQSOs.forEach((qso) => {
+          qso = processOneQSO(qso)
+        })
 
-      const ourCalls = {}
-      const entityGroups = {}
-      yearQSOs.forEach((qso) => {
-        qso = processOneQSO(qso)
-
-        if (qso.our.call) {
-          ourCalls[qso.our.call] = (ourCalls[qso.our.call] || 0) + 1
+        if (options.append) {
+          const prevQSOs = getState()?.log?.qsos ?? []
+          const prevYearQSOs = getState()?.log?.yearQSOs ?? []
+          qsos = prevQSOs.concat(qsos)
+          yearQSOs = prevYearQSOs.concat(yearQSOs)
         }
 
-        if (qso.their.entityPrefix) {
-          entityGroups[qso.their.entityPrefix] = entityGroups[qso.their.entityPrefix] || []
-          entityGroups[qso.their.entityPrefix].push(qso)
-        }
-        if (qso.their.guess.entityPrefix && qso.their.guess.entityPrefix !== qso.their.entityPrefix) {
-          entityGroups[qso.their.guess.entityPrefix] = entityGroups[qso.their.guess.entityPrefix] || []
-          entityGroups[qso.their.guess.entityPrefix].push(qso)
-        }
+        const ourCalls = {}
+        const entityGroups = {}
 
-        if (qso.their.cqZone) {
-          entityGroups[`Zone ${qso.their.cqZone}`] = entityGroups[`Zone ${qso.their.cqZone}`] || []
-          entityGroups[`Zone ${qso.their.cqZone}`].push(qso)
+        yearQSOs.forEach((qso) => {
+          if (qso.our.call) {
+            ourCalls[qso.our.call] = (ourCalls[qso.our.call] ?? 0) + 1
+          }
+
+          if (qso.their.entityPrefix) {
+            entityGroups[qso.their.entityPrefix] = entityGroups[qso.their.entityPrefix] ?? []
+            entityGroups[qso.their.entityPrefix].push(qso)
+          }
+          if (qso.their.guess.entityPrefix && qso.their.guess.entityPrefix !== qso.their.entityPrefix) {
+            entityGroups[qso.their.guess.entityPrefix] = entityGroups[qso.their.guess.entityPrefix] ?? []
+            entityGroups[qso.their.guess.entityPrefix].push(qso)
+          }
+
+          if (qso.their.cqZone) {
+            entityGroups[`Zone ${qso.their.cqZone}`] = entityGroups[`Zone ${qso.their.cqZone}`] ?? []
+            entityGroups[`Zone ${qso.their.cqZone}`].push(qso)
+          }
+          if (qso.their.guess.cqZone && qso.their.guess.cqZone !== qso.their.cqZone) {
+            entityGroups[`Zone ${qso.their.guess.cqZone}`] = entityGroups[`Zone ${qso.their.guess.cqZone}`] ?? []
+            entityGroups[`Zone ${qso.their.guess.cqZone}`].push(qso)
+          }
+        })
+
+        Object.keys(entityGroups).forEach((key) => {
+          entityGroups[key] = entityGroups[key].sort(qsoComparer)
+        })
+
+        const transaction = db.transaction(["logs"], "readwrite")
+        const request = transaction
+          .objectStore("logs")
+          .put({ key: "current", year, qsos, ourCalls, yearQSOs, entityGroups })
+        request.onsuccess = () => {
+          dispatch(setCurrentLogInfo({ qsos, ourCalls, yearQSOs, entityGroups }))
+          dispatch(setSettingsYear({ year }))
+          resolve()
         }
-        if (qso.their.guess.cqZone && qso.their.guess.cqZone !== qso.their.cqZone) {
-          entityGroups[`Zone ${qso.their.guess.cqZone}`] = entityGroups[`Zone ${qso.their.guess.cqZone}`] || []
-          entityGroups[`Zone ${qso.their.guess.cqZone}`].push(qso)
+        request.onerror = (event) => {
+          console.error("IndexedDB Error", event, transaction)
+          reject("Error occured")
         }
       })
-
-      Object.keys(entityGroups).forEach((key) => {
-        entityGroups[key] = entityGroups[key].sort(qsoComparer)
-      })
-
-      const transaction = db.transaction(["logs"], "readwrite")
-      const request = transaction
-        .objectStore("logs")
-        .put({ key: "current", year, qson, ourCalls, yearQSOs, entityGroups })
-      request.onsuccess = () => {
-        dispatch(setCurrentLogInfo({ qson, ourCalls, yearQSOs, entityGroups }))
-        dispatch(setSettingsYear({ year }))
-        resolve()
-      }
-      request.onerror = (event) => {
-        console.error("IndexedDB Error", event, transaction)
-        reject("Error occured")
-      }
     })
-  })
-}
+  }
 
 export const fetchCurrentLog = () => (dispatch) => {
   logDB().then((db) => {
@@ -150,29 +162,41 @@ export const fetchCurrentLog = () => (dispatch) => {
 }
 
 export const clearCurrentLog = () => (dispatch) => {
-  logDB().then((db) => {
-    const transaction = db.transaction("logs", "readwrite")
-    transaction.objectStore("logs").put({ key: "current" })
-    transaction.onsuccess = () => {
-      dispatch(setCurrentLogInfo(undefined))
-    }
+  return new Promise((resolve, reject) => {
+    console.log("Clear current log")
+    logDB().then((db) => {
+      const transaction = db.transaction("logs", "readwrite")
+      const request = transaction.objectStore("logs").put({ key: "current" })
+      request.onsuccess = () => {
+        dispatch(
+          setCurrentLogInfo({ qsos: undefined, ourCalls: undefined, yearQSOs: undefined, entityGroups: undefined })
+        )
+        console.log("Clear resolve")
+        resolve()
+      }
+      request.onerror = (event) => {
+        console.error("IndexedDB Error", event, transaction)
+        reject("Error occured")
+      }
+      console.log("Clear store")
+    })
   })
 }
 
-export const selectCurrentLog = (state) => {
-  return state?.log?.qson
+export const selectAllQSOs = (state) => {
+  return state?.log?.qsos
 }
 
 export const selectYearQSOs = (state) => {
-  return state?.log?.yearQSOs || []
+  return state?.log?.yearQSOs ?? []
 }
 
 export const selectEntityGroups = (state) => {
-  return state?.log?.entityGroups || {}
+  return state?.log?.entityGroups ?? {}
 }
 
 export const selectOurCalls = (state) => {
-  return state?.log?.ourCalls || {}
+  return state?.log?.ourCalls ?? {}
 }
 
 export default logSlice.reducer

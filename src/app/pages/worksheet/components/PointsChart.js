@@ -13,7 +13,7 @@ const ONE_WEEK_IN_MILLIS = 7 * ONE_DAY_IN_MILLIS
 
 const fmtDateDayMonthZulu = dateFormatterGenerator("dayMonth", { timeZone: "UTC" })
 
-export function PointsChart({ qson, entityGroups, entrySelections, settings }) {
+export function PointsChart({ qsos, entityGroups, entrySelections, settings }) {
   const height = 200
 
   const zoneEntries = []
