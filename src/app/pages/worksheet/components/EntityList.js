@@ -125,11 +125,9 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
         </table>
       </div>
 
-      <Typography component="h2" variant="h5">
-        <a name="entities">
-          <b>{counts.entities.qsl + counts.entities.qso} Entities</b>
-          {counts.entities.qso > 0 && <span>&nbsp;&nbsp;({counts.entities.qso} unconfirmed)</span>}
-        </a>
+      <Typography component="h2" variant="h5" id="entities">
+        <b>{counts.entities.qsl + counts.entities.qso} Entities</b>
+        {counts.entities.qso > 0 && <span>&nbsp;&nbsp;({counts.entities.qso} unconfirmed)</span>}
       </Typography>
 
       <table className="table nice-table band-colors">
@@ -160,11 +158,9 @@ export function EntityList({ qson, entityGroups, entrySelections }) {
         </tbody>
       </table>
 
-      <Typography component="h2" variant="h5">
-        <a name="zones">
-          <b>{counts.zones.qsl + counts.zones.qso} Zones</b>
-          {counts.zones.qso > 0 && <span>&nbsp;&nbsp;({counts.zones.qso} unconfirmed)</span>}
-        </a>
+      <Typography component="h2" variant="h5" id="zones">
+        <b>{counts.zones.qsl + counts.zones.qso} Zones</b>
+        {counts.zones.qso > 0 && <span>&nbsp;&nbsp;({counts.zones.qso} unconfirmed)</span>}
       </Typography>
       <table className="table nice-table band-colors">
         <thead>

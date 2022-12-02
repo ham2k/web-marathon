@@ -102,7 +102,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
     )
     cols.push(
       <td key="call" className="col-call">
-        <span class="callsign" style={{ verticalAlign: "middle", display: "inline-block" }}>
+        <span className="callsign" style={{ verticalAlign: "middle", display: "inline-block" }}>
           {entry.their.call}&nbsp;
         </span>
         {entry.notes && (
@@ -110,8 +110,8 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
             arrow
             title={
               <>
-                {entry.notes.map((n) => (
-                  <p>{n.note}</p>
+                {entry.notes.map((n, i) => (
+                  <p key={i}>{n.note}</p>
                 ))}
               </>
             }
@@ -205,7 +205,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                 <td className={classNames("col-band", "band-color")}>{qso.band}</td>
                 <td className="col-mode">{qso.mode}</td>
                 <td className="col-call">
-                  <span class="callsign" style={{ verticalAlign: "middle", display: "inline-block" }}>
+                  <span className="callsign" style={{ verticalAlign: "middle", display: "inline-block" }}>
                     {qso.their.call}&nbsp;
                   </span>
                   {qso.notes && (
@@ -213,8 +213,8 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
                       arrow
                       title={
                         <>
-                          {qso.notes.map((n) => (
-                            <p>{n.note}</p>
+                          {qso.notes.map((n, i) => (
+                            <p key={i}>{n.note}</p>
                           ))}
                         </>
                       }

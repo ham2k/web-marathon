@@ -165,8 +165,8 @@ export function PointsChart({ qson, entityGroups, entrySelections, settings }) {
     <div>
       <Typography component="h2" variant="h5">
         <b>{entityEntries.length + zoneEntries.length} total points:&nbsp;</b>
-        <a href="#entities">{entityEntries.length} Entities</a>&nbsp;+&nbsp;
-        <a href="#zones">{zoneEntries.length} Zones</a>
+        <a href="worksheet#entities">{entityEntries.length} Entities</a>&nbsp;+&nbsp;
+        <a href="worksheet#zones">{zoneEntries.length} Zones</a>
       </Typography>
 
       <ApexChart options={options} series={series} type="bar" height={height} />
