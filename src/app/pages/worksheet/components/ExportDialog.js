@@ -22,7 +22,7 @@ export function ExportDialog({ onClose }) {
     sel.addRange(range)
     document.execCommand("copy")
     sel.removeAllRanges()
-    setExportReady("clipboard")
+    // setExportReady("clipboard")
   }
 
   const handleDownload = (event) => {
@@ -48,88 +48,131 @@ export function ExportDialog({ onClose }) {
   }
 
   return (
-    <div>
-      <DialogTitle>Export your DX Marathon Score Sheet</DialogTitle>
-      {!exportReady && (
-        <>
-          <DialogContent>
-            <DialogContentText sx={{ textAlign: "center" }}>
-              <p>You have two ways of preparing your score sheet:</p>
-              <Box sx={{ pt: 3 }}>Copy the entries manually into Excel:</Box>
-              <p>
-                <Button onClick={handlePaste}>
-                  <ContentCopy /> Copy
-                </Button>
-              </p>
-              <Box sx={{ pt: 3 }}>Or Download a generated XLS file:</Box>
-              <p>
-                <Button onClick={handleDownload}>
-                  <FileDownload /> Download
-                </Button>{" "}
-              </p>
-              <p>
-                <b>
-                  This "download" method does not work correctly right now!!!
-                  <br />
-                  Use only for testing.
-                </b>
-              </p>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-          </DialogActions>
-        </>
-      )}
-      {exportReady === "file" && (
-        <>
-          <DialogContent>
-            <DialogContentText>
-              <p>Your XLS score sheet has been generated and is being downloaded on your browser</p>
-              <p style={{ textDecoration: "line-through" }}>
-                Please note that while this file is a simplified version of the official score sheet, it is believed to
-                work just fine with the DX Marathon submission and scoring process
-              </p>
-              <p>
-                <b>
-                  Be warned that the file you downloaded will not work for direct submission. This feature is here so
-                  that we can continue testing it while we work on it!
-                </b>
-              </p>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Done</Button>
-          </DialogActions>
-        </>
-      )}
-      {exportReady === "clipboard" && (
-        <>
-          <DialogContent>
-            <DialogContentText>
-              <p>Your entries have been copied to the clipboard. Now perform the following steps:</p>
-              <ol>
-                <li>
-                  Download the{" "}
-                  <a href="https://www.dxmarathon.com/Submission/2022/Submission2022.htm">
-                    official score sheet from dxmarathon.com
-                  </a>
-                </li>
-                <li>
-                  Open the official score sheet in Excel or <a href="https://www.openoffice.org/">OpenOffice</a>
-                </li>
-                <li>Click on cell D17 ("Day" for "SMO Malta")</li>
-                <li>Select "Paste" from the "Edit" menu</li>
-                <li>Save the file, preserving the original file format options.</li>
-              </ol>
-              <p>You should now have an XLS score sheet ready to be submitted.</p>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Done</Button>
-          </DialogActions>
-        </>
-      )}
-    </div>
+    <>
+      <DialogContent>
+        <DialogContentText>
+          <p>First click on the "copy" button below, to place the data on your clipboard.</p>
+
+          <p>
+            <Button sx={{ ml: 3 }} onClick={handlePaste}>
+              <ContentCopy /> Copy
+            </Button>
+          </p>
+
+          <p>Then perform the following steps:</p>
+          <ol>
+            <li>
+              Download the latest version of the Submission Form from{" "}
+              <a href="https://www.dxmarathon.com/Submission/2022/Submission2022.htm" target="_blank" rel="noreferrer">
+                dxmarathon.com
+              </a>
+              .
+            </li>
+            <li>
+              Open the official Submission Form scoresheet in Excel or{" "}
+              <a href="https://www.openoffice.org/">OpenOffice</a>.
+            </li>
+            <li>Click on cell D17 ("Day" for "SMO Malta").</li>
+            <li>Select "Paste" from the "Edit" menu.</li>
+          </ol>
+          <p>
+            Your scoresheet should now have all the QSOs you selected in this tool. Fill the rest of the information and
+            follow any additional instructions from the{" "}
+            <a href="https://www.dxmarathon.com/Submission/2022/Submission2022.htm" target="_blank" rel="noreferrer">
+              Marathon Submission Page
+            </a>
+            .
+          </p>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Done</Button>
+      </DialogActions>
+    </>
   )
+  // return (
+  //   <div>
+  //     <DialogTitle>Export your DX Marathon Score Sheet</DialogTitle>
+  //     {!exportReady && (
+  //       <>
+  //         <DialogContent>
+  //           <DialogContentText sx={{ textAlign: "center" }}>
+  //             <p>You have two ways of preparing your score sheet:</p>
+  //             <Box sx={{ pt: 3 }}>Copy the entries manually into Excel:</Box>
+  //             <p>
+  //               <Button onClick={handlePaste}>
+  //                 <ContentCopy /> Copy
+  //               </Button>
+  //             </p>
+  //             <Box sx={{ pt: 3 }}>Or Download a generated XLS file:</Box>
+  //             <p>
+  //               <Button onClick={handleDownload}>
+  //                 <FileDownload /> Download
+  //               </Button>{" "}
+  //             </p>
+  //             <p>
+  //               <b>
+  //                 This "download" method does not work correctly right now!!!
+  //                 <br />
+  //                 Use only for testing.
+  //               </b>
+  //             </p>
+  //           </DialogContentText>
+  //         </DialogContent>
+  //         <DialogActions>
+  //           <Button onClick={onClose}>Cancel</Button>
+  //         </DialogActions>
+  //       </>
+  //     )}
+  //     {exportReady === "file" && (
+  //       <>
+  //         <DialogContent>
+  //           <DialogContentText>
+  //             <p>Your XLS score sheet has been generated and is being downloaded on your browser</p>
+  //             <p style={{ textDecoration: "line-through" }}>
+  //               Please note that while this file is a simplified version of the official score sheet, it is believed to
+  //               work just fine with the DX Marathon submission and scoring process
+  //             </p>
+  //             <p>
+  //               <b>
+  //                 Be warned that the file you downloaded will not work for direct submission. This feature is here so
+  //                 that we can continue testing it while we work on it!
+  //               </b>
+  //             </p>
+  //           </DialogContentText>
+  //         </DialogContent>
+  //         <DialogActions>
+  //           <Button onClick={onClose}>Done</Button>
+  //         </DialogActions>
+  //       </>
+  //     )}
+  //     {exportReady === "clipboard" && (
+  //       <>
+  //         <DialogContent>
+  //           <DialogContentText>
+  //             <p>Your entries have been copied to the clipboard. Now perform the following steps:</p>
+  //             <ol>
+  //               <li>
+  //                 Download the{" "}
+  //                 <a href="https://www.dxmarathon.com/Submission/2022/Submission2022.htm">
+  //                   official score sheet from dxmarathon.com
+  //                 </a>
+  //               </li>
+  //               <li>
+  //                 Open the official score sheet in Excel or <a href="https://www.openoffice.org/">OpenOffice</a>
+  //               </li>
+  //               <li>Click on cell D17 ("Day" for "SMO Malta")</li>
+  //               <li>Select "Paste" from the "Edit" menu</li>
+  //               <li>Save the file, preserving the original file format options.</li>
+  //             </ol>
+  //             <p>You should now have an XLS score sheet ready to be submitted.</p>
+  //           </DialogContentText>
+  //         </DialogContent>
+  //         <DialogActions>
+  //           <Button onClick={onClose}>Done</Button>
+  //         </DialogActions>
+  //       </>
+  //     )}
+  //   </div>
+  // )
 }

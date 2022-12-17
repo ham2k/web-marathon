@@ -49,7 +49,7 @@ export function WorksheetPage() {
       <Typography component="h1" variant="h3">
         <span style={{ float: "right" }}>
           <Button onClick={() => setExportDialogOpen(true)}>
-            <FileDownload /> Export
+            <FileDownload /> Generate Submission
           </Button>
         </span>
         <i>{fmtNumber(qsos.length)} QSOs</i>

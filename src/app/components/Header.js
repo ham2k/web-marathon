@@ -13,7 +13,7 @@ export function Header({ styles }) {
             </Link>
           </Typography>
           <Typography component="div" color="inherit" noWrap sx={styles.version}>
-            &nbsp;&nbsp;ALPHA VERSION, FOR TESTING PURPOSES ONLY
+            &nbsp;&nbsp;Version 0.1
           </Typography>
         </div>
       </Toolbar>
