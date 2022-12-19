@@ -28,7 +28,7 @@ export function ExcelEntry({ qsos, entryKey }) {
           {fmtDateTime(entry.endMillis ?? entry.startMillis, {
             hour: "2-digit",
             minute: "2-digit",
-            hour12: false,
+            hourCycle: "h23",
             timeZone: "UTC",
           }).replace(":", "")}
         </td>

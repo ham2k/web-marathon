@@ -37,7 +37,7 @@ const DATE_FORMAT = {
   month: "short",
   hour: "numeric",
   minute: "numeric",
-  timeZone: "Zulu",
+  timeZone: "UTC",
 }
 
 const QSL_ICONS = {
