@@ -79,7 +79,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
   )
   cols.push(
     <td key="name" className="col-name">
-      {entity.flag ?? "🏳"}&nbsp;
+      {entity.flag || "🏳"}&nbsp;
       {entity.name}
     </td>
   )

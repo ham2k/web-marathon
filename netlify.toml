@@ -1,0 +1,18 @@
+## more info on configuring this file: https://www.netlify.com/docs/netlify-toml-reference/
+
+[[redirects]]
+  from = "/ham2k-proxy/logbook.qrz.com/*"
+  to = "https://logbook.qrz.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  port = 4212 # Port that the dev server will be listening on
+  targetPort = 4202 # Port where the undelying dev server will run on
+  command = "nx serve marathon" # Command to start the undelying dev server
+  # publish = "dist" # Folder with the static content for _redirect file

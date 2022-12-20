@@ -3,6 +3,7 @@ import { useSelector } from "react-redux"
 import { LogLoader } from "./components/LogLoader"
 import { selectSettings } from "../../store/settings"
 import { Box, Typography } from "@mui/material"
+import { QrzDialogButton } from "./components/QrzDialog"
 
 const styles = {
   root: {
@@ -34,8 +35,28 @@ export function HomePage() {
 
       <p>Your files will be processed locally on your own browser. Nothing will be uploaded anywhere.</p>
 
-      <Box sx={{ pt: 2 }}>
-        <LogLoader title={"Load ADIF file(s)"} />{" "}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignContent: "center",
+          ml: "auto",
+          mr: "auto",
+          pt: 3,
+          flexWrap: "wrap",
+          rowGap: 1,
+          columnGap: 1,
+          minWidth: "10rem",
+          maxWidth: "60rem",
+        }}
+      >
+        <Box sx={{}}>
+          <LogLoader title={"Load ADIF file(s)"} />
+        </Box>
+        <Box sx={{}}>
+          <QrzDialogButton />
+        </Box>
       </Box>
     </Box>
   )

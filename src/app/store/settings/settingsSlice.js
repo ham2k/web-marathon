@@ -16,6 +16,10 @@ export const settingsSlice = createSlice({
       if (!state) return { year: guessCurrentYear() }
       state.year = action.payload.year ?? guessCurrentYear()
     },
+
+    setQrzKey: (state, action) => {
+      state.qrzKey = action.payload.qrzKey
+    },
   },
 
   // extraReducers: (builder) => {
@@ -33,10 +37,18 @@ export const settingsSlice = createSlice({
   // },
 })
 
-export const { setSettingsYear } = settingsSlice.actions
+export const { setSettingsYear, setQrzKey } = settingsSlice.actions
 
 export const selectSettings = (state) => {
   return state?.settings
+}
+
+export const selectCurrentYear = (state) => {
+  return state?.settings?.year ?? guessCurrentYear()
+}
+
+export const selectQrzKey = (state) => {
+  return state?.settings?.qrzKey
 }
 
 export default settingsSlice.reducer
