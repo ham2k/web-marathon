@@ -2,8 +2,11 @@ import * as React from "react"
 import { useSelector } from "react-redux"
 import { LogLoader } from "./components/LogLoader"
 import { selectSettings } from "../../store/settings"
-import { Box, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import { QrzDialogButton } from "./components/QrzDialog"
+import { selectOurCalls } from "../../store/entries"
+import { Login } from "@mui/icons-material"
+import { useNavigate } from "react-router-dom"
 
 const styles = {
   root: {
@@ -15,7 +18,13 @@ const styles = {
 }
 
 export function HomePage() {
+  const navigate = useNavigate()
   const settings = useSelector(selectSettings)
+  const calls = Object.keys(useSelector(selectOurCalls) ?? {})
+
+  const handleContinue = () => {
+    navigate(`/worksheet`)
+  }
 
   return (
     <Box sx={styles.root}>
@@ -56,6 +65,24 @@ export function HomePage() {
         </Box>
         <Box sx={{}}>
           <QrzDialogButton />
+        </Box>
+        <Box sx={{}}>
+          {calls && calls.length > 0 ? (
+            <Button
+              variant="contained"
+              startIcon={<Login />}
+              color="primary"
+              component="label"
+              size="medium"
+              onClick={handleContinue}
+            >
+              Continue with {calls.join(", ")}
+            </Button>
+          ) : (
+            <Button variant="contained" disabled startIcon={<Login />} color="primary" component="label" size="medium">
+              Continue with …
+            </Button>
+          )}
         </Box>
       </Box>
     </Box>

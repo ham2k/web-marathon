@@ -1,5 +1,6 @@
 import { useBuiltinCountryFile } from "@ham2k/data/country-file/builtinData"
 import { createSlice } from "@reduxjs/toolkit"
+import { setCurrentLogCalls } from "../entries"
 import { setSettingsYear } from "../settings"
 import { logDB } from "./logDB"
 
@@ -31,6 +32,7 @@ export const fetchCurrentLog = () => (dispatch) => {
     const request = transaction.objectStore("logs").get("current")
     request.onsuccess = () => {
       dispatch(setCurrentLogInfo(request.result))
+      dispatch(setCurrentLogCalls(request.result.ourCalls))
       dispatch(setSettingsYear({ year: request.result.year }))
     }
     request.onerror = (event) => {
@@ -46,8 +48,14 @@ export const clearCurrentLog = () => (dispatch) => {
       const request = transaction.objectStore("logs").put({ key: "current" })
       request.onsuccess = () => {
         dispatch(
-          setCurrentLogInfo({ qsos: undefined, ourCalls: undefined, yearQSOs: undefined, entityGroups: undefined })
+          setCurrentLogInfo({
+            qsos: undefined,
+            ourCalls: undefined,
+            yearQSOs: undefined,
+            entityGroups: undefined,
+          })
         )
+        dispatch(setCurrentLogCalls(undefined))
         resolve()
       }
       request.onerror = (event) => {
@@ -67,10 +75,6 @@ export const selectYearQSOs = (state) => {
 
 export const selectEntityGroups = (state) => {
   return state?.log?.entityGroups ?? {}
-}
-
-export const selectOurCalls = (state) => {
-  return state?.log?.ourCalls ?? {}
 }
 
 export default logSlice.reducer

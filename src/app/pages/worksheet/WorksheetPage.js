@@ -1,15 +1,17 @@
 import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { clearCurrentLog, fetchCurrentLog, selectEntityGroups, selectOurCalls, selectYearQSOs } from "../../store/log"
-import { PointsChart } from "./components/PointsChart"
-import { selectSettings } from "../../store/settings"
-import { EntityList } from "./components/EntityList"
-import { fmtNumber } from "@ham2k/util/format"
+import { useNavigate } from "react-router-dom"
 import { Box, Button, Dialog, Typography } from "@mui/material"
 import { Clear, FileDownload } from "@mui/icons-material"
-import { selectEntrySelections } from "../../store/entries"
+
+import { fmtNumber } from "@ham2k/util/format"
+
+import { clearCurrentLog, fetchCurrentLog, selectEntityGroups, selectYearQSOs } from "../../store/log"
+import { selectEntrySelections, selectOurCalls } from "../../store/entries"
+import { selectSettings } from "../../store/settings"
+import { PointsChart } from "./components/PointsChart"
+import { EntityList } from "./components/EntityList"
 import { ExportDialog } from "./components/ExportDialog"
-import { useNavigate } from "react-router-dom"
 
 const styles = {
   root: {

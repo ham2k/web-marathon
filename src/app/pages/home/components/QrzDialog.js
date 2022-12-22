@@ -45,7 +45,10 @@ export function QrzDialog({ onClose }) {
     <>
       <DialogTitle>Import from QRZ</DialogTitle>
       <DialogContent>
-        <DialogContentText>Please enter the QRZ.com API Key for the logbook you want to use.</DialogContentText>
+        <DialogContentText>
+          Please enter the QRZ.com API Key for the logbook you want to use. API keys are available on the Logbook
+          Settings page, but you need a QRZ Subscription with "XML Access".
+        </DialogContentText>
 
         <Box sx={{ pt: 3, pb: 3 }}>
           <TextField label="API Key" variant="outlined" fullWidth value={key ?? ""} onChange={changeKey} />
