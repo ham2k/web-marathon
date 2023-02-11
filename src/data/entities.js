@@ -1,5 +1,5 @@
-import { ENTITIES } from "@ham2k/data/cqww"
-import { CQZONES } from "@ham2k/data/cqzones"
+import { ENTITIES } from "@ham2k/data-cqww"
+import { CQZONES } from "@ham2k/data-cqzones"
 
 // DX Marathon form has some entities out of order
 // * CE0X after CE0Z
