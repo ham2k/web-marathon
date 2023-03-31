@@ -14,7 +14,7 @@ export function ExcelEntry({ qsos, entryKey }) {
   let entry
 
   if (entryKey) {
-    entry = qsos && qsos.find((q) => q.key === entryKey)
+    entry = (qsos && qsos.find((q) => q.key === entryKey)) || qsos[0]
   } else {
     entry = qsos && qsos[0]
   }
