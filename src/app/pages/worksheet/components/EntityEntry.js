@@ -66,7 +66,7 @@ export function EntityEntry({ entity, num, qsos, entryKey, selectedPrefix, setSe
   }
 
   if (entryKey) {
-    entry = (qsos && qsos.find((q) => q.key === entryKey)) || qsos[0]
+    entry = (qsos && qsos.find((q) => q.key === entryKey)) || (qsos && qsos[0])
   } else {
     entry = qsos && qsos[0]
   }
