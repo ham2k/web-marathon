@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+/* globals FileReader */
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Button, CircularProgress } from '@mui/material'

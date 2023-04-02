@@ -33,7 +33,7 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
         } else {
           console.error('Unexpected Error contacting QRZ: bad response')
           console.error(response)
-          reject()
+          reject(new Error('Unexpected Error contacting QRZ: bad response'))
         }
       })
       .then((bodyText) => {
@@ -42,7 +42,8 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
         if (qrz.RESULT === 'OK') {
           dispatch(loadADIFLog(qrz.ADIF)).then(
             () => resolve(),
-            () => reject()
+            () => reject(new Error('Error loading ADIF Log'))
+
           )
         } else {
           console.error('Unexpected QRZ Error', qrz)
@@ -52,13 +53,13 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
             setError && setError('Unexpected Error contacting QRZ')
           }
 
-          reject()
+          reject(new Error('Unexpected QRZ Error'))
         }
       })
       .catch((error) => {
         setError && setError(`Unexpected Error contacting QRZ: ${error.message}`)
         console.log('QRZ Error', error)
-        reject()
+        reject(new Error('Unexpected QRZ Error'))
       })
   })
 }

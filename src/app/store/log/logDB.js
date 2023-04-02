@@ -1,3 +1,5 @@
+/* eslint-env browser */
+
 export const DB_VERSION = 1
 export const DB_NAME = 'logdb'
 
@@ -31,14 +33,14 @@ export function logDB () {
 
     request.onerror = () => {
       console.error('IndexedDB Error', request)
-      reject('Error occured')
+      reject(new Error('Error occured'))
     }
     request.onblocked = () => {
       // This should only happen if we upgrade the database while another tab has an older version open
       // AND the other tab fails to close it when notified via `onversionchanged`
       console.error('IndexedDB Blocked', request)
       alert('There seem to be other tabs open with an older version of this app. Please close them first')
-      reject('Blocked!')
+      reject(new Error('Blocked!'))
     }
   })
 }

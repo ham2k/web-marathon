@@ -122,7 +122,7 @@ export const loadADIFLog =
           }
           request.onerror = (event) => {
             console.error('IndexedDB Error', event, transaction)
-            reject('Error occured')
+            reject(new Error('Error occured'))
           }
         })
       })

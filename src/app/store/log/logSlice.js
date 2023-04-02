@@ -4,8 +4,7 @@ import { setCurrentLogCalls } from '../entries'
 import { setSettingsYear } from '../settings'
 import { logDB } from './logDB'
 
-// Not sure why ESLint thinks this is a hook 🤷
-useBuiltinCountryFile() // eslint-disable-line react-hooks/rules-of-hooks
+useBuiltinCountryFile()
 
 const initialState = {}
 

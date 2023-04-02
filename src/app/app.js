@@ -1,5 +1,4 @@
 import React, { forwardRef } from 'react'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 import { Link as RouterLink } from 'react-router-dom'
 
