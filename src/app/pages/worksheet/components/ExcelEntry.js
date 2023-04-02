@@ -1,16 +1,16 @@
-import { fmtDateTime } from "@ham2k/lib-format-tools"
-import React from "react"
+import { fmtDateTime } from '@ham2k/lib-format-tools'
+import React from 'react'
 
 const MODE_TRANSLATION = {
-  CW: "CW",
-  SSB: "Phone",
-  USB: "Phone",
-  LSB: "Phone",
-  AM: "Phone",
-  FM: "Phone",
-  default: "Digital",
+  CW: 'CW',
+  SSB: 'Phone',
+  USB: 'Phone',
+  LSB: 'Phone',
+  AM: 'Phone',
+  FM: 'Phone',
+  default: 'Digital'
 }
-export function ExcelEntry({ qsos, entryKey }) {
+export function ExcelEntry ({ qsos, entryKey }) {
   let entry
 
   if (entryKey) {
@@ -22,17 +22,17 @@ export function ExcelEntry({ qsos, entryKey }) {
   if (entry) {
     return (
       <tr>
-        <td>{fmtDateTime(entry.endMillis ?? entry.startMillis, { day: "2-digit", timeZone: "UTC" })}</td>
-        <td>{fmtDateTime(entry.endMillis ?? entry.startMillis, { month: "2-digit", timeZone: "UTC" })}</td>
+        <td>{fmtDateTime(entry.endMillis ?? entry.startMillis, { day: '2-digit', timeZone: 'UTC' })}</td>
+        <td>{fmtDateTime(entry.endMillis ?? entry.startMillis, { month: '2-digit', timeZone: 'UTC' })}</td>
         <td>
           {fmtDateTime(entry.endMillis ?? entry.startMillis, {
-            hour: "2-digit",
-            minute: "2-digit",
-            hourCycle: "h23",
-            timeZone: "UTC",
-          }).replace(":", "")}
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23',
+            timeZone: 'UTC'
+          }).replace(':', '')}
         </td>
-        <td>{entry.band.replace("m", "")}</td>
+        <td>{entry.band.replace('m', '')}</td>
         <td>{MODE_TRANSLATION[entry.mode] ?? MODE_TRANSLATION.default}</td>
         <td>{entry.their.call}</td>
       </tr>
@@ -40,12 +40,12 @@ export function ExcelEntry({ qsos, entryKey }) {
   } else {
     return (
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td />
+        <td />
+        <td />
+        <td />
+        <td />
+        <td />
       </tr>
     )
   }

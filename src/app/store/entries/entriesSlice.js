@@ -1,12 +1,12 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   selections: {},
-  calls: undefined,
+  calls: undefined
 }
 
 export const entriesSlice = createSlice({
-  name: "entries",
+  name: 'entries',
 
   initialState,
 
@@ -21,8 +21,8 @@ export const entriesSlice = createSlice({
     },
     setCurrentLogCalls: (state, action) => {
       state.calls = action.payload
-    },
-  },
+    }
+  }
 })
 
 export const { resetSelections, setSelection, setCurrentLogCalls } = entriesSlice.actions

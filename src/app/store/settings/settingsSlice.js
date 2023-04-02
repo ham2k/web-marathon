@@ -1,14 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit"
-import { REHYDRATE } from "redux-persist"
+import { createSlice } from '@reduxjs/toolkit'
+import { REHYDRATE } from 'redux-persist'
 // import { REHYDRATE } from "redux-persist"
-import guessCurrentYear from "../../tools/guessCurrentYear"
+import guessCurrentYear from '../../tools/guessCurrentYear'
 
 const initialState = {
-  year: guessCurrentYear(),
+  year: guessCurrentYear()
 }
 
 export const settingsSlice = createSlice({
-  name: "settings",
+  name: 'settings',
 
   initialState,
 
@@ -20,7 +20,7 @@ export const settingsSlice = createSlice({
 
     setQrzKey: (state, action) => {
       state.qrzKey = action.payload.qrzKey
-    },
+    }
   },
 
   extraReducers: (builder) => {
@@ -33,7 +33,7 @@ export const settingsSlice = createSlice({
       .addDefaultCase((state, action) => {
         return null
       })
-  },
+  }
 })
 
 export const { setSettingsYear, setQrzKey } = settingsSlice.actions

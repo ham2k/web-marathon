@@ -1,28 +1,28 @@
-import React, { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
-import { Box, Button, Dialog, Typography } from "@mui/material"
-import { Clear, FileDownload } from "@mui/icons-material"
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { Box, Button, Dialog, Typography } from '@mui/material'
+import { Clear, FileDownload } from '@mui/icons-material'
 
-import { fmtNumber } from "@ham2k/lib-format-tools"
+import { fmtNumber } from '@ham2k/lib-format-tools'
 
-import { clearCurrentLog, fetchCurrentLog, selectEntityGroups, selectYearQSOs } from "../../store/log"
-import { selectEntrySelections, selectOurCalls } from "../../store/entries"
-import { selectSettings } from "../../store/settings"
-import { PointsChart } from "./components/PointsChart"
-import { EntityList } from "./components/EntityList"
-import { ExportDialog } from "./components/ExportDialog"
+import { clearCurrentLog, fetchCurrentLog, selectEntityGroups, selectYearQSOs } from '../../store/log'
+import { selectEntrySelections, selectOurCalls } from '../../store/entries'
+import { selectSettings } from '../../store/settings'
+import { PointsChart } from './components/PointsChart'
+import { EntityList } from './components/EntityList'
+import { ExportDialog } from './components/ExportDialog'
 
 const styles = {
   root: {
-    "& h2": {
-      marginTop: "1em",
-      borderBottom: "2px solid #333",
-    },
-  },
+    '& h2': {
+      marginTop: '1em',
+      borderBottom: '2px solid #333'
+    }
+  }
 }
 
-export function WorksheetPage() {
+export function WorksheetPage () {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const settings = useSelector(selectSettings)
@@ -39,7 +39,7 @@ export function WorksheetPage() {
 
   const handleClearLog = (event) => {
     dispatch(clearCurrentLog({}))
-    navigate(`/`)
+    navigate('/')
   }
 
   if (!qsos) {
@@ -48,8 +48,8 @@ export function WorksheetPage() {
 
   return (
     <Box sx={styles.root}>
-      <Typography component="h1" variant="h3">
-        <span style={{ float: "right" }}>
+      <Typography component='h1' variant='h3'>
+        <span style={{ float: 'right' }}>
           <Button onClick={() => setExportDialogOpen(true)}>
             <FileDownload /> Generate Submission
           </Button>
@@ -57,7 +57,7 @@ export function WorksheetPage() {
         <i>{fmtNumber(qsos.length)} QSOs</i>
         {Object.keys(ourCalls).length > 0 && (
           <>
-            <i> for</i> {Object.keys(ourCalls).join(", ")}
+            <i> for</i> {Object.keys(ourCalls).join(', ')}
           </>
         )}
         <i> in</i> {settings?.year}

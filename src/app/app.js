@@ -1,26 +1,26 @@
-import React, { forwardRef } from "react"
+import React, { forwardRef } from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink } from 'react-router-dom'
 
-import { Box, Container, CssBaseline, responsiveFontSizes } from "@mui/material"
+import { Box, Container, CssBaseline, responsiveFontSizes } from '@mui/material'
 
-import { createTheme, ThemeProvider } from "@mui/material/styles"
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 
-import { ContentRoutes } from "./routes"
-import ErrorBoundary from "./components/ErrorBoundary"
-import commonStyles from "./styles/common"
-import { VersionChecker } from "./components/VersionChecker"
-import { Footer } from "./components/Footer"
-import { Header } from "./components/Header"
+import { ContentRoutes } from './routes'
+import ErrorBoundary from './components/ErrorBoundary'
+import commonStyles from './styles/common'
+import { VersionChecker } from './components/VersionChecker'
+import { Footer } from './components/Footer'
+import { Header } from './components/Header'
 
 window.currentCommit = window?.ENV?.COMMIT
 window.currentEnv = window?.ENV?.NODE_ENV
 window.currentURL = window?.ENV?.URL
 
-if (window.currentCommit === "%NX_COMMIT%") window.currentCommit = ""
-if (window.currentEnv === "%NODE_ENV%") window.currentEnv = "unknown"
-if (window.currentURL === "%NX_URL%") window.currentURL = ""
+if (window.currentCommit === '%NX_COMMIT%') window.currentCommit = ''
+if (window.currentEnv === '%NODE_ENV%') window.currentEnv = 'unknown'
+if (window.currentURL === '%NX_URL%') window.currentURL = ''
 
 const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   const { href, ...other } = props
@@ -32,26 +32,26 @@ const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
 let baseTheme = createTheme({
   palette: {
     primary: {
-      main: "#546e7a",
+      main: '#546e7a'
     },
     secondary: {
-      main: "#757575",
-    },
+      main: '#757575'
+    }
   },
 
   // Ensure MUI Links use React-Router links as their underlying component
   components: {
     MuiLink: {
       defaultProps: {
-        component: MuiToRouterLinkTranslator,
-      },
+        component: MuiToRouterLinkTranslator
+      }
     },
     MuiButtonBase: {
       defaultProps: {
-        LinkComponent: MuiToRouterLinkTranslator,
-      },
-    },
-  },
+        LinkComponent: MuiToRouterLinkTranslator
+      }
+    }
+  }
 })
 baseTheme = responsiveFontSizes(baseTheme)
 
@@ -59,36 +59,36 @@ const styles = {
   root: {
     ...commonStyles,
 
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
     left: 0,
     bottom: 0,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    "& header": {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    '& header': {
       zIndex: 1,
-      "& .MuiToolbar-root div": {
+      '& .MuiToolbar-root div': {
         flexGrow: 1,
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "start",
-        alignItems: "baseline",
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'start',
+        alignItems: 'baseline'
       },
-      "& h1": {
-        fontWeight: "500 !important",
+      '& h1': {
+        fontWeight: '500 !important'
       },
-      "& h1 i": {
-        fontStyle: "normal",
-        fontWeight: "300 !important",
-      },
-    },
+      '& h1 i': {
+        fontStyle: 'normal',
+        fontWeight: '300 !important'
+      }
+    }
   },
   toolbar: {
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     pl: { xs: 0.5, sm: 1, lg: 3 },
-    pr: { xs: 0.5, sm: 1, lg: 3 },
+    pr: { xs: 0.5, sm: 1, lg: 3 }
   },
 
   footer: {
@@ -97,37 +97,37 @@ const styles = {
     pl: { xs: 1, sm: 2 },
     pr: { xs: 1, sm: 2 },
 
-    textAlign: "center",
+    textAlign: 'center',
     zIndex: 1,
-    boxShadow: "0px 0px 10px 5px rgb(0 0 0 / 12%)",
-    "& a, & a:link, & a:visited": {
-      color: "#0000AA",
-      textDecoration: "none",
+    boxShadow: '0px 0px 10px 5px rgb(0 0 0 / 12%)',
+    '& a, & a:link, & a:visited': {
+      color: '#0000AA',
+      textDecoration: 'none'
     },
-    "& a:hover, & a:active": {
-      color: "#0000CC",
-      textDecoration: "underline",
-    },
+    '& a:hover, & a:active': {
+      color: '#0000CC',
+      textDecoration: 'underline'
+    }
   },
   contentWrapper: {
     flex: 1,
-    overflow: "auto",
+    overflow: 'auto'
   },
   content: {
     pt: 2,
     pb: 2,
     pl: 4,
-    "& h1": {
-      fontWeight: "500 !important",
+    '& h1': {
+      fontWeight: '500 !important'
     },
-    "& h1 i": {
-      fontStyle: "normal",
-      fontWeight: "300 !important",
-    },
-  },
+    '& h1 i': {
+      fontStyle: 'normal',
+      fontWeight: '300 !important'
+    }
+  }
 }
 
-export function App() {
+export function App () {
   return (
     <Box sx={styles.root}>
       <Header styles={styles} />
@@ -147,7 +147,7 @@ export function App() {
   )
 }
 
-export function ThemedApp() {
+export function ThemedApp () {
   return (
     <>
       <CssBaseline />

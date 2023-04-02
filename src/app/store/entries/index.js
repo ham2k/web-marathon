@@ -1,5 +1,5 @@
-import reducer from "./entriesSlice"
+import reducer from './entriesSlice'
 
-export * from "./entriesSlice"
+export * from './entriesSlice'
 
 export default reducer

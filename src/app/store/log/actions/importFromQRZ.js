@@ -1,13 +1,13 @@
-import { proxyFor } from "../../../tools/proxyFor"
-import { selectCurrentYear, selectQrzKey } from "../../settings"
-import { loadADIFLog } from "./loadADIFLog"
+import { proxyFor } from '../../../tools/proxyFor'
+import { selectCurrentYear, selectQrzKey } from '../../settings'
+import { loadADIFLog } from './loadADIFLog'
 
-const BASE_URL = "https://logbook.qrz.com/api"
+const BASE_URL = 'https://logbook.qrz.com/api'
 
 const HTML_ENTITIES = {
-  "&lt;": "<",
-  "&gt;": ">",
-  "&amp;": "&",
+  '&lt;': '<',
+  '&gt;': '>',
+  '&amp;': '&'
 }
 
 export const importFromQRZ = (setError) => (dispatch, getState) => {
@@ -18,20 +18,20 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
 
     const url = new URL(BASE_URL)
     const body = new URLSearchParams()
-    body.append("KEY", key)
-    body.append("ACTION", "FETCH")
-    body.append("OPTION", `BETWEEN:${year}-01-01 ${year + 1}-01-01`)
+    body.append('KEY', key)
+    body.append('ACTION', 'FETCH')
+    body.append('OPTION', `BETWEEN:${year}-01-01 ${year + 1}-01-01`)
 
     return fetch(proxyFor(url), {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-      body: body,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body
     })
       .then((response) => {
         if (response.ok) {
           return response.text()
         } else {
-          console.error("Unexpected Error contacting QRZ: bad response")
+          console.error('Unexpected Error contacting QRZ: bad response')
           console.error(response)
           reject()
         }
@@ -39,17 +39,17 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
       .then((bodyText) => {
         const qrz = parseQrzResponse(bodyText)
 
-        if (qrz.RESULT === "OK") {
+        if (qrz.RESULT === 'OK') {
           dispatch(loadADIFLog(qrz.ADIF)).then(
             () => resolve(),
             () => reject()
           )
         } else {
-          console.error("Unexpected QRZ Error", qrz)
+          console.error('Unexpected QRZ Error', qrz)
           if (qrz.REASON) {
             setError && setError(`Unexpected Error contacting QRZ: ${qrz.REASON}`)
           } else {
-            setError && setError(`Unexpected Error contacting QRZ`)
+            setError && setError('Unexpected Error contacting QRZ')
           }
 
           reject()
@@ -57,7 +57,7 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
       })
       .catch((error) => {
         setError && setError(`Unexpected Error contacting QRZ: ${error.message}`)
-        console.log("QRZ Error", error)
+        console.log('QRZ Error', error)
         reject()
       })
   })
@@ -93,7 +93,7 @@ const QRZ_PARSING_REGEXP =
 
 const HTML_ENTITY_REGEXP = /&\w+;/g
 
-function parseQrzResponse(str) {
+function parseQrzResponse (str) {
   const pairs = {}
 
   str = str.replace(HTML_ENTITY_REGEXP, (match) => HTML_ENTITIES[match] || `[${match}]`)

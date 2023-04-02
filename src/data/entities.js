@@ -1,5 +1,4 @@
-import { CQWW_ENTITIES } from "@ham2k/lib-cqmag-data"
-import { CQZONES } from "@ham2k/lib-cqmag-data"
+import { CQWW_ENTITIES, CQZONES } from '@ham2k/lib-cqmag-data'
 
 // DX Marathon form has some entities out of order
 // * CE0X after CE0Z
@@ -9,18 +8,18 @@ import { CQZONES } from "@ham2k/lib-cqmag-data"
 // * HK0/a after HK0/m
 // * VP8/h after VP8/s
 const REORDERED_PREFIXES = {
-  CE0X: "CE0Zzzz",
-  FO: "FO/czzz",
-  FR: "FT/jzzz",
-  FS: "FT/tzzz",
-  "HK0/a": "HK0/mzzz",
-  "VP8/h": "VP8/szzz",
+  CE0X: 'CE0Zzzz',
+  FO: 'FO/czzz',
+  FR: 'FT/jzzz',
+  FS: 'FT/tzzz',
+  'HK0/a': 'HK0/mzzz',
+  'VP8/h': 'VP8/szzz'
 }
 
 export const CQWWEntities = Object.values(CQWW_ENTITIES).sort((a, b) => {
-  const attr = "entityPrefix"
-  let aValue = a[attr][0] === "*" ? a[attr].slice(1) : a[attr]
-  let bValue = b[attr][0] === "*" ? b[attr].slice(1) : b[attr]
+  const attr = 'entityPrefix'
+  let aValue = a[attr][0] === '*' ? a[attr].slice(1) : a[attr]
+  let bValue = b[attr][0] === '*' ? b[attr].slice(1) : b[attr]
 
   aValue = REORDERED_PREFIXES[aValue] ?? aValue
   bValue = REORDERED_PREFIXES[bValue] ?? bValue

@@ -1,15 +1,15 @@
-import { Refresh } from "@mui/icons-material"
-import { Box } from "@mui/system"
-import React, { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Refresh } from '@mui/icons-material'
+import { Box } from '@mui/system'
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 const CHECK_PERIODICITY_IN_MILLIS = 4 * 60 * 60 * 1000 // 4 hours
 
-export function VersionChecker() {
+export function VersionChecker () {
   const [serverCommit, setServerCommit] = useState(false)
 
   useEffect(() => {
-    if (window.currentEnv === "production" && window.currentURL) {
+    if (window.currentEnv === 'production' && window.currentURL) {
       const intervalId = setInterval(() => {
         fetch(window.currentURL).then(
           (response) => {
@@ -21,7 +21,7 @@ export function VersionChecker() {
             })
           },
           (error) => {
-            console.error("Error while trying to fetch current server version", error)
+            console.error('Error while trying to fetch current server version', error)
           }
         )
       }, CHECK_PERIODICITY_IN_MILLIS)
@@ -33,20 +33,20 @@ export function VersionChecker() {
     }
   }, [])
 
-  if (window.currentEnv === "production" && serverCommit && serverCommit !== window.currentCommit) {
+  if (window.currentEnv === 'production' && serverCommit && serverCommit !== window.currentCommit) {
     return (
       <Box
         sx={{
-          backgroundColor: "#F0F0AA",
+          backgroundColor: '#F0F0AA',
           m: 0,
           p: 2,
-          display: "inline-flex",
-          verticalAlign: "middle",
-          justifyContent: "center",
+          display: 'inline-flex',
+          verticalAlign: 'middle',
+          justifyContent: 'center'
         }}
       >
         There is a newer version of this application. &nbsp;&nbsp; Please&nbsp;&nbsp;
-        <Link onClick={() => window.location.reload()} style={{ display: "inline-flex", verticalAlign: "middle" }}>
+        <Link onClick={() => window.location.reload()} style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
           <Refresh /> &nbsp;reload this page
         </Link>
         &nbsp;&nbsp;&nbsp;to update it.

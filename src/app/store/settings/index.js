@@ -1,5 +1,5 @@
-import reducer from "./settingsSlice"
+import reducer from './settingsSlice'
 
-export * from "./settingsSlice"
+export * from './settingsSlice'
 
 export default reducer

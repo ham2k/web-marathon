@@ -1,4 +1,4 @@
-function guessCurrentYear() {
+function guessCurrentYear () {
   const today = new Date()
   const month = today.getMonth() + 1
   const day = today.getDate()

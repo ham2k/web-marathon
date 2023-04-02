@@ -32,10 +32,12 @@
     "web-vitals": "^2.1.4"
   },
   "devDepedencies": {
-    "netlify-cli": "^12.4.0"
+    "netlify-cli": "^12.4.0",
+    "standard": "^17.0.0"
   },
   "scripts": {
     "start": "PORT=4202 react-scripts start",
+    "dev": "netlify dev",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

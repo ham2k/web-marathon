@@ -1,14 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   loading: false,
   error: undefined,
   lastLoaded: undefined,
-  cty: {},
+  cty: {}
 }
 
 export const clublogSlice = createSlice({
-  name: "clublog",
+  name: 'clublog',
 
   initialState,
 
@@ -30,8 +30,8 @@ export const clublogSlice = createSlice({
       state.error = undefined
       state.loading = false
       state.lastLoaded = new Date().valueOf()
-    },
-  },
+    }
+  }
 })
 
 export const { setClublogLoading, setClublogCtyData } = clublogSlice.actions

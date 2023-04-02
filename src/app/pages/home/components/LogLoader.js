@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react"
-import { useDispatch } from "react-redux"
-import { Button, CircularProgress } from "@mui/material"
-import { Box } from "@mui/system"
-import FolderOpenIcon from "@mui/icons-material/FolderOpen"
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { Button, CircularProgress } from '@mui/material'
+import { Box } from '@mui/system'
+import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
-import { clearCurrentLog, loadADIFLog } from "../../../store/log"
-import { useNavigate } from "react-router-dom"
+import { clearCurrentLog, loadADIFLog } from '../../../store/log'
+import { useNavigate } from 'react-router-dom'
 
-export function LogLoader({ title, classes }) {
+export function LogLoader ({ title, classes }) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -31,12 +31,12 @@ export function LogLoader({ title, classes }) {
                 pendingFileCount--
                 if (pendingFileCount === 0) {
                   setLoading(false)
-                  navigate(`/worksheet`)
+                  navigate('/worksheet')
                 }
               })
             }
             /* eslint-enable no-loop-func */
-            reader.readAsText(file, "ISO-8859-1")
+            reader.readAsText(file, 'ISO-8859-1')
           }
           event.target.value = null
         }, 500)
@@ -46,35 +46,35 @@ export function LogLoader({ title, classes }) {
 
   if (loading) {
     return (
-      <Box sx={{ position: "relative" }} component="span">
+      <Box sx={{ position: 'relative' }} component='span'>
         <Button
-          variant="contained"
+          variant='contained'
           disabled
           startIcon={<FolderOpenIcon />}
-          color="primary"
-          component="label"
-          size="medium"
+          color='primary'
+          component='label'
+          size='medium'
         >
-          {title ?? "Load ADIF Log"}
-          <input type="file" hidden multiple onChange={(x) => handleFileSelected(x)} />
+          {title ?? 'Load ADIF Log'}
+          <input type='file' hidden multiple onChange={(x) => handleFileSelected(x)} />
         </Button>
         <CircularProgress
           size={24}
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            marginTop: "-12px",
-            marginLeft: "-12px",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            marginTop: '-12px',
+            marginLeft: '-12px'
           }}
         />
       </Box>
     )
   } else {
     return (
-      <Button variant="contained" startIcon={<FolderOpenIcon />} color="primary" component="label" size="medium">
-        {title ?? "Load ADIF Log"}
-        <input type="file" hidden multiple onChange={(x) => handleFileSelected(x)} />
+      <Button variant='contained' startIcon={<FolderOpenIcon />} color='primary' component='label' size='medium'>
+        {title ?? 'Load ADIF Log'}
+        <input type='file' hidden multiple onChange={(x) => handleFileSelected(x)} />
       </Button>
     )
   }
