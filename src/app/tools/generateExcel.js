@@ -1,5 +1,5 @@
 import XLSX from "xlsx"
-import { fmtDateTime } from "@ham2k/util/format"
+import { fmtDateTime } from "@ham2k/lib-format-tools"
 
 import { CQWWEntities, CQZones } from "../../data/entities"
 import Scoresheet from "../../data/Scoresheet-2022.1.xls"

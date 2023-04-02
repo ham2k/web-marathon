@@ -1,4 +1,4 @@
-import { fmtDateTime } from "@ham2k/util/format"
+import { fmtDateTime } from "@ham2k/lib-format-tools"
 import React from "react"
 
 const MODE_TRANSLATION = {

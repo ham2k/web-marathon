@@ -4,7 +4,7 @@ import ApexChart from "react-apexcharts"
 import { EntitiesAndZones } from "../../../../data/entities"
 
 import { Typography } from "@mui/material"
-import { dateFormatterGenerator } from "@ham2k/util/format"
+import { dateFormatterGenerator } from "@ham2k/lib-format-tools"
 import guessCurrentYear from "../../../tools/guessCurrentYear"
 
 const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000

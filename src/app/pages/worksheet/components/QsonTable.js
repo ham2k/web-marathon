@@ -3,8 +3,8 @@ import React from "react"
 
 import classNames from "classnames"
 
-import { fmtDateMonthYear } from "@ham2k/util/format"
-import { fmtInteger } from "@ham2k/util/format"
+import { fmtDateMonthYear } from "@ham2k/lib-format-tools"
+import { fmtInteger } from "@ham2k/lib-format-tools"
 
 const styles = {
   root: {

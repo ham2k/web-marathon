@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { Box, Button, Dialog, Typography } from "@mui/material"
 import { Clear, FileDownload } from "@mui/icons-material"
 
-import { fmtNumber } from "@ham2k/util/format"
+import { fmtNumber } from "@ham2k/lib-format-tools"
 
 import { clearCurrentLog, fetchCurrentLog, selectEntityGroups, selectYearQSOs } from "../../store/log"
 import { selectEntrySelections, selectOurCalls } from "../../store/entries"

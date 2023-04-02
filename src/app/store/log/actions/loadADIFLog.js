@@ -1,8 +1,9 @@
 import { logDB } from "../logDB"
-import { parseCallsign } from "@ham2k/data/callsigns"
-import { annotateFromCountryFile, fillDXCCfromCountryFile } from "@ham2k/data/country-file"
-import { adifToQSON } from "@ham2k/qson/adif"
-import { qsoKey } from "@ham2k/qson/tools"
+import { parseCallsign } from "@ham2k/lib-callsigns"
+import { annotateFromCountryFile, fillDXCCfromCountryFile } from "@ham2k/lib-country-files"
+import { adifToQSON } from "@ham2k/lib-qson-adif"
+import { qsoKey } from "@ham2k/lib-qson-tools"
+
 import qsoComparer from "../../../tools/qsoComparer"
 import qslSourceComparer from "../../../tools/qslSourceComparer"
 import guessCurrentYear from "../../../tools/guessCurrentYear"

@@ -1,0 +1,61 @@
+{
+  "name": "@ham2k/web-marathon",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@mui/icons-material": "^5.5.0",
+    "@mui/material": "5.10",
+    "@reduxjs/toolkit": "^1.8.4",
+    "react-apexcharts": "^1.4.0",
+    "apexcharts": "^3.35.0",
+    "classnames": "^2.3.1",
+    "localforage": "^1.10.0",
+    "react-redux": "8.0.2",
+    "react-router-dom": "6.4.1",
+    "redux-persist": "^6.0.0",
+    "regenerator-runtime": "0.13.7",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.0/xlsx-0.19.0.tgz",
+    "@ham2k/lib-format-tools": "~0.0.1",
+    "@ham2k/lib-callsigns": "~0.0.1",
+    "@ham2k/lib-country-files": "~0.0.1",
+    "@ham2k/lib-qson-adif": "~0.0.1",
+    "@ham2k/lib-qson-tools": "~0.0.1",
+    "@ham2k/lib-cqmag-data": "~0.0.1",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "devDepedencies": {
+    "netlify-cli": "^12.4.0"
+  },
+  "scripts": {
+    "start": "PORT=4202 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

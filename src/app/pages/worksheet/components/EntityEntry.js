@@ -2,8 +2,8 @@ import React from "react"
 
 import classNames from "classnames"
 
-import { fmtInteger } from "@ham2k/util/format"
-import { fmtDateTime } from "@ham2k/util/format"
+import { fmtInteger } from "@ham2k/lib-format-tools"
+import { fmtDateTime } from "@ham2k/lib-format-tools"
 import { Button, Chip, Tooltip } from "@mui/material"
 import {
   CheckCircleRounded,
