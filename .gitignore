@@ -1,0 +1,23 @@
+# local secrets
+.local.env
+
+# compiled output
+/dist
+/tmp
+
+# dependencies
+node_modules
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Local Netlify folder
+.netlify
