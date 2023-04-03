@@ -19,9 +19,13 @@ function processOneQSO (qso) {
   }
 
   parseCallsign(qso.their.call, qso.their.guess)
-  const iotaRef = qso.refs && qso.refs.find((ref) => ref.type === 'iota')
+  const iotaRef = qso.refs && qso.refs.find(ref => ref.type === 'iota')
   if (qso.their.dxccCode) fillDXCCfromCountryFile(qso.their.dxccCode, qso.their) // fill any missing dxcc info
-  annotateFromCountryFile(qso.their.guess, { wae: true, state: qso.their.state, iota: iotaRef?.ref }) // guess dxcc from callsign
+  annotateFromCountryFile(qso.their.guess, {
+    wae: true,
+    state: qso.their.state,
+    iota: iotaRef?.ref
+  }) // guess dxcc from callsign
 
   if (
     qso.their.entityPrefix &&
@@ -36,7 +40,11 @@ function processOneQSO (qso) {
     qso.notes.push(note)
   }
 
-  if (qso.their.cqZone && qso.their.guess.cqZone && qso.their.cqZone !== qso.their.guess.cqZone) {
+  if (
+    qso.their.cqZone &&
+    qso.their.guess.cqZone &&
+    qso.their.cqZone !== qso.their.guess.cqZone
+  ) {
     qso.notes = qso.notes ?? []
     const note = {
       about: 'cqZone',
@@ -54,76 +62,90 @@ function processOneQSO (qso) {
   return qso
 }
 
-export const loadADIFLog =
-  (data, options = {}) =>
-    (dispatch, getState) => {
-      return new Promise((resolve, reject) => {
-        logDB().then((db) => {
-          const { settings } = getState()
+export const loadADIFLog = (data, options = {}) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve, reject) => {
+      logDB().then(db => {
+        const { settings } = getState()
 
-          const qson = adifToQSON(data)
-          let qsos = qson.qsos
+        const qson = adifToQSON(data)
+        let qsos = qson.qsos
 
-          const year = settings?.year ?? guessCurrentYear()
-          const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
-          const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
+        const year = settings?.year ?? guessCurrentYear()
+        const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
+        const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
-          let yearQSOs = qsos.filter((qso) => qso.startMillis <= yearEnd && qso.endMillis >= yearStart)
-          yearQSOs.forEach((qso) => {
-            qso = processOneQSO(qso)
-          })
+        let yearQSOs = qsos.filter(
+          qso => qso.startMillis <= yearEnd && qso.endMillis >= yearStart
+        )
+        yearQSOs.forEach(qso => {
+          qso = processOneQSO(qso)
+        })
 
-          if (options.append) {
-            const prevQSOs = getState()?.log?.qsos ?? []
-            const prevYearQSOs = getState()?.log?.yearQSOs ?? []
-            qsos = prevQSOs.concat(qsos)
-            yearQSOs = prevYearQSOs.concat(yearQSOs)
+        if (options.append) {
+          const prevQSOs = getState()?.log?.qsos ?? []
+          const prevYearQSOs = getState()?.log?.yearQSOs ?? []
+          qsos = prevQSOs.concat(qsos)
+          yearQSOs = prevYearQSOs.concat(yearQSOs)
+        }
+
+        const ourCalls = {}
+        const entityGroups = {}
+
+        yearQSOs.forEach(qso => {
+          if (qso.our.call) {
+            ourCalls[qso.our.call] = (ourCalls[qso.our.call] ?? 0) + 1
           }
 
-          const ourCalls = {}
-          const entityGroups = {}
-
-          yearQSOs.forEach((qso) => {
-            if (qso.our.call) {
-              ourCalls[qso.our.call] = (ourCalls[qso.our.call] ?? 0) + 1
-            }
-
-            if (qso.their.entityPrefix) {
-              entityGroups[qso.their.entityPrefix] = entityGroups[qso.their.entityPrefix] ?? []
-              entityGroups[qso.their.entityPrefix].push(qso)
-            }
-            if (qso.their.guess.entityPrefix && qso.their.guess.entityPrefix !== qso.their.entityPrefix) {
-              entityGroups[qso.their.guess.entityPrefix] = entityGroups[qso.their.guess.entityPrefix] ?? []
-              entityGroups[qso.their.guess.entityPrefix].push(qso)
-            }
-
-            if (qso.their.cqZone) {
-              entityGroups[`Zone ${qso.their.cqZone}`] = entityGroups[`Zone ${qso.their.cqZone}`] ?? []
-              entityGroups[`Zone ${qso.their.cqZone}`].push(qso)
-            }
-            if (qso.their.guess.cqZone && qso.their.guess.cqZone !== qso.their.cqZone) {
-              entityGroups[`Zone ${qso.their.guess.cqZone}`] = entityGroups[`Zone ${qso.their.guess.cqZone}`] ?? []
-              entityGroups[`Zone ${qso.their.guess.cqZone}`].push(qso)
-            }
-          })
-
-          Object.keys(entityGroups).forEach((key) => {
-            entityGroups[key] = entityGroups[key].sort(qsoComparer)
-          })
-
-          const transaction = db.transaction(['logs'], 'readwrite')
-          const request = transaction
-            .objectStore('logs')
-            .put({ key: 'current', year, qsos, ourCalls, yearQSOs, entityGroups })
-          request.onsuccess = () => {
-            dispatch(setCurrentLogInfo({ qsos, ourCalls, yearQSOs, entityGroups }))
-            dispatch(setSettingsYear({ year }))
-            resolve()
+          if (qso.their.entityPrefix) {
+            entityGroups[qso.their.entityPrefix] =
+              entityGroups[qso.their.entityPrefix] ?? []
+            entityGroups[qso.their.entityPrefix].push(qso)
           }
-          request.onerror = (event) => {
-            console.error('IndexedDB Error', event, transaction)
-            reject(new Error('Error occured'))
+          if (
+            qso.their.guess.entityPrefix &&
+            qso.their.guess.entityPrefix !== qso.their.entityPrefix
+          ) {
+            entityGroups[qso.their.guess.entityPrefix] =
+              entityGroups[qso.their.guess.entityPrefix] ?? []
+            entityGroups[qso.their.guess.entityPrefix].push(qso)
+          }
+
+          if (qso.their.cqZone) {
+            entityGroups[`Zone ${qso.their.cqZone}`] =
+              entityGroups[`Zone ${qso.their.cqZone}`] ?? []
+            entityGroups[`Zone ${qso.their.cqZone}`].push(qso)
+          }
+          if (
+            qso.their.guess.cqZone &&
+            qso.their.guess.cqZone !== qso.their.cqZone
+          ) {
+            entityGroups[`Zone ${qso.their.guess.cqZone}`] =
+              entityGroups[`Zone ${qso.their.guess.cqZone}`] ?? []
+            entityGroups[`Zone ${qso.their.guess.cqZone}`].push(qso)
           }
         })
+
+        Object.keys(entityGroups).forEach(key => {
+          entityGroups[key] = entityGroups[key].sort(qsoComparer)
+        })
+
+        const transaction = db.transaction(['logs'], 'readwrite')
+        const request = transaction
+          .objectStore('logs')
+          .put({ key: 'current', year, qsos, ourCalls, yearQSOs, entityGroups })
+        request.onsuccess = () => {
+          dispatch(
+            setCurrentLogInfo({ qsos, ourCalls, yearQSOs, entityGroups })
+          )
+          dispatch(setSettingsYear({ year }))
+          resolve()
+        }
+        request.onerror = event => {
+          console.error('IndexedDB Error', event, transaction)
+          reject(new Error('Error occured'))
+        }
       })
-    }
+    })
+  }
+}
