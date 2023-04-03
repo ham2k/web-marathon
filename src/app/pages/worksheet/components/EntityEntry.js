@@ -47,25 +47,32 @@ const QSL_ICONS = {
   default: CheckCircleRounded
 }
 
-export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setSelectedPrefix }) {
+export function EntityEntry ({
+  entity,
+  num,
+  qsos,
+  entryKey,
+  selectedPrefix,
+  setSelectedPrefix
+}) {
   const dispatch = useDispatch()
 
   const prefix = entity.entityPrefix
 
   let entry
 
-  const handleToggleEntityEntry = (event) => {
+  const handleToggleEntityEntry = event => {
     if (selectedPrefix === prefix) setSelectedPrefix('')
     else setSelectedPrefix(prefix)
   }
 
-  const handleSelectEntry = (newEntry) => {
+  const handleSelectEntry = newEntry => {
     dispatch(setSelection({ prefix: entity.entityPrefix, key: newEntry.key }))
     setSelectedPrefix('')
   }
 
   if (entryKey) {
-    entry = (qsos && qsos.find((q) => q.key === entryKey)) || (qsos && qsos[0])
+    entry = (qsos && qsos.find(q => q.key === entryKey)) || (qsos && qsos[0])
   } else {
     entry = qsos && qsos[0]
   }
@@ -100,10 +107,13 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
     )
     cols.push(
       <td key='call' className='col-call'>
-        <span className='callsign' style={{ verticalAlign: 'middle', display: 'inline-block' }}>
+        <span
+          className='callsign'
+          style={{ verticalAlign: 'middle', display: 'inline-block' }}
+        >
           {entry.their.call}&nbsp;
         </span>
-        {entry.notes && (
+        {entry.notes && (entity.source === 'WAE' && entry.their.guess.entityPrefix !== entity.entityPrefix) && (
           <Tooltip
             arrow
             title={
@@ -128,7 +138,12 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
       <td key='qsl' className='col-qsl'>
         {entry?.qsl?.sources?.length
           ? (
-            <Chip label={entry?.qsl?.sources[0].via} color='info' size='small' icon={<QslIcon entry={entry} />} />
+            <Chip
+              label={entry?.qsl?.sources[0].via}
+              color='info'
+              size='small'
+              icon={<QslIcon entry={entry} />}
+            />
             )
           : (
             <Chip label='qso' color='warning' size='small' icon={<Error />} />
@@ -165,7 +180,12 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
     )
     cols.push(
       <td key='qsl'>
-        <Chip label='nil' color='default' size='small' icon={<HearingDisabled />} />
+        <Chip
+          label='nil'
+          color='default'
+          size='small'
+          icon={<HearingDisabled />}
+        />
       </td>
     )
     cols.push(
@@ -192,8 +212,8 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
       </Box>
       {prefix && selectedPrefix === prefix
         ? qsos
-          .filter((qso) => qso.key !== entry.key)
-          .map((qso) => (
+          .filter(qso => qso.key !== entry.key)
+          .map(qso => (
             <Box
               component='tr'
               sx={styles.root}
@@ -205,14 +225,21 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
               )}
             >
               <td colSpan='2'>&nbsp;</td>
-              <td className='col-date'>{fmtDateTime(qso.endMillis, DATE_FORMAT)}</td>
-              <td className={classNames('col-band', 'band-color')}>{qso.band}</td>
+              <td className='col-date'>
+                {fmtDateTime(qso.endMillis, DATE_FORMAT)}
+              </td>
+              <td className={classNames('col-band', 'band-color')}>
+                {qso.band}
+              </td>
               <td className='col-mode'>{qso.mode}</td>
               <td className='col-call'>
-                <span className='callsign' style={{ verticalAlign: 'middle', display: 'inline-block' }}>
+                <span
+                  className='callsign'
+                  style={{ verticalAlign: 'middle', display: 'inline-block' }}
+                >
                   {qso.their.call}&nbsp;
                 </span>
-                {qso.notes && (
+                {qso.notes && entity.source === 'WAE' && qso.their.guess.entityPrefix !== qso.entityPrefix && (
                   <Tooltip
                     arrow
                     title={
@@ -225,7 +252,10 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
                   >
                     <Error
                       fontSize='small'
-                      sx={{ verticalAlign: 'middle', display: 'inline-block' }}
+                      sx={{
+                        verticalAlign: 'middle',
+                        display: 'inline-block'
+                      }}
                       color='warning'
                       size='small'
                     />
@@ -235,14 +265,28 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
               <td className='col-qsl'>
                 {qso?.qsl?.sources?.length
                   ? (
-                    <Chip label={qso.qsl.sources[0].via} color='info' size='small' icon={<QslIcon entry={qso} />} />
+                    <Chip
+                      label={qso.qsl.sources[0].via}
+                      color='info'
+                      size='small'
+                      icon={<QslIcon entry={qso} />}
+                    />
                     )
                   : (
-                    <Chip label='qso' color='warning' size='small' icon={<Error />} />
+                    <Chip
+                      label='qso'
+                      color='warning'
+                      size='small'
+                      icon={<Error />}
+                    />
                     )}
               </td>
               <td>
-                <Button color='info' size='small' onClick={() => handleSelectEntry(qso)}>
+                <Button
+                  color='info'
+                  size='small'
+                  onClick={() => handleSelectEntry(qso)}
+                >
                   <PushPinOutlined fontSize='small' />
                 </Button>
               </td>
@@ -255,6 +299,8 @@ export function EntityEntry ({ entity, num, qsos, entryKey, selectedPrefix, setS
 
 function QslIcon (params) {
   const { entry } = params
-  const Icon = (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) ?? QSL_ICONS.default
+  const Icon =
+    (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) ??
+    QSL_ICONS.default
   return <Icon {...params} />
 }

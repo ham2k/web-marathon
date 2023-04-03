@@ -1,6 +1,9 @@
 import { logDB } from '../logDB'
 import { parseCallsign } from '@ham2k/lib-callsigns'
-import { annotateFromCountryFile, fillDXCCfromCountryFile } from '@ham2k/lib-country-files'
+import {
+  annotateFromCountryFile,
+  fillDXCCfromCountryFile
+} from '@ham2k/lib-country-files'
 import { adifToQSON } from '@ham2k/lib-qson-adif'
 import { qsoKey } from '@ham2k/lib-qson-tools'
 
@@ -32,12 +35,22 @@ function processOneQSO (qso) {
     qso.their.guess.entityPrefix &&
     qso.their.entityPrefix !== qso.their.guess.entityPrefix
   ) {
-    qso.notes = qso.notes ?? []
-    const note = {
-      about: 'entityPrefix',
-      note: `Log says ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`
+    if (qso.their.dxccCode === qso.their.guess.dxccCode) {
+      // If the entity prefix is wrong, but the DXCC is right, then it's probably a WAE entity
+      qso.notes = qso.notes ?? []
+      const note = {
+        about: 'waeEntity',
+        note: `Log says ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`
+      }
+      qso.notes.push(note)
+    } else {
+      qso.notes = qso.notes ?? []
+      const note = {
+        about: 'entityPrefix',
+        note: `Log says ${qso.their.entityName}.\nWe believe it should be ${qso.their.guess.entityName}.`
+      }
+      qso.notes.push(note)
     }
-    qso.notes.push(note)
   }
 
   if (
