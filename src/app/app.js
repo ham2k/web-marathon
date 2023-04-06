@@ -26,6 +26,7 @@ const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   // Map href (MUI) -> to (react-router)
   return <RouterLink ref={ref} to={href} {...other} />
 })
+MuiToRouterLinkTranslator.displayName = 'MuiToRouterLinkTranslator'
 
 /* https://material.io/resources/color/ */
 let baseTheme = createTheme({

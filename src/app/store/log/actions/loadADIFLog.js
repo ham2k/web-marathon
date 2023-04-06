@@ -144,9 +144,11 @@ export const loadADIFLog = (data, options = {}) => {
         })
 
         const transaction = db.transaction(['logs'], 'readwrite')
+
         const request = transaction
           .objectStore('logs')
           .put({ key: 'current', year, qsos, ourCalls, yearQSOs, entityGroups })
+
         request.onsuccess = () => {
           dispatch(setCurrentLogInfo({ qsos, ourCalls, yearQSOs, entityGroups }))
           dispatch(setSettingsYear({ year }))

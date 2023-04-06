@@ -32,21 +32,20 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.0/xlsx-0.19.0.tgz"
   },
   "devDependencies": {
-    "netlify-cli": "^12.4.0",
-    "standard": "^17.0.0"
+    "eslint": "^8.37.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.32.2",
+    "netlify-cli": "^12.4.0"
   },
   "scripts": {
     "start": "PORT=4202 react-scripts start",
     "dev": "netlify dev",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "standard"
-  },
-  "standard": {
-    "env": [
-      "jest"
-    ]
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
