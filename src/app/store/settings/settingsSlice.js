@@ -31,7 +31,7 @@ export const settingsSlice = createSlice({
         return { ...state, ...settings, year: guessCurrentYear() }
       })
       .addDefaultCase((state, action) => {
-        return null
+        return state
       })
   }
 })

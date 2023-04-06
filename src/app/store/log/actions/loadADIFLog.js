@@ -148,9 +148,7 @@ export const loadADIFLog = (data, options = {}) => {
           .objectStore('logs')
           .put({ key: 'current', year, qsos, ourCalls, yearQSOs, entityGroups })
         request.onsuccess = () => {
-          dispatch(
-            setCurrentLogInfo({ qsos, ourCalls, yearQSOs, entityGroups })
-          )
+          dispatch(setCurrentLogInfo({ qsos, ourCalls, yearQSOs, entityGroups }))
           dispatch(setSettingsYear({ year }))
           resolve()
         }
