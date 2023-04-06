@@ -1,4 +1,5 @@
 import React from 'react'
+import packageJson from '../../../package.json'
 
 import { AppBar, Link, Toolbar, Typography } from '@mui/material'
 
@@ -13,7 +14,7 @@ export function Header ({ styles }) {
             </Link>
           </Typography>
           <Typography component='div' color='inherit' noWrap sx={styles.version}>
-            &nbsp;&nbsp;Version 0.1
+            &nbsp;&nbsp;Version { packageJson.version }
           </Typography>
         </div>
       </Toolbar>

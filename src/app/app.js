@@ -17,9 +17,9 @@ window.currentCommit = window?.ENV?.COMMIT
 window.currentEnv = window?.ENV?.NODE_ENV
 window.currentURL = window?.ENV?.URL
 
-if (window.currentCommit === '%NX_COMMIT%') window.currentCommit = ''
+if (window.currentCommit === '%REACT_APP_COMMIT_REF%') window.currentCommit = ''
 if (window.currentEnv === '%NODE_ENV%') window.currentEnv = 'unknown'
-if (window.currentURL === '%NX_URL%') window.currentURL = ''
+if (window.currentURL === '%REACT_APP_URL%') window.currentURL = ''
 
 const MuiToRouterLinkTranslator = forwardRef((props, ref) => {
   const { href, ...other } = props
