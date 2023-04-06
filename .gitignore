@@ -1,12 +1,12 @@
 # local secrets
 .local.env
 
-# compiled output
-/dist
-/tmp
-
 # dependencies
 node_modules
+
+# production
+/build
+/dist
 
 # IDE - VSCode
 .vscode/*

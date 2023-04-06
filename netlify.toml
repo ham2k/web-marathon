@@ -15,4 +15,4 @@
   port = 4212 # Port that the dev server will be listening on
   targetPort = 4202 # Port where the undelying dev server will run on
   command = "npm start" # Command to start the undelying dev server
-  publish = "dist" # Folder with the static content for _redirect file
+  publish = "public" # Folder with the static content for _redirect file
