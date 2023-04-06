@@ -6,7 +6,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@ham2k/lib-callsigns": "~0.0.1",
-    "@ham2k/lib-country-files": "~0.0.1",
+    "@ham2k/lib-country-files": "^0.0.20230330",
     "@ham2k/lib-cqmag-data": "~0.0.1",
     "@ham2k/lib-format-tools": "~0.0.1",
     "@ham2k/lib-qson-adif": "~0.0.1",
