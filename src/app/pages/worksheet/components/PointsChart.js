@@ -40,12 +40,12 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
   // We need to define these functions out here, instead of inline, to avoid scope problems
   // See https://eslint.org/docs/latest/rules/no-loop-func
   const entityPusher = (bin) => (entry) => {
-    if (entry.startMillis <= weekEnd && entry.endMillis >= weekStart) {
+    if (entry.startOnMillis <= weekEnd && entry.endOnMillis >= weekStart) {
       bin.entities.push(entry)
     }
   }
   const zonePusher = (bin) => (entry) => {
-    if (entry.startMillis <= weekEnd && entry.endMillis >= weekStart) {
+    if (entry.startOnMillis <= weekEnd && entry.endOnMillis >= weekStart) {
       bin.zones.push(entry)
     }
   }
@@ -54,7 +54,7 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
   while (weekStart <= yearEnd) {
     weekEnd = weekStart + ONE_WEEK_IN_MILLIS
 
-    const bin = { entities: [], zones: [], startMillis: weekStart, endMillis: weekEnd }
+    const bin = { entities: [], zones: [], startOnMillis: weekStart, endOnMillis: weekEnd }
     entityEntries.forEach(entityPusher(bin))
     zoneEntries.forEach(zonePusher(bin))
     bins.push(bin)
@@ -67,12 +67,12 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
     {
       type: 'column',
       name: 'Entities',
-      data: bins.map((bin, i) => ({ x: bin.startMillis, y: bin.entities.length ?? null, bin }))
+      data: bins.map((bin, i) => ({ x: bin.startOnMillis, y: bin.entities.length ?? null, bin }))
     },
     {
       type: 'column',
       name: 'Zones',
-      data: bins.map((bin, i) => ({ x: bin.startMillis, y: bin.zones.length ?? null, bin }))
+      data: bins.map((bin, i) => ({ x: bin.startOnMillis, y: bin.zones.length ?? null, bin }))
     }
   ]
 

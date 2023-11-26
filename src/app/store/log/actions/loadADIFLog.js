@@ -1,14 +1,10 @@
 import { logDB } from '../logDB'
 import { parseCallsign } from '@ham2k/lib-callsigns'
-import {
-  annotateFromCountryFile,
-  fillDXCCfromCountryFile
-} from '@ham2k/lib-country-files'
+import { annotateFromCountryFile } from '@ham2k/lib-country-files'
 import { adifToQSON } from '@ham2k/lib-qson-adif'
 import { qsoKey } from '@ham2k/lib-qson-tools'
 
 import qsoComparer from '../../../tools/qsoComparer'
-import qslSourceComparer from '../../../tools/qslSourceComparer'
 import guessCurrentYear from '../../../tools/guessCurrentYear'
 import { setCurrentLogInfo } from '../logSlice'
 import { setSettingsYear } from '../../settings'
@@ -18,17 +14,12 @@ function processOneQSO (qso) {
   qso.their.guess = {}
   if (qso.our.call) {
     parseCallsign(qso.our.call, qso.our.guess)
-    annotateFromCountryFile(qso.our.guess, { wae: true, state: qso.our.state })
+    annotateFromCountryFile(qso.our.guess, { wae: true })
   }
 
   parseCallsign(qso.their.call, qso.their.guess)
-  const iotaRef = qso.refs && qso.refs.find(ref => ref.type === 'iota')
-  if (qso.their.dxccCode) fillDXCCfromCountryFile(qso.their.dxccCode, qso.their) // fill any missing dxcc info
-  annotateFromCountryFile(qso.their.guess, {
-    wae: true,
-    state: qso.their.state,
-    iota: iotaRef?.ref
-  }) // guess dxcc from callsign
+  if (qso.their.dxccCode) annotateFromCountryFile({ dxccCode: qso.their.dxccCode }, { destination: qso.their }) // fill any missing dxcc info
+  annotateFromCountryFile(qso.their.guess, { wae: true, refs: qso.refs }) // guess dxcc from callsign
 
   if (
     qso.their.entityPrefix &&
@@ -68,10 +59,6 @@ function processOneQSO (qso) {
 
   qso.key = qsoKey(qso)
 
-  // Sort QSL info by trust level
-  qso.qsl = qso.qsl ?? {}
-  qso.qsl.sources = (qso.qsl.sources ?? []).sort(qslSourceComparer)
-
   return qso
 }
 
@@ -89,7 +76,7 @@ export const loadADIFLog = (data, options = {}) => {
         const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
         let yearQSOs = qsos.filter(
-          qso => qso.startMillis <= yearEnd && qso.endMillis >= yearStart
+          qso => qso.startOnMillis <= yearEnd && qso.endOnMillis >= yearStart
         )
         yearQSOs.forEach(qso => {
           qso = processOneQSO(qso)

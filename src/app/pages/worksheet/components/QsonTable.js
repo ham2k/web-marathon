@@ -70,7 +70,7 @@ export function QsonTable ({ qsos }) {
         {qsos.map((qso, i) => (
           <tr key={i} className={`band-${qso.band}`}>
             <td className='col-number'>{fmtInteger(qso.number)}</td>
-            <td className='col-time'>{fmtDateMonthYear(qso.startMillis)}</td>
+            <td className='col-time'>{fmtDateMonthYear(qso.startOnMillis)}</td>
             <td className='col-call'>{qso.their.call}</td>
             <td className='col-band band-color'>{qso.band}</td>
             <td className='col-freq band-color'>{fmtInteger(qso.freq)}</td>

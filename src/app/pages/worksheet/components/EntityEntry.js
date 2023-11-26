@@ -8,10 +8,6 @@ import {
   CheckCircleRounded,
   Error,
   HearingDisabled,
-  Key,
-  Language,
-  LocalPostOffice,
-  MoveToInbox,
   PushPin,
   PushPinOutlined
 } from '@mui/icons-material'
@@ -37,14 +33,6 @@ const DATE_FORMAT = {
   hour: 'numeric',
   minute: 'numeric',
   timeZone: 'UTC'
-}
-
-const QSL_ICONS = {
-  lotw: Key,
-  qrz: Language,
-  eqsl: MoveToInbox,
-  card: LocalPostOffice,
-  default: CheckCircleRounded
 }
 
 export function EntityEntry ({
@@ -92,7 +80,7 @@ export function EntityEntry ({
   if (entry) {
     cols.push(
       <td key='date' className='col-date'>
-        {fmtDateTime(entry.endMillis, DATE_FORMAT)}
+        {fmtDateTime(entry.endOnMillis, DATE_FORMAT)}
       </td>
     )
     cols.push(
@@ -136,13 +124,13 @@ export function EntityEntry ({
     )
     cols.push(
       <td key='qsl' className='col-qsl'>
-        {entry?.qsl?.sources?.length
+        {entry?.qsl?.received
           ? (
             <Chip
-              label={entry?.qsl?.sources[0].via}
+              label='QSL'
               color='info'
               size='small'
-              icon={<QslIcon entry={entry} />}
+              icon={<CheckCircleRounded entry={entry} />}
             />
             )
           : (
@@ -226,7 +214,7 @@ export function EntityEntry ({
             >
               <td colSpan='2'>&nbsp;</td>
               <td className='col-date'>
-                {fmtDateTime(qso.endMillis, DATE_FORMAT)}
+                {fmtDateTime(qso.endOnMillis, DATE_FORMAT)}
               </td>
               <td className={classNames('col-band', 'band-color')}>
                 {qso.band}
@@ -263,13 +251,13 @@ export function EntityEntry ({
                 )}
               </td>
               <td className='col-qsl'>
-                {qso?.qsl?.sources?.length
+                {qso?.qsl?.received
                   ? (
                     <Chip
-                      label={qso.qsl.sources[0].via}
+                      label={'QSL'}
                       color='info'
                       size='small'
-                      icon={<QslIcon entry={qso} />}
+                      icon={<CheckCircleRounded entry={qso} />}
                     />
                     )
                   : (
@@ -295,12 +283,4 @@ export function EntityEntry ({
         : null}
     </>
   )
-}
-
-function QslIcon (params) {
-  const { entry } = params
-  const Icon =
-    (entry?.qsl?.sources?.length > 0 && QSL_ICONS[entry.qsl.sources[0]?.via]) ??
-    QSL_ICONS.default
-  return <Icon {...params} />
 }

@@ -20,13 +20,43 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
+const reduxDevtoolsActionSanitizer = (action) => {
+  if (action.type === 'log/setCurrentLogInfo' && action?.payload?.yearQSOs) {
+    return {
+      ...action,
+      payload: {
+        ...action.payload,
+        qsos: `<<${action.payload.qsos?.length || 'no'} qsos>>`,
+        yearQSOs: `<<${action.payload.yearQSOs?.length || 'no'} qsos>>`
+      }
+    }
+  } else {
+    return action
+  }
+}
+
+const reduxDevtoolsStateSanitizer = (state) => {
+  return {
+    ...state,
+    log: {
+      ...state.log,
+      qsos: `<<${state?.log?.qsos?.length || 'no'} qsos>>`,
+      yearQSOs: `<<${state?.log?.yearQSOs?.length || 'no'} qsos>>`
+    }
+  }
+}
+
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
       immutableCheck: false
-    })
+    }),
+  devTools: {
+    actionSanitizer: reduxDevtoolsActionSanitizer,
+    stateSanitizer: reduxDevtoolsStateSanitizer
+  }
 })
 
 export const testStore = configureStore({

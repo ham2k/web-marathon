@@ -64,7 +64,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       const qsos = entityGroups[entity.entityPrefix] ?? []
       const entry = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
       if (entry) {
-        if (entry.qsl.sources.length > 0) {
+        if (entry.qsl?.received > 0) {
           memoCounts.entities.qsl += 1
         } else {
           memoCounts.entities.qso += 1
@@ -79,7 +79,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       const qsos = entityGroups[zone.entityPrefix] ?? []
       const entry = qsos.find((qso) => qso.key === key) ?? qsos[0]
       if (entry) {
-        if (entry.qsl.sources.length > 0) {
+        if (entry.qsl?.received > 0) {
           memoCounts.zones.qsl += 1
         } else {
           memoCounts.zones.qso += 1

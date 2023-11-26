@@ -1,4 +1,4 @@
-import { useBuiltinCountryFile } from '@ham2k/lib-country-files/builtinData'
+import { useBuiltinCountryFile } from '@ham2k/lib-country-files'
 import { createSlice } from '@reduxjs/toolkit'
 import { setCurrentLogCalls } from '../entries'
 import { setSettingsYear } from '../settings'
