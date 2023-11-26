@@ -111,6 +111,9 @@ export const loadADIFLog = (data, options = {}) => {
             entityGroups[qso.their.guess.entityPrefix].push(qso)
           }
 
+          if (qso.their.call === 'WE5E') console.log(qso)
+          if (qso.their.call === 'VK6AL') console.log(qso)
+
           if (qso.their.cqZone) {
             entityGroups[`Zone ${qso.their.cqZone}`] =
               entityGroups[`Zone ${qso.their.cqZone}`] ?? []

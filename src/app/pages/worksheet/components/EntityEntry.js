@@ -101,7 +101,7 @@ export function EntityEntry ({
         >
           {entry.their.call}&nbsp;
         </span>
-        {entry.notes && (entity.source === 'WAE' && entry.their.guess.entityPrefix !== entity.entityPrefix) && (
+        {entry.notes && ((entity.source === 'WAE' && entry.their.guess.entityPrefix !== entity.entityPrefix) || entity.zone) && (
           <Tooltip
             arrow
             title={
