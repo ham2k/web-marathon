@@ -1,55 +1,43 @@
 import * as React from 'react'
 import { Button, DialogActions, DialogContent, DialogContentText } from '@mui/material'
-import { ContentCopy } from '@mui/icons-material'
+import { DownloadForOffline } from '@mui/icons-material'
+import { useDispatch, useSelector } from 'react-redux'
+import { generateDXM } from '../../../store/log/actions/generateDXM'
+import { selectOurCalls } from '../../../store/entries'
+
+const FILENAME_CLEANUP_REGEX = /[^A-Z0-9]/gi
 
 export function ExportDialog ({ onClose }) {
-  const handlePaste = (event) => {
-    const table = document.querySelector('#excel-table')
-    const range = document.createRange()
-    const sel = window.getSelection()
-    sel.removeAllRanges()
-    range.selectNodeContents(table)
-    sel.addRange(range)
-    document.execCommand('copy')
-    sel.removeAllRanges()
-  }
+  const dispatch = useDispatch()
+  const ourCalls = useSelector(selectOurCalls)
+
+  const handleDownload = React.useCallback(() => {
+    const call = Object.keys(ourCalls)[0] || 'N0CALL'
+
+    dispatch(generateDXM()).then((dxm) => {
+      const fileName = `${call.replaceAll(FILENAME_CLEANUP_REGEX, '_')}-ham2k.dxm.xml`
+
+      const blob = new Blob([dxm], { type: 'application/xml;charset=utf-8' })
+      const a = document.createElement('a')
+      a.download = fileName
+      a.href = window.URL.createObjectURL(blob)
+      a.click()
+    })
+  }, [dispatch, ourCalls])
 
   return (
     <>
       <DialogContent>
         <DialogContentText>
-          <p>First click on the "copy" button below, to place the data on your clipboard.</p>
+          <p>First click on the "download" button below, to get a copy of the DXM XML file you will be submitting.</p>
 
           <p>
-            <Button sx={{ ml: 3 }} onClick={handlePaste}>
-              <ContentCopy /> Copy
+            <Button sx={{ ml: 3 }} onClick={handleDownload}>
+              <DownloadForOffline />&nbsp;&nbsp;Download
             </Button>
           </p>
 
-          <p>Then perform the following steps:</p>
-          <ol>
-            <li>
-              Download the latest version of the Submission Form from{' '}
-              <a href='https://www.dxmarathon.com/Submission/2022/Submission2022.htm' target='_blank' rel='noreferrer'>
-                dxmarathon.com
-              </a>
-              .
-            </li>
-            <li>
-              Open the official Submission Form scoresheet in Excel or{' '}
-              <a href='https://www.openoffice.org/'>OpenOffice</a>.
-            </li>
-            <li>Click on cell D17 ("Day" for "SMO Malta").</li>
-            <li>Select "Paste" from the "Edit" menu.</li>
-          </ol>
-          <p>
-            Your scoresheet should now have all the QSOs you selected in this tool. Fill the rest of the information and
-            follow any additional instructions from the{' '}
-            <a href='https://www.dxmarathon.com/Submission/2022/Submission2022.htm' target='_blank' rel='noreferrer'>
-              Marathon Submission Page
-            </a>
-            .
-          </p>
+          <p>Then visit <a href='https://entry.dxmarathon.com/'>entry.dxmarathon.com</a>, click on the "Load file(s)" button and select the file you just downloaded.</p>
         </DialogContentText>
       </DialogContent>
       <DialogActions>
