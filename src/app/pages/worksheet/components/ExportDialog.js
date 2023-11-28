@@ -39,7 +39,7 @@ export function ExportDialog ({ onClose }) {
       compress(dxm).then((dxmgz) => {
         const dxmgz64 = btoa(String.fromCharCode.apply(null, new Uint8Array(dxmgz)))
         const a = document.createElement('a')
-        a.href = `http://localhost:5023/?data=${encodeURIComponent(dxmgz64)}&label=Data+from+Ham2K`
+        a.href = `https://entry.dxmarathon.com/?data=${encodeURIComponent(dxmgz64)}&label=Data+from+Ham2K`
         a.click()
       })
     })
