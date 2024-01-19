@@ -1,4 +1,4 @@
-import { CQWW_ENTITIES, CQZONES } from '@ham2k/lib-cqmag-data'
+import { CQWW_ENTITIES_BY_PREFIX, CQZONES } from '@ham2k/lib-cqmag-data'
 
 // DX Marathon form has some entities out of order
 // * CE0X after CE0Z
@@ -16,7 +16,7 @@ const REORDERED_PREFIXES = {
   'VP8/h': 'VP8/szzz'
 }
 
-export const CQWWEntities = Object.values(CQWW_ENTITIES).sort((a, b) => {
+export const CQWWEntities = Object.values(CQWW_ENTITIES_BY_PREFIX).sort((a, b) => {
   const attr = 'entityPrefix'
   let aValue = a[attr][0] === '*' ? a[attr].slice(1) : a[attr]
   let bValue = b[attr][0] === '*' ? b[attr].slice(1) : b[attr]

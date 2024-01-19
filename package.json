@@ -1,22 +1,24 @@
 {
   "name": "@ham2k/web-marathon",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "type": "module",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@ham2k/lib-callsigns": "^0.0",
-    "@ham2k/lib-country-files": "^0.6.20230330",
-    "@ham2k/lib-cqmag-data": "^0.0.4",
-    "@ham2k/lib-format-tools": "^0.2.0",
-    "@ham2k/lib-qson-adif": "^0.2.0",
-    "@ham2k/lib-qson-tools": "^0.3.0",
+    "@ham2k/lib-callsigns": "^0.1",
+    "@ham2k/lib-country-files": "^0.9",
+    "@ham2k/lib-cqmag-data": "^0.2",
+    "@ham2k/lib-format-tools": "^0.3",
+    "@ham2k/lib-qson-adif": "^0.4",
+    "@ham2k/lib-qson-tools": "^0.4",
     "@mui/icons-material": "^5.5.0",
     "@mui/material": "5.10",
     "@reduxjs/toolkit": "^1.8.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@vitejs/plugin-react": "^4.1.0",
     "apexcharts": "^3.35.0",
     "classnames": "^2.3.1",
     "localforage": "^1.10.0",
@@ -28,6 +30,7 @@
     "react-scripts": "5.0.1",
     "redux-persist": "^6.0.0",
     "regenerator-runtime": "0.13.7",
+    "vite": "^4.5.0",
     "web-vitals": "^2.1.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.0/xlsx-0.19.0.tgz",
     "xmlbuilder2": "^3.1.1"
@@ -42,11 +45,13 @@
     "netlify-cli": "^12.4.0"
   },
   "scripts": {
-    "start": "PORT=4202 react-scripts start",
-    "dev": "netlify dev",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage .",
+    "test:debug": "jest --inspect-brk --runInBand --no-cache"
   },
   "browserslist": {
     "production": [

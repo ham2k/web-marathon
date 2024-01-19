@@ -12,14 +12,15 @@
     <script>
       window.ENV = {
         NODE_ENV: "%NODE_ENV%",
-        URL: "%REACT_APP_URL%",
-        PRIME_URL: "%REACT_APP_PRIME_URL%",
-        COMMIT: "%REACT_APP_COMMIT_REF%",
-        BRANCH: "%REACT_APP_BRANCH%"
+        URL: "%VITE_APP_URL%",
+        PRIME_URL: "%VITE_APP_PRIME_URL%",
+        COMMIT: "%VITE_APP_COMMIT_REF%",
+        BRANCH: "%VITE_APP_BRANCH%"
       }
     </script>
   </head>
   <body>
+    <script type="module" src="/src/index.jsx"></script>
     <div id="root"></div>
   </body>
 </html>

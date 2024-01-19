@@ -1,5 +1,10 @@
 ## more info on this configuration file: https://www.netlify.com/docs/netlify-toml-reference/
 
+[build]
+  command = "VITE_COMMIT_REF=$COMMIT_REF npm run build"
+  publish = "dist"
+  functions = "functions"
+
 [[redirects]]
   from = "/ham2k-proxy/logbook.qrz.com/*"
   to = "https://logbook.qrz.com/:splat"
@@ -16,3 +21,5 @@
   targetPort = 4202 # Port where the undelying dev server will run on
   command = "npm start" # Command to start the undelying dev server
   publish = "public" # Folder with the static content for _redirect file
+
+
