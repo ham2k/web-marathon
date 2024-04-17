@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useCallback, useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { LogLoader } from './components/LogLoader'
 import { selectSettings } from '../../store/settings'
@@ -7,6 +7,8 @@ import { QrzDialogButton } from './components/QrzDialog'
 import { selectOurCalls } from '../../store/entries'
 import { Login } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
+import { useBuiltinCountryFile, parseCountryFile, setCountryFileData, analyzeFromCountryFile } from '@ham2k/lib-country-files'
+
 
 const styles = {
   root: {
@@ -25,6 +27,26 @@ export function HomePage () {
   const handleContinue = () => {
     navigate('/worksheet')
   }
+
+  const [dataLoaded, setDataLoaded] = useState()
+  useEffect(() => {
+    fetch("/country-files/bigcty/cty.csv")
+    .then((response) => {
+      return response.text()
+    }).then((body) => {
+      const data = parseCountryFile(body)
+
+      setCountryFileData(data)
+      const info = analyzeFromCountryFile({ call: 'VERSION' })
+      console.log(`Country Files data donwloaded. Version: ${info.entityName}`)
+      setDataLoaded(true)
+    })
+    .catch(error => {
+      console.error('Error loading Country Files data', error)
+      useBuiltinCountryFile()
+      setDataLoaded(true)
+    })
+  }, [])
 
   return (
     <Box sx={styles.root}>
@@ -61,7 +83,7 @@ export function HomePage () {
         }}
       >
         <Box sx={{}}>
-          <LogLoader title='Load ADIF file(s)' />
+          <LogLoader disabled={!dataLoaded} title='Load ADIF file(s)' />
         </Box>
         <Box sx={{}}>
           <QrzDialogButton />
@@ -76,6 +98,7 @@ export function HomePage () {
                 component='label'
                 size='medium'
                 onClick={handleContinue}
+                disabled={!dataLoaded}
               >
                 Continue with {calls.join(', ')}
               </Button>
