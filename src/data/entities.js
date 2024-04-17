@@ -24,7 +24,10 @@ export const CQWWEntities = Object.values(CQWW_ENTITIES_BY_PREFIX).sort((a, b) =
   aValue = REORDERED_PREFIXES[aValue] ?? aValue
   bValue = REORDERED_PREFIXES[bValue] ?? bValue
 
-  return aValue.localeCompare(bValue)
+  // Sorting should not use `localeCompare` because not all locales sort A-Z the same way
+  if (aValue < bValue) return -1
+  else if (aValue > bValue) return 1
+  else return 0
 })
 
 export const CQZones = Object.keys(CQZONES)
