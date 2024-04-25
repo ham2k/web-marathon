@@ -12,6 +12,12 @@
   force = true
 
 [[redirects]]
+  from = "/country-files/bigcty/cty.csv"
+  to = "https://www.country-files.com/bigcty/cty.csv"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
