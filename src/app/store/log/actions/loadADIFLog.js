@@ -18,7 +18,7 @@ function processOneQSO (qso) {
   }
 
   parseCallsign(qso.their.call, qso.their.guess)
-  if (qso.their.dxccCode) annotateFromCountryFile({ dxccCode: qso.their.dxccCode }, { destination: qso.their }) // fill any missing dxcc info
+  if (qso.their.dxccCode) annotateFromCountryFile({ dxccCode: qso.their.dxccCode }, { destination: qso.their, override: false }) // fill any missing dxcc info
   annotateFromCountryFile(qso.their.guess, { wae: true, refs: qso.refs }) // guess dxcc from callsign
 
   if (
