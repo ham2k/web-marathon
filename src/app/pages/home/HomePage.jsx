@@ -51,7 +51,7 @@ export function HomePage () {
   return (
     <Box sx={styles.root}>
       <Typography component='h1' variant='h3'>
-        Welcome to Ham2K Marathon Tools for {settings?.year}
+        Welcome to Ham2K Marathon Tools for {settings?.year}!
       </Typography>
 
       <p>
