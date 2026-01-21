@@ -22,10 +22,10 @@ export function ExcelEntry ({ qsos, entryKey }) {
   if (entry) {
     return (
       <tr>
-        <td>{fmtDateTime(entry.endOnMillis ?? entry.startOnMillis, { day: '2-digit', timeZone: 'UTC' })}</td>
-        <td>{fmtDateTime(entry.endOnMillis ?? entry.startOnMillis, { month: '2-digit', timeZone: 'UTC' })}</td>
+        <td>{fmtDateTime(entry.endAtMillis ?? entry.startAtMillis, { day: '2-digit', timeZone: 'UTC' })}</td>
+        <td>{fmtDateTime(entry.endAtMillis ?? entry.startAtMillis, { month: '2-digit', timeZone: 'UTC' })}</td>
         <td>
-          {fmtDateTime(entry.endOnMillis ?? entry.startOnMillis, {
+          {fmtDateTime(entry.endAtMillis ?? entry.startAtMillis, {
             hour: '2-digit',
             minute: '2-digit',
             hourCycle: 'h23',

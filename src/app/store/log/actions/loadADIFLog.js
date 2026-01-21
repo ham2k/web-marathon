@@ -76,7 +76,7 @@ export const loadADIFLog = (data, options = {}) => {
         const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
         let yearQSOs = qsos.filter(
-          qso => qso.startOnMillis <= yearEnd && qso.endOnMillis >= yearStart
+          qso => qso.startAtMillis <= yearEnd && qso.endAtMillis >= yearStart
         )
         yearQSOs.forEach(qso => {
           qso = processOneQSO(qso)
