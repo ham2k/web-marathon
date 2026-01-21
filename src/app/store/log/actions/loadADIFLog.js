@@ -9,7 +9,20 @@ import guessCurrentYear from '../../../tools/guessCurrentYear'
 import { setCurrentLogInfo } from '../logSlice'
 import { setSettingsYear } from '../../settings'
 
-function processOneQSO (qso) {
+const VALID_BANDS = {
+  '160m': true,
+  '80m': true,
+  '60m': true,
+  '40m': true,
+  '20m': true,
+  '17m': true,
+  '15m': true,
+  '12m': true,
+  '10m': true,
+  '6m': true,
+}
+
+function processOneQSO(qso) {
   qso.our.guess = {}
   qso.their.guess = {}
   if (qso.our.call) {
@@ -75,8 +88,11 @@ export const loadADIFLog = (data, options = {}) => {
         const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
         const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
-        let yearQSOs = qsos.filter(
-          qso => qso.startAtMillis <= yearEnd && qso.endAtMillis >= yearStart
+        let yearQSOs = qsos.filter(qso => {
+          if (!VALID_BANDS[qso.band]) return false
+
+          return qso.startAtMillis <= yearEnd && qso.endAtMillis >= yearStart
+        }
         )
         yearQSOs.forEach(qso => {
           qso = processOneQSO(qso)
