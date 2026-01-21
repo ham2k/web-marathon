@@ -19,7 +19,7 @@ const styles = {
   }
 }
 
-export function HomePage () {
+export function HomePage() {
   const navigate = useNavigate()
   const settings = useSelector(selectSettings)
   const calls = Object.keys(useSelector(selectOurCalls) ?? {})
@@ -31,21 +31,21 @@ export function HomePage () {
   const [dataLoaded, setDataLoaded] = useState()
   useEffect(() => {
     fetch("/country-files/bigcty/cty.csv")
-    .then((response) => {
-      return response.text()
-    }).then((body) => {
-      const data = parseCountryFile(body)
+      .then((response) => {
+        return response.text()
+      }).then((body) => {
+        const data = parseCountryFile(body)
 
-      setCountryFileData(data)
-      const info = analyzeFromCountryFile({ call: 'VERSION' })
-      console.log(`Country Files data donwloaded. Version: ${info.entityName}`)
-      setDataLoaded(true)
-    })
-    .catch(error => {
-      console.error('Error loading Country Files data', error)
-      useBuiltinCountryFile()
-      setDataLoaded(true)
-    })
+        setCountryFileData(data)
+        const info = analyzeFromCountryFile({ call: 'VERSION' })
+        console.log(`Country Files data donwloaded. Version: ${info.entityName}`)
+        setDataLoaded(true)
+      })
+      .catch(error => {
+        console.error('Error loading Country Files data', error)
+        useBuiltinCountryFile()
+        setDataLoaded(true)
+      })
   }, [])
 
   return (
@@ -57,7 +57,7 @@ export function HomePage () {
       <p>
         This tool can help you prepare your entry for <a href='https://www.dxmarathon.com/'>DX Marathon</a> by analyzing
         all your QSOs for the year. This is an unofficial tool, not endorsed in any way by the DX Marathon Management
-        Team or by CQ Magazine. It's meant to help you prepare your entry to the Marathon, but the final result is your
+        Team. It's meant to help you prepare your entry to the Marathon, but the final result is your
         responsibility. We are not making any claims as to the accuracy of the results and cannot be held liable for any
         impact they might have on your participation in the DX Marathon.
       </p>
@@ -102,12 +102,12 @@ export function HomePage () {
               >
                 Continue with {calls.join(', ')}
               </Button>
-              )
+            )
             : (
               <Button variant='contained' disabled startIcon={<Login />} color='primary' component='label' size='medium'>
                 Continue with …
               </Button>
-              )}
+            )}
         </Box>
       </Box>
     </Box>
