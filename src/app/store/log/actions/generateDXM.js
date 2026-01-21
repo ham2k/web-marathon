@@ -28,7 +28,7 @@ export const generateDXM = () => {
   }
 }
 
-function buildADX ({ entryInfo, entrySelections, entityGroups, settings }) {
+function buildADX({ entryInfo, entrySelections, entityGroups, settings }) {
   const dxm = create({ version: '1.0', encoding: 'utf-8' })
     .ele('DXMARATHON', { year: settings.year, generated_on: fmtDateTimeISO(new Date()), generated_by: 'Ham2K Marathon Tools' })
 
@@ -50,7 +50,7 @@ function buildADX ({ entryInfo, entrySelections, entityGroups, settings }) {
         .ele('OUR_CALL').txt(selected.our.call).up()
         .ele('TIME').txt(fmtDateTimeISO(selected.startAtMillis)).up()
         .ele('BAND').txt(selected.band).up()
-        .ele('MODE').txt(selected.mode).up()
+        .ele('MODE').txt(simplifyMode(selected.mode)).up()
         .ele('PREFIX').txt(entity.entityPrefix).up()
         .ele('COUNTRY').txt(entity.name).up()
         .ele('DXCC').txt(WAE_CODES[entity.entityPrefix] || entity.dxccCode).up()
@@ -74,7 +74,7 @@ function buildADX ({ entryInfo, entrySelections, entityGroups, settings }) {
         .ele('OUR_CALL').txt(selected.our.call).up()
         .ele('TIME').txt(fmtDateTimeISO(selected.startAtMillis)).up()
         .ele('BAND').txt(selected.band).up()
-        .ele('MODE').txt(selected.mode).up()
+        .ele('MODE').txt(simplifyMode(selected.mode)).up()
         .ele('CQZ').txt(zone.zone).up()
 
       selected?.qsl?.received && Object.keys(selected.qsl).forEach(source => {
@@ -84,4 +84,24 @@ function buildADX ({ entryInfo, entrySelections, entityGroups, settings }) {
   })
 
   return dxm
+}
+
+const SIMPLIFIED_MODES = {
+  CW: 'CW',
+  SSB: 'PHONE',
+  USB: 'PHONE',
+  LSB: 'PHONE',
+  AM: 'PHONE',
+  FM: 'PHONE',
+  PH: 'PHONE',
+  DIGITALVOICE: 'PHONE',
+  C4FM: 'PHONE',
+  DMR: 'PHONE',
+  DSTAR: 'PHONE',
+  PHONE: 'PHONE'
+}
+
+export default function simplifyMode(mode) {
+  mode = mode.toUpperCase()
+  return SIMPLIFIED_MODES[mode] || 'DIGITAL'
 }
