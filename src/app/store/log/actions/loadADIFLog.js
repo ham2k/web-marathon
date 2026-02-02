@@ -14,6 +14,7 @@ const VALID_BANDS = {
   '80m': true,
   '60m': true,
   '40m': true,
+  '30m': true,
   '20m': true,
   '17m': true,
   '15m': true,
@@ -32,6 +33,7 @@ function processOneQSO(qso) {
 
   parseCallsign(qso.their.call, qso.their.guess)
   if (qso.their.dxccCode) annotateFromCountryFile({ dxccCode: qso.their.dxccCode }, { destination: qso.their, override: false }) // fill any missing dxcc info
+
   annotateFromCountryFile(qso.their.guess, { wae: true, refs: qso.refs }) // guess dxcc from callsign
 
   if (
@@ -84,6 +86,7 @@ export const loadADIFLog = (data, options = {}) => {
         const qson = adifToQSON(data)
         let qsos = qson.qsos
 
+        console.log('Loaded UN/OH7O', qsos.filter(qso => qso.their.call === 'UN/OH7O'))
         const year = settings?.year ?? guessCurrentYear()
         const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
         const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
@@ -92,8 +95,8 @@ export const loadADIFLog = (data, options = {}) => {
           if (!VALID_BANDS[qso.band]) return false
 
           return qso.startAtMillis <= yearEnd && qso.endAtMillis >= yearStart
-        }
-        )
+        })
+
         yearQSOs.forEach(qso => {
           qso = processOneQSO(qso)
         })
@@ -126,9 +129,6 @@ export const loadADIFLog = (data, options = {}) => {
               entityGroups[qso.their.guess.entityPrefix] ?? []
             entityGroups[qso.their.guess.entityPrefix].push(qso)
           }
-
-          if (qso.their.call === 'WE5E') console.log(qso)
-          if (qso.their.call === 'VK6AL') console.log(qso)
 
           if (qso.their.cqZone) {
             entityGroups[`Zone ${qso.their.cqZone}`] =
