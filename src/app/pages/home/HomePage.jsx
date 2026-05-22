@@ -30,10 +30,11 @@ export function HomePage() {
 
   const [dataLoaded, setDataLoaded] = useState()
   useEffect(() => {
-    fetch("/country-files/bigcty/cty.csv")
+    fetch("https://marathon.ham2k.net/country-files/bigcty/cty.csv")
       .then((response) => {
         return response.text()
       }).then((body) => {
+        console.log('Country Files data', body)
         const data = parseCountryFile(body)
 
         setCountryFileData(data)
