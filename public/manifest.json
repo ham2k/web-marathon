@@ -3,17 +3,17 @@
   "name": "Ham2k Marathon",
   "icons": [
     {
-      "src": "radio-blue-64.png",
+      "src": "/favicon/apple-touch-icon.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/png"
     },
     {
-      "src": "radio-blue-192.png",
+      "src": "/favicon/android-chrome-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "radio-blue-512.png",
+      "src": "/favicon/android-chrome-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }

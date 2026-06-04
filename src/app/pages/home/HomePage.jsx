@@ -111,6 +111,9 @@ export function HomePage() {
             )}
         </Box>
       </Box>
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <img src='/paul-512.png' style={{ width: '40%', height: 'auto', opacity: 0.3 }}/>
+      </Box>
     </Box>
   )
 }
