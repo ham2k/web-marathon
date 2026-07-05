@@ -1,6 +1,6 @@
 {
   "name": "@ham2k/web-marathon",
-  "version": "26.6.0",
+  "version": "26.7.0",
   "type": "module",
   "private": true,
   "dependencies": {
@@ -36,6 +36,7 @@
     "xmlbuilder2": "^3.1.1"
   },
   "devDependencies": {
+    "wrangler": "^4.54.0",
     "eslint": "^8.37.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
@@ -46,6 +47,9 @@
   "scripts": {
     "dev": "vite --port 4001",
     "build": "vite build",
+    "build:pages": "VITE_APP_COMMIT_REF=${CF_PAGES_COMMIT_SHA:-} VITE_APP_BRANCH=${CF_PAGES_BRANCH:-} VITE_APP_URL=${CF_PAGES_URL:-} VITE_APP_PRIME_URL=${VITE_APP_PRIME_URL:-$CF_PAGES_URL} npm run build",
+    "pages:dev": "npm run build && wrangler pages dev dist --port 4212",
+    "pages:deploy": "npm run build:pages && wrangler pages deploy dist",
     "preview": "vite preview",
     "test": "jest",
     "test:watch": "jest --watch",

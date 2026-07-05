@@ -4,17 +4,34 @@ An app that helps you analize your log entries for submission to the [CQ DX Mara
 
 The latest version is available at https://marathon.ham2k.org/
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/1350816d-b3b9-4a0f-be72-7eefc3603819/deploy-status)](https://app.netlify.com/sites/marathon-ham2k/deploys)
-
 # Dev Environmnent Setup
 
 ```
 npm install
-npm install netlify-cli -g
 ```
 
 ## Run Locally
 
 ```
-netlify dev
+npm start
+```
+
+Vite serves the app on port 4202 with local proxies for QRZ and country-file requests.
+
+## Cloudflare Pages
+
+Build and deploy:
+
+```
+npm run pages:deploy
+```
+
+For Git-connected Pages projects, set the build command to `npm run build:pages` and the output directory to `dist`.
+
+Cloudflare injects `CF_PAGES_COMMIT_SHA`, `CF_PAGES_BRANCH`, and `CF_PAGES_URL` at build time. For preview deployments that should compare versions against production, set `VITE_APP_PRIME_URL` to `https://marathon.ham2k.org` in the Pages dashboard.
+
+To preview the production build locally:
+
+```
+npm run pages:dev
 ```

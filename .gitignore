@@ -19,5 +19,5 @@ node_modules
 .DS_Store
 Thumbs.db
 
-# Local Netlify folder
-.netlify
+# Local Cloudflare folder
+.wrangler

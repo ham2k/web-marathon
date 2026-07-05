@@ -1,8 +1,7 @@
-import { proxyFor } from '../../../tools/proxyFor'
 import { selectCurrentYear, selectQrzKey } from '../../settings'
 import { loadADIFLog } from './loadADIFLog'
 
-const BASE_URL = 'https://logbook.qrz.com/api'
+const BASE_URL = 'https://services.ham2k.net/logbook.qrz.com/api'
 
 const HTML_ENTITIES = {
   '&lt;': '<',
@@ -22,7 +21,7 @@ export const importFromQRZ = (setError) => (dispatch, getState) => {
     body.append('ACTION', 'FETCH')
     body.append('OPTION', `BETWEEN:${year}-01-01 ${year + 1}-01-01`)
 
-    return fetch(proxyFor(url), {
+    return fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
       body
@@ -94,7 +93,7 @@ const QRZ_PARSING_REGEXP =
 
 const HTML_ENTITY_REGEXP = /&\w+;/g
 
-function parseQrzResponse (str) {
+function parseQrzResponse(str) {
   const pairs = {}
 
   str = str.replace(HTML_ENTITY_REGEXP, (match) => HTML_ENTITIES[match] || `[${match}]`)

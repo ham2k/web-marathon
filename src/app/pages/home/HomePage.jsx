@@ -30,7 +30,7 @@ export function HomePage() {
 
   const [dataLoaded, setDataLoaded] = useState()
   useEffect(() => {
-    fetch("https://marathon.ham2k.net/country-files/bigcty/cty.csv")
+    fetch("https://services.ham2k.net/country-files/bigcty/cty.csv")
       .then((response) => {
         return response.text()
       }).then((body) => {
@@ -112,7 +112,7 @@ export function HomePage() {
         </Box>
       </Box>
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <img src='/paul-512.png' style={{ width: '40%', height: 'auto', opacity: 0.3 }}/>
+        <img src='/paul-512.png' style={{ width: '40%', height: 'auto', opacity: 0.3 }} />
       </Box>
     </Box>
   )
