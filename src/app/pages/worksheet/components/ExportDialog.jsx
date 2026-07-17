@@ -7,7 +7,7 @@ import { selectOurCalls } from '../../../store/entries'
 
 const FILENAME_CLEANUP_REGEX = /[^A-Z0-9]/gi
 
-function compress (string) {
+function compress(string) {
   const byteArray = new TextEncoder().encode(string)
   const cs = new window.CompressionStream('gzip')
   const writer = cs.writable.getWriter()
@@ -16,7 +16,7 @@ function compress (string) {
   return new Response(cs.readable).arrayBuffer()
 }
 
-export function ExportDialog ({ onClose }) {
+export function ExportDialog({ onClose }) {
   const dispatch = useDispatch()
   const ourCalls = useSelector(selectOurCalls)
 
@@ -49,23 +49,27 @@ export function ExportDialog ({ onClose }) {
     <>
       <DialogContent>
         <DialogContentText>
-          <div style={{ marginBottom: '0.5rem' }}>
-            You need to get your data to the <a href='https://entry.dxmarathon.com/'>DX Marathon Official Submission Tool</a>
+          <div style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
+            To complete a submission, you need to get your data to the<br /><a href='https://entry.dxmarathon.com/'>DX Marathon Official Submission Tool</a>
           </div>
-          <div style={{ marginBottom: '0.5rem' }}>
-            You can download a "DXM XML" file and manually upload at <a href='https://entry.dxmarathon.com/'>entry.dxmarathon.com</a>
+          <div style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
+            Download this "DXM" file, visit <a href='https://entry.dxmarathon.com/'>entry.dxmarathon.com</a> and upload it there.
           </div>
 
-          <Button sx={{ ml: 3 }} onClick={handleDownload}>
-            <DownloadForOffline />&nbsp;&nbsp;Download
-          </Button>
-
-          <div style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>
-            Or you can send the data directly to the Official Submission Tool by clicking on the button below.
+          <div style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
+            <Button onClick={handleDownload}>
+              <DownloadForOffline />&nbsp;&nbsp;Download
+            </Button>
           </div>
-          <Button sx={{ ml: 3 }} onClick={handleLink}>
-            <Sync />&nbsp;&nbsp;Send Directly to DX Marathon
-          </Button>
+
+          <div style={{ marginTop: '3rem', textAlign: 'center' }}>
+            And if you found this app useful, please consider supporting our work at
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <a href='https://www.buymeacoffee.com/ham2k'>
+              <img src='https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png' alt='Buy me a coffee' height='40' />
+            </a>
+          </div>
         </DialogContentText>
 
       </DialogContent>
