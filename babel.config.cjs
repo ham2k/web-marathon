@@ -6,7 +6,10 @@ try {
   testMode = true
 }
 
-const presets = ['@babel/preset-env', '@babel/preset-react']
+const presets = [
+  '@babel/preset-env',
+  ['@babel/preset-react', { runtime: 'automatic' }]
+]
 const plugins = []
 
 if (testMode) {

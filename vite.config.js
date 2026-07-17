@@ -7,5 +7,10 @@ export default defineConfig({
   server: {
     open: true,
     port: 4202
+  },
+  resolve: {
+    alias: {
+      xmlbuilder2: 'xmlbuilder2/lib/xmlbuilder2.min.js'
+    }
   }
 })

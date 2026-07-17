@@ -13,9 +13,9 @@ import { VersionChecker } from './components/VersionChecker'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 
-window.currentCommit = window?.ENV?.COMMIT
-window.currentEnv = window?.ENV?.NODE_ENV
-window.currentURL = window?.ENV?.URL
+window.currentCommit = window?.ENV?.COMMIT || ''
+window.currentEnv = window?.ENV?.NODE_ENV || 'unknown'
+window.currentURL = window?.ENV?.URL || ''
 
 if (window.currentCommit === '%VITE_APP_COMMIT_REF%') window.currentCommit = ''
 if (window.currentEnv === '%NODE_ENV%') window.currentEnv = 'unknown'
