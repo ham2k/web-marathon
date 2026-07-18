@@ -40,11 +40,13 @@ export function HomePage() {
         setCountryFileData(data)
         const info = analyzeFromCountryFile({ call: 'VERSION' })
         console.log(`Country Files data downloaded. Version: ${info.entityName}`)
+        window.dispatchEvent(new CustomEvent('country-files-loaded'))
         setDataLoaded(true)
       })
       .catch(error => {
         console.error('Error loading Country Files data', error)
         useBuiltinCountryFile()
+        window.dispatchEvent(new CustomEvent('country-files-loaded'))
         setDataLoaded(true)
       })
   }, [])
