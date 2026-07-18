@@ -133,6 +133,7 @@ const SIMPLIFIED_MODES = {
 }
 
 export default function simplifyMode(mode) {
+  if (!mode) return 'DIGITAL'
   mode = mode.toUpperCase()
   return SIMPLIFIED_MODES[mode] || 'DIGITAL'
 }

@@ -163,7 +163,13 @@ export function annotateAndGroupLog(qsos, goodCalls = [], badCalls = [], year) {
   let yearQSOs = qsos.filter(qso => {
     if (!VALID_BANDS[qso.band]) return false
     return (qso.startAtMillis || qso.endOnMillis) <= yearEnd && (qso.endAtMillis || qso.endOnMillis || qso.startAtMillis) >= yearStart
-  })
+  }).map(qso => ({
+    ...qso,
+    our: { ...qso.our },
+    their: { ...qso.their },
+    qsl: qso.qsl ? { ...qso.qsl } : undefined,
+    notes: qso.notes ? [...qso.notes] : []
+  }))
 
   yearQSOs.forEach(qso => {
     qso = processOneQSO(qso)

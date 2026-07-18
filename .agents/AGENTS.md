@@ -81,3 +81,6 @@ If you think a convention is harmful, surface it. Don't fork silently.
 "Completed" is wrong if anything was skipped silently.
 "Tests pass" is wrong if any were skipped.
 Default to surfacing uncertainty, not hiding it.
+
+## Rule 13 — Notifications behavior
+Do not send notifications if the user is active in the IDE or the application.

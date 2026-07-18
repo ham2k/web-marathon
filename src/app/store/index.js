@@ -50,8 +50,9 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
-      immutableCheck: false
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'persist/REGISTER', 'persist/PAUSE', 'persist/PURGE', 'persist/FLUSH']
+      }
     }),
   devTools: {
     actionSanitizer: reduxDevtoolsActionSanitizer,

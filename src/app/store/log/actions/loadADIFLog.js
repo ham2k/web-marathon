@@ -46,7 +46,7 @@ export const loadADIFLog = (data, options = {}) => {
         }
         request.onerror = event => {
           console.error('IndexedDB Error', event, transaction)
-          reject(new Error('Error occured'))
+          reject(new Error('Error occurred'))
         }
       })
     })

@@ -39,7 +39,7 @@ export function HomePage() {
 
         setCountryFileData(data)
         const info = analyzeFromCountryFile({ call: 'VERSION' })
-        console.log(`Country Files data donwloaded. Version: ${info.entityName}`)
+        console.log(`Country Files data downloaded. Version: ${info.entityName}`)
         setDataLoaded(true)
       })
       .catch(error => {

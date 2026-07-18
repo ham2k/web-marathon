@@ -110,15 +110,18 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
   const paddingLeft = 50
   const paddingRight = 20
   const plotWidth = Math.max(200, width - paddingLeft - paddingRight)
-  const step = plotWidth / (bins.length - 1)
 
-  const maxBarWidth = Math.max(4, step - 5)
+  // Give enough padding to keep bars to the right of the vertical axis
+  const tempStep = plotWidth / (bins.length - 1)
+  const maxBarWidth = Math.max(4, tempStep - 5)
+  const barMargin = maxBarWidth / 2 + 5
+
+  const activePlotWidth = plotWidth - 2 * barMargin
+  const step = activePlotWidth / (bins.length - 1)
   const scaleW = maxBarWidth / Math.sqrt(maxTotVal || 1)
 
-  const firstBin = bins[0]
-  const firstBinTot = firstBin ? firstBin.entities.length + firstBin.zones.length : 0
-  const firstBinWidth = Math.sqrt(firstBinTot) * scaleW
-  const labelX = paddingLeft - firstBinWidth / 2
+  // Title aligns exactly with the left edge of the canvas
+  const labelX = 0
 
   const gridVals = [5, 10, 50, 100].filter((v) => v <= maxTotVal)
 
@@ -126,9 +129,9 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
   let futureX = null
   if (now >= yearStart && now <= yearEnd) {
     const proportion = (now - yearStart) / (yearEnd - yearStart)
-    futureX = paddingLeft + proportion * plotWidth
+    futureX = paddingLeft + barMargin + proportion * activePlotWidth
   } else if (now < yearStart) {
-    futureX = paddingLeft
+    futureX = paddingLeft + barMargin
   }
 
   const handleMouseMove = (event, bin) => {
@@ -165,26 +168,17 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
             </tspan>
           </text>
 
-          {/* Baseline Label */}
-          <text
-            x={paddingLeft - 12}
-            y={164}
-            textAnchor="end"
-            style={{ fontSize: '10px', fill: '#888', fontFamily: 'sans-serif' }}
-          >
-            0
-          </text>
 
           {/* Grid lines & Y-Axis labels */}
           {gridVals.map((val) => {
             const y = 160 - Math.sqrt(val) * scaleH
             return (
               <React.Fragment key={val}>
-                <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke="#e5e5e5" strokeDasharray="3,3" />
+                <line x1={0} y1={y} x2={width} y2={y} stroke="#e5e5e5" strokeDasharray="3,3" />
                 <text
-                  x={paddingLeft - 12}
-                  y={y + 4}
-                  textAnchor="end"
+                  x={0}
+                  y={y - 4}
+                  textAnchor="start"
                   style={{ fontSize: '10px', fill: '#888', fontFamily: 'sans-serif' }}
                 >
                   {val}
@@ -199,7 +193,7 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
               <rect
                 x={futureX}
                 y={10}
-                width={width - paddingRight - futureX}
+                width={width - futureX}
                 height={150}
                 fill="rgba(0, 0, 0, 0.025)"
                 pointerEvents="none"
@@ -219,7 +213,7 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
 
           {/* Render bars */}
           {bins.map((bin, i) => {
-            const x = paddingLeft + i * step
+            const x = paddingLeft + barMargin + i * step
             const cEnt = bin.entities.length
             const cZone = bin.zones.length
             const cTot = cEnt + cZone
@@ -275,7 +269,7 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
           {/* X-Axis labels */}
           {bins.map((bin, i) => {
             if (i % 7 === 0 || i === bins.length - 1) {
-              const x = paddingLeft + i * step
+              const x = paddingLeft + barMargin + i * step
               return (
                 <text
                   key={i}
@@ -292,7 +286,10 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
           })}
 
           {/* Baseline */}
-          <line x1={paddingLeft} y1={160} x2={width - paddingRight} y2={160} stroke="#ccc" strokeWidth={1} />
+          <line x1={0} y1={160} x2={width} y2={160} stroke="#ccc" strokeWidth={1} />
+          
+          {/* Top border */}
+          <line x1={0} y1={10} x2={width} y2={10} stroke="#ccc" strokeWidth={1} />
         </svg>
       </Box>
 

@@ -51,7 +51,7 @@ const renderStatusIcon = (type, insideTooltip = false) => {
 const styles = {
   root: {
     '& .table': {
-      width: 'inherit important!',
+      width: 'inherit !important',
       minWidth: '100%',
       marginTop: '0.5em',
       '& th': {
@@ -88,6 +88,68 @@ const styles = {
       }
     }
   }
+}
+
+function WarningsTable ({ claimedQSOs }) {
+  return (
+    <table className='table nice-table band-colors'>
+      <thead>
+        <tr>
+          <th className='col-prefix'>Prefix</th>
+          <th className='col-name'>Name</th>
+          <th className='col-date'>Date</th>
+          <th className='col-band'>Band</th>
+          <th className='col-mode'>Mode</th>
+          <th className='col-call'>Call</th>
+          <th className='col-status' style={{ textAlign: 'center' }}>Status</th>
+          <th className='col-message'>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {claimedQSOs
+          .filter(qso => qso.isBadCall || qso.notes?.some(n => n.about !== 'goodCall' && n.about !== 'badCall'))
+          .map((qso) => {
+            const prefix = qso.their.entityPrefix
+            const entity = CQWWEntities.find(e => e.entityPrefix === prefix) || CQZones.find(z => z.entityPrefix === prefix)
+            const entityName = entity ? entity.name : qso.their.entityName || ''
+            const flag = entity ? entity.flag : '🏳'
+            const displayNotes = (qso.notes ?? []).filter(n => n.about !== 'goodCall')
+
+            const icons = []
+            if (qso.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
+            if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
+              icons.push({ type: 'warning', element: renderStatusIcon('warning') })
+            }
+            const zIndexMap = { bad: 3, warning: 2, good: 1 }
+
+            return (
+              <tr key={qso.key} className={classNames(`band-${qso.band}`)}>
+                <td className='col-prefix'>{prefix}</td>
+                <td className='col-name'>{flag}&nbsp;{entityName}</td>
+                <td className='col-date'>{fmtDateTime(qso.endOnMillis || qso.startAtMillis, DATE_FORMAT)}</td>
+                <td className='col-band'>{qso.band}</td>
+                <td className='col-mode'>{qso.mode}</td>
+                <td className='col-call'>{qso.their.call}</td>
+                <td className='col-status' style={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+                    {icons.map((item, idx) => (
+                      <Box key={idx} sx={{ ml: idx > 0 ? '-10px' : 0, zIndex: zIndexMap[item.type] || 0, position: 'relative' }}>
+                        {item.element}
+                      </Box>
+                    ))}
+                  </Box>
+                </td>
+                <td className='col-message' style={{ fontSize: '0.85rem', whiteSpace: 'pre-line' }}>
+                  {displayNotes.map((n, i) => (
+                    <div key={i} style={{ margin: '2px 0' }}>{n.note}</div>
+                  ))}
+                </td>
+              </tr>
+            )
+          })}
+      </tbody>
+    </table>
+  )
 }
 
 export function EntityList ({ qsos, entityGroups, entrySelections }) {
@@ -533,123 +595,11 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       )}
 
       {marathonMode !== 'challenge' && activeTab === 3 && (
-        <table className='table nice-table band-colors'>
-          <thead>
-            <tr>
-              <th className='col-prefix'>Prefix</th>
-              <th className='col-name'>Name</th>
-              <th className='col-date'>Date</th>
-              <th className='col-band'>Band</th>
-              <th className='col-mode'>Mode</th>
-              <th className='col-call'>Call</th>
-              <th className='col-status' style={{ textAlign: 'center' }}>Status</th>
-              <th className='col-message'>Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {claimedQSOs
-              .filter(qso => qso.isBadCall || qso.notes?.some(n => n.about !== 'goodCall' && n.about !== 'badCall'))
-              .map((qso) => {
-                const prefix = qso.their.entityPrefix
-                const entity = CQWWEntities.find(e => e.entityPrefix === prefix) || CQZones.find(z => z.entityPrefix === prefix)
-                const entityName = entity ? entity.name : qso.their.entityName || ''
-                const flag = entity ? entity.flag : '🏳'
-                const displayNotes = (qso.notes ?? []).filter(n => n.about !== 'goodCall')
-
-                const icons = []
-                if (qso.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
-                if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
-                  icons.push({ type: 'warning', element: renderStatusIcon('warning') })
-                }
-                const zIndexMap = { bad: 3, warning: 2, good: 1 }
-
-                return (
-                  <tr key={qso.key} className={classNames(`band-${qso.band}`)}>
-                    <td className='col-prefix'>{prefix}</td>
-                    <td className='col-name'>{flag}&nbsp;{entityName}</td>
-                    <td className='col-date'>{fmtDateTime(qso.endOnMillis || qso.startAtMillis, DATE_FORMAT)}</td>
-                    <td className='col-band'>{qso.band}</td>
-                    <td className='col-mode'>{qso.mode}</td>
-                    <td className='col-call'>{qso.their.call}</td>
-                    <td className='col-status' style={{ textAlign: 'center' }}>
-                      <Box sx={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-                        {icons.map((item, idx) => (
-                          <Box key={idx} sx={{ ml: idx > 0 ? '-10px' : 0, zIndex: zIndexMap[item.type] || 0, position: 'relative' }}>
-                            {item.element}
-                          </Box>
-                        ))}
-                      </Box>
-                    </td>
-                    <td className='col-message' style={{ fontSize: '0.85rem', whiteSpace: 'pre-line' }}>
-                      {displayNotes.map((n, i) => (
-                        <div key={i} style={{ margin: '2px 0' }}>{n.note}</div>
-                      ))}
-                    </td>
-                  </tr>
-                )
-              })}
-          </tbody>
-        </table>
+        <WarningsTable claimedQSOs={claimedQSOs} />
       )}
 
       {marathonMode === 'challenge' && activeTab === CHALLENGE_BANDS.length && (
-        <table className='table nice-table band-colors'>
-          <thead>
-            <tr>
-              <th className='col-prefix'>Prefix</th>
-              <th className='col-name'>Name</th>
-              <th className='col-date'>Date</th>
-              <th className='col-band'>Band</th>
-              <th className='col-mode'>Mode</th>
-              <th className='col-call'>Call</th>
-              <th className='col-status' style={{ textAlign: 'center' }}>Status</th>
-              <th className='col-message'>Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {claimedQSOs
-              .filter(qso => qso.isBadCall || qso.notes?.some(n => n.about !== 'goodCall' && n.about !== 'badCall'))
-              .map((qso) => {
-                const prefix = qso.their.entityPrefix
-                const entity = CQWWEntities.find(e => e.entityPrefix === prefix) || CQZones.find(z => z.entityPrefix === prefix)
-                const entityName = entity ? entity.name : qso.their.entityName || ''
-                const flag = entity ? entity.flag : '🏳'
-                const displayNotes = (qso.notes ?? []).filter(n => n.about !== 'goodCall')
-
-                const icons = []
-                if (qso.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
-                if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
-                  icons.push({ type: 'warning', element: renderStatusIcon('warning') })
-                }
-                const zIndexMap = { bad: 3, warning: 2, good: 1 }
-
-                return (
-                  <tr key={qso.key} className={classNames(`band-${qso.band}`)}>
-                    <td className='col-prefix'>{prefix}</td>
-                    <td className='col-name'>{flag}&nbsp;{entityName}</td>
-                    <td className='col-date'>{fmtDateTime(qso.endOnMillis || qso.startAtMillis, DATE_FORMAT)}</td>
-                    <td className='col-band'>{qso.band}</td>
-                    <td className='col-mode'>{qso.mode}</td>
-                    <td className='col-call'>{qso.their.call}</td>
-                    <td className='col-status' style={{ textAlign: 'center' }}>
-                      <Box sx={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-                        {icons.map((item, idx) => (
-                          <Box key={idx} sx={{ ml: idx > 0 ? '-10px' : 0, zIndex: zIndexMap[item.type] || 0, position: 'relative' }}>
-                            {item.element}
-                          </Box>
-                        ))}
-                      </Box>
-                    </td>
-                    <td className='col-message' style={{ fontSize: '0.85rem', whiteSpace: 'pre-line' }}>
-                      {displayNotes.map((n, i) => (
-                        <div key={i} style={{ margin: '2px 0' }}>{n.note}</div>
-                      ))}
-                    </td>
-                  </tr>
-                )
-              })}
-          </tbody>
-        </table>
+        <WarningsTable claimedQSOs={claimedQSOs} />
       )}
     </Box>
   )

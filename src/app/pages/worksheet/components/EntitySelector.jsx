@@ -226,7 +226,7 @@ export function EntitySelector({
           </thead>
           <tbody>
             {qsos.map((qso) => {
-              const isSelected = entrySelections[entity.entityPrefix] === qso.key
+              const isSelected = currentSelectionKey === qso.key
               const icons = []
               if (qso.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
               if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {

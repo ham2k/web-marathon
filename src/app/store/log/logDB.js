@@ -33,7 +33,7 @@ export function logDB () {
 
     request.onerror = () => {
       console.error('IndexedDB Error', request)
-      reject(new Error('Error occured'))
+      reject(new Error('Error occurred'))
     }
     request.onblocked = () => {
       // This should only happen if we upgrade the database while another tab has an older version open
