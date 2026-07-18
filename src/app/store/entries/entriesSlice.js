@@ -27,12 +27,14 @@ export const entriesSlice = createSlice({
 
 export const { resetSelections, setSelection, setCurrentLogCalls } = entriesSlice.actions
 
+const EMPTY_OBJECT = {}
+
 export const selectEntrySelections = (state) => {
-  return state?.entries?.selections ?? {}
+  return state?.entries?.selections ?? EMPTY_OBJECT
 }
 
 export const selectOurCalls = (state) => {
-  return state?.entries?.calls ?? {}
+  return state?.entries?.calls ?? EMPTY_OBJECT
 }
 
 export default entriesSlice.reducer

@@ -42,7 +42,7 @@ function buildADX({ entryInfo, entrySelections, entityGroups, settings }) {
   CQWWEntities.forEach((entity) => {
     const key = entrySelections[entity.entityPrefix]
     const qsos = entityGroups[entity.entityPrefix] ?? []
-    const selected = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
+    const selected = key === 'X' ? undefined : ((key && qsos.find((qso) => qso.key === key)) ?? qsos[0])
 
     if (selected) {
       const qso = entities.ele('QSO')
@@ -66,7 +66,7 @@ function buildADX({ entryInfo, entrySelections, entityGroups, settings }) {
   CQZones.forEach((zone) => {
     const key = entrySelections[zone.entityPrefix]
     const qsos = entityGroups[zone.entityPrefix] ?? []
-    const selected = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
+    const selected = key === 'X' ? undefined : ((key && qsos.find((qso) => qso.key === key)) ?? qsos[0])
 
     if (selected) {
       const qso = zones.ele('QSO')

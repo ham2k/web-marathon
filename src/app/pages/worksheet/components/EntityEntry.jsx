@@ -1,19 +1,21 @@
-import React from 'react'
-
 import classNames from 'classnames'
 
 import { fmtInteger, fmtDateTime } from '@ham2k/lib-format-tools'
-import { Button, Chip, Tooltip } from '@mui/material'
+import { Button, Chip, Tooltip, Typography } from '@mui/material'
 import {
   CheckCircleRounded,
   Error,
   HearingDisabled,
-  PushPin,
-  PushPinOutlined
+  Edit,
+  Clear,
+  ThumbUp,
+  ThumbDown,
+  Feedback
 } from '@mui/icons-material'
 import { useDispatch } from 'react-redux'
 import { setSelection } from '../../../store/entries'
 import { Box } from '@mui/system'
+import { EntitySelector } from './EntitySelector'
 
 const styles = {
   root: {
@@ -26,7 +28,7 @@ const styles = {
   }
 }
 
-const DATE_FORMAT = {
+export const DATE_FORMAT = {
   hourCycle: 'h23',
   day: 'numeric',
   month: 'short',
@@ -35,13 +37,65 @@ const DATE_FORMAT = {
   timeZone: 'UTC'
 }
 
-export function EntityEntry ({
+const renderStatusIcon = (type, insideTooltip = false) => {
+  let bgColor = ''
+  let IconComponent = null
+
+  if (type === 'good') {
+    bgColor = '#4caf50' // green
+    IconComponent = ThumbUp
+  } else if (type === 'bad') {
+    bgColor = '#d32f2f' // red
+    IconComponent = ThumbDown
+  } else {
+    bgColor = '#ed6c02' // orange
+    IconComponent = Feedback
+  }
+
+  return (
+    <Box
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 18,
+        height: 18,
+        borderRadius: '50%',
+        backgroundColor: bgColor,
+        color: '#fff',
+        verticalAlign: 'middle',
+        ml: insideTooltip ? 0 : 0.5,
+        flexShrink: 0
+      }}
+    >
+      <IconComponent sx={{ fontSize: '0.75rem' }} />
+    </Box>
+  )
+}
+
+const renderTooltipNote = (n, i) => {
+  let iconType = 'warning'
+  if (n.about === 'goodCall') iconType = 'good'
+  else if (n.about === 'badCall') iconType = 'bad'
+
+  return (
+    <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.75 }}>
+      {renderStatusIcon(iconType, true)}
+      <Typography variant="body2" sx={{ fontSize: '0.75rem', whiteSpace: 'pre-line', color: 'inherit' }}>
+        {n.note}
+      </Typography>
+    </Box>
+  )
+}
+
+export function EntityEntry({
   entity,
   num,
   qsos,
   entryKey,
   selectedPrefix,
-  setSelectedPrefix
+  setSelectedPrefix,
+  yearQSOs
 }) {
   const dispatch = useDispatch()
 
@@ -54,12 +108,9 @@ export function EntityEntry ({
     else setSelectedPrefix(prefix)
   }
 
-  const handleSelectEntry = newEntry => {
-    dispatch(setSelection({ prefix: entity.entityPrefix, key: newEntry.key }))
-    setSelectedPrefix('')
-  }
-
-  if (entryKey) {
+  if (entryKey === 'X') {
+    entry = undefined
+  } else if (entryKey) {
     entry = (qsos && qsos.find(q => q.key === entryKey)) || (qsos && qsos[0])
   } else {
     entry = qsos && qsos[0]
@@ -80,7 +131,7 @@ export function EntityEntry ({
   if (entry) {
     cols.push(
       <td key='date' className='col-date'>
-        {fmtDateTime(entry.endOnMillis, DATE_FORMAT)}
+        {fmtDateTime(entry.endOnMillis || entry.startAtMillis, DATE_FORMAT)}
       </td>
     )
     cols.push(
@@ -93,6 +144,18 @@ export function EntityEntry ({
         {entry.mode}
       </td>
     )
+    const icons = []
+    if (entry.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
+    if (entry.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
+      icons.push({ type: 'warning', element: renderStatusIcon('warning') })
+    }
+    if (entry.isGoodCall) icons.push({ type: 'good', element: renderStatusIcon('good') })
+    if (icons.length === 0 && entry.notes?.length > 0) {
+      icons.push({ type: 'warning', element: renderStatusIcon('warning') })
+    }
+
+    const zIndexMap = { bad: 3, warning: 2, good: 1 }
+
     cols.push(
       <td key='call' className='col-call'>
         <span
@@ -101,29 +164,28 @@ export function EntityEntry ({
         >
           {entry.their.call}&nbsp;
         </span>
-        {entry.notes && ((entity.source === 'WAE' && entry.their.guess.entityPrefix !== entity.entityPrefix) || entity.zone) && (
+        {entry.notes && entry.notes.length > 0 && (
           <Tooltip
             arrow
             title={
-              <>
-                {entry.notes.map((n, i) => (
-                  <p key={i}>{n.note}</p>
-                ))}
-              </>
+              <Box>
+                {entry.notes.map((n, i) => renderTooltipNote(n, i))}
+              </Box>
             }
           >
-            <Error
-              fontSize='small'
-              sx={{ verticalAlign: 'middle', display: 'inline-block' }}
-              color='warning'
-              size='small'
-            />
+            <Box sx={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+              {icons.map((item, idx) => (
+                <Box key={idx} sx={{ ml: idx > 0 ? '-10px' : 0, zIndex: zIndexMap[item.type] || 0, position: 'relative' }}>
+                  {item.element}
+                </Box>
+              ))}
+            </Box>
           </Tooltip>
         )}
       </td>
     )
     cols.push(
-      <td key='qsl' className='col-qsl'>
+      <td key='qsl-active' className='col-qsl'>
         {entry?.qsl?.received
           ? (
             <Chip
@@ -132,42 +194,34 @@ export function EntityEntry ({
               size='small'
               icon={<CheckCircleRounded entry={entry} />}
             />
-            )
+          )
           : (
             <Chip label='qso' color='warning' size='small' icon={<Error />} />
-            )}
+          )}
       </td>
     )
     cols.push(
-      <td key='other' className='col-other'>
-        {entryKey && entry
-          ? (
-            <Button color='info' size='small' onClick={handleToggleEntityEntry}>
-              <PushPin fontSize='small' />
-              {qsos.length > 1 ? `+${fmtInteger(qsos.length - 1)}` : ''}
-            </Button>
-            )
-          : qsos?.length > 0
-            ? (
-              <Button color='info' size='small' onClick={handleToggleEntityEntry}>
-                <PushPinOutlined fontSize='small' />
-                {fmtInteger(qsos.length)}
-              </Button>
-              )
-            : (
-                '-'
-              )}
+      <td key='edit-active' className='col-edit' style={{ textAlign: 'center' }}>
+        {prefix && selectedPrefix === prefix ? (
+          <Button size='small' color='error' onClick={handleToggleEntityEntry} startIcon={<Clear />}>
+            DONE
+          </Button>
+        ) : (
+          <Button size='small' color='primary' onClick={handleToggleEntityEntry}>
+            <Edit fontSize='small' />
+            {qsos && qsos.length > 1 ? `+${fmtInteger(qsos.length - 1)}` : ''}
+          </Button>
+        )}
       </td>
     )
   } else {
     cols.push(
-      <td key='call' colSpan='4'>
-        {' '}
-        -{' '}
+      <td key='call' colSpan='4' style={{ textAlign: 'center', color: '#888' }}>
+        -
       </td>
     )
     cols.push(
-      <td key='qsl'>
+      <td key='qsl-inactive'>
         <Chip
           label='nil'
           color='default'
@@ -177,10 +231,17 @@ export function EntityEntry ({
       </td>
     )
     cols.push(
-      <td key='other'>
-        <Button size='small' disabled>
-          <PushPinOutlined fontSize='small' />-
-        </Button>
+      <td key='edit-inactive' className='col-edit' style={{ textAlign: 'center' }}>
+        {prefix && selectedPrefix === prefix ? (
+          <Button size='small' color='error' onClick={handleToggleEntityEntry} startIcon={<Clear />}>
+            DONE
+          </Button>
+        ) : (
+          <Button size='small' color='primary' onClick={handleToggleEntityEntry}>
+            <Edit fontSize='small' />
+            {qsos && qsos.length > 1 ? `+${fmtInteger(qsos.length - 1)}` : ''}
+          </Button>
+        )}
       </td>
     )
   }
@@ -193,94 +254,30 @@ export function EntityEntry ({
         className={classNames(
           prefix && selectedPrefix === prefix && 'selected',
           num % 2 === 0 ? 'even' : 'odd',
-          `band-${entry?.band}`
+          `band-${entry?.band || 'none'}`
         )}
       >
         {cols}
       </Box>
-      {prefix && selectedPrefix === prefix
-        ? qsos
-          .filter(qso => qso.key !== entry.key)
-          .map(qso => (
-            <Box
-              component='tr'
-              sx={styles.root}
-              key={qso.key}
-              className={classNames(
-                prefix && selectedPrefix === prefix && 'selected',
-                num % 2 === 0 ? 'even' : 'odd',
-                  `band-${qso.band}`
-              )}
-            >
-              <td colSpan='2'>&nbsp;</td>
-              <td className='col-date'>
-                {fmtDateTime(qso.endOnMillis, DATE_FORMAT)}
-              </td>
-              <td className={classNames('col-band', 'band-color')}>
-                {qso.band}
-              </td>
-              <td className='col-mode'>{qso.mode}</td>
-              <td className='col-call'>
-                <span
-                  className='callsign'
-                  style={{ verticalAlign: 'middle', display: 'inline-block' }}
-                >
-                  {qso.their.call}&nbsp;
-                </span>
-                {qso.notes && entity.source === 'WAE' && qso.their.guess.entityPrefix !== qso.entityPrefix && (
-                  <Tooltip
-                    arrow
-                    title={
-                      <>
-                        {qso.notes.map((n, i) => (
-                          <p key={i}>{n.note}</p>
-                        ))}
-                      </>
-                      }
-                  >
-                    <Error
-                      fontSize='small'
-                      sx={{
-                        verticalAlign: 'middle',
-                        display: 'inline-block'
-                      }}
-                      color='warning'
-                      size='small'
-                    />
-                  </Tooltip>
-                )}
-              </td>
-              <td className='col-qsl'>
-                {qso?.qsl?.received
-                  ? (
-                    <Chip
-                      label={'QSL'}
-                      color='info'
-                      size='small'
-                      icon={<CheckCircleRounded entry={qso} />}
-                    />
-                    )
-                  : (
-                    <Chip
-                      label='qso'
-                      color='warning'
-                      size='small'
-                      icon={<Error />}
-                    />
-                    )}
-              </td>
-              <td>
-                <Button
-                  color='info'
-                  size='small'
-                  onClick={() => handleSelectEntry(qso)}
-                >
-                  <PushPinOutlined fontSize='small' />
-                </Button>
-              </td>
-            </Box>
-          ))
-        : null}
+      {prefix && selectedPrefix === prefix && (
+        <Box
+          component='tr'
+          sx={styles.root}
+          className={classNames(
+            'selected',
+            num % 2 === 0 ? 'even' : 'odd'
+          )}
+        >
+          <td colSpan={8}>
+            <EntitySelector
+              entity={entity}
+              qsos={qsos}
+              yearQSOs={yearQSOs}
+              setSelectedPrefix={setSelectedPrefix}
+            />
+          </td>
+        </Box>
+      )}
     </>
   )
 }

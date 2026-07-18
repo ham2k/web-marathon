@@ -1,9 +1,17 @@
 export default function qsoComparer (a, b) {
-  const qslComp = (b?.qsl?.received ? 1 : 0) - (a?.qsl?.received ? 1 : 0)
-  if (qslComp !== 0) return qslComp
+  const score = (qso) => {
+    let s = 0
+    if (qso?.qsl?.received) s += 10000
+    if (qso?.isBadCall) s -= 100000
 
-  const notesComp = (a.notes?.length || 0) - (b.notes?.length || 0)
-  if (notesComp !== 0) return notesComp
+    const warningNotes = (qso?.notes ?? []).filter(n => n.about !== 'goodCall')
+    s -= warningNotes.length * 100
 
-  return a?.endOnMillis - b?.endOnMillis
+    return s
+  }
+
+  const scoreComp = score(b) - score(a)
+  if (scoreComp !== 0) return scoreComp
+
+  return (a?.endOnMillis || 0) - (b?.endOnMillis || 0)
 }

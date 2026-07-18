@@ -1,11 +1,9 @@
 import React from 'react'
 
-import ApexChart from 'react-apexcharts'
 import { EntitiesAndZones } from '../../../../data/entities'
-
-import { Typography } from '@mui/material'
 import { dateFormatterGenerator } from '@ham2k/lib-format-tools'
 import guessCurrentYear from '../../../tools/guessCurrentYear'
+import { Box, Typography } from '@mui/material'
 
 const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000
 
@@ -14,7 +12,26 @@ const ONE_WEEK_IN_MILLIS = 7 * ONE_DAY_IN_MILLIS
 const fmtDateDayMonthZulu = dateFormatterGenerator('dayMonth', { timeZone: 'UTC' })
 
 export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) {
-  const height = 200
+  const [hoveredBin, setHoveredBin] = React.useState(null)
+  const [tooltipPos, setTooltipPos] = React.useState({ x: 0, y: 0 })
+  const containerRef = React.useRef(null)
+  const [width, setWidth] = React.useState(800)
+
+  React.useEffect(() => {
+    if (!containerRef.current) return
+    if (typeof ResizeObserver === 'undefined') return
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width) {
+          setWidth(entry.contentRect.width)
+        }
+      }
+    })
+
+    resizeObserver.observe(containerRef.current)
+    return () => resizeObserver.disconnect()
+  }, [])
 
   const zoneEntries = []
   const entityEntries = []
@@ -37,8 +54,6 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
   let weekStart = yearStart
   let weekEnd
 
-  // We need to define these functions out here, instead of inline, to avoid scope problems
-  // See https://eslint.org/docs/latest/rules/no-loop-func
   const entityPusher = (bin) => (entry) => {
     if (entry.startAtMillis <= weekEnd && entry.endAtMillis >= weekStart) {
       bin.entities.push(entry)
@@ -50,7 +65,6 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
     }
   }
 
-  // debugger
   while (weekStart <= yearEnd) {
     weekEnd = weekStart + ONE_WEEK_IN_MILLIS
 
@@ -61,115 +75,229 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
     weekStart = weekEnd
   }
 
-  const maxPoints = Math.max(...bins.map((bin) => bin.entities.length + bin.zones.length))
+  const maxTotVal = Math.max(...bins.map((bin) => bin.entities.length + bin.zones.length))
+  const scaleH = 120 / Math.sqrt(maxTotVal || 1)
 
-  const series = [
-    {
-      type: 'column',
-      name: 'Entities',
-      data: bins.map((bin, i) => ({ x: bin.startAtMillis, y: bin.entities.length ?? null, bin }))
-    },
-    {
-      type: 'column',
-      name: 'Zones',
-      data: bins.map((bin, i) => ({ x: bin.startAtMillis, y: bin.zones.length ?? null, bin }))
-    }
-  ]
+  const paddingLeft = 50
+  const paddingRight = 20
+  const plotWidth = Math.max(200, width - paddingLeft - paddingRight)
+  const step = plotWidth / (bins.length - 1)
 
-  const options = {
-    chart: {
-      type: 'line',
-      height,
-      stacked: true,
-      toolbar: {
-        show: false
-        // tools: {
-        //   download: false,
-        //   selection: false,
-        //   zoom: true,
-        //   zoomin: true,
-        //   zoomout: true,
-        //   pan: true,
-        //   reset: true,
-        // },
-      },
-      zoom: {
-        enabled: false
-      }
-    },
-    stroke: {
-      width: [0, 0],
-      curve: ['straight', 'straight']
-    },
-    fill: {
-      opacity: [1, 1]
-    },
-    colors: ['#ff9800', '#0288d1'],
-    responsive: [
-      {
-        breakpoint: 800,
-        options: {
-          legend: {
-            position: 'bottom',
-            offsetX: -10,
-            offsetY: 0
-          }
-        }
-      }
-    ],
-    dataLabels: { enabled: false },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        borderRadius: 0
-      }
-    },
-    tooltip: {
-      enabled: true,
-      // shared: true,
-      // intersect: false,
-      followCursor: false,
-      x: {
-        formatter: (x) =>
-          `${fmtDateDayMonthZulu(x)} to ${fmtDateDayMonthZulu(x + ONE_WEEK_IN_MILLIS - ONE_DAY_IN_MILLIS)}`
-      },
-      y: {
-        formatter: (y) => `${y} Points`
-      }
-    },
-    xaxis: {
-      type: 'datetime',
-      labels: {
-        formatter: (x) => fmtDateDayMonthZulu(x)
-      }
-    },
-    yaxis: [
-      {
-        seriesName: 'Entities',
-        show: true,
-        forceNiceScale: true,
-        min: 0,
-        max: maxPoints
-      },
-      { seriesName: 'Zones', show: false, min: 0, max: maxPoints }
-    ],
-    legend: {
-      position: 'right',
-      offsetY: 40,
-      showForNullSeries: false,
-      inverseOrder: true
-    }
+  const maxBarWidth = Math.max(4, step - 5)
+  const scaleW = maxBarWidth / Math.sqrt(maxTotVal || 1)
+
+  const firstBin = bins[0]
+  const firstBinTot = firstBin ? firstBin.entities.length + firstBin.zones.length : 0
+  const firstBinWidth = Math.sqrt(firstBinTot) * scaleW
+  const labelX = paddingLeft - firstBinWidth / 2
+
+  const gridVals = [5, 10, 50, 100].filter((v) => v <= maxTotVal)
+
+  const now = Date.now()
+  let futureX = null
+  if (now >= yearStart && now <= yearEnd) {
+    const proportion = (now - yearStart) / (yearEnd - yearStart)
+    futureX = paddingLeft + proportion * plotWidth
+  } else if (now < yearStart) {
+    futureX = paddingLeft
+  }
+
+  const handleMouseMove = (event, bin) => {
+    setHoveredBin(bin)
+    setTooltipPos({ x: event.clientX, y: event.clientY })
+  }
+
+  const handleMouseLeave = () => {
+    setHoveredBin(null)
   }
 
   return (
-    <div>
-      <Typography component='h2' variant='h5'>
-        <b>{entityEntries.length + zoneEntries.length} total points:&nbsp;</b>
-        <a href='worksheet#entities'>{entityEntries.length} Entities</a>&nbsp;+&nbsp;
-        <a href='worksheet#zones'>{zoneEntries.length} Zones</a>
-      </Typography>
+    <Box sx={{ mb: 3, position: 'relative' }}>
+      <Box
+        ref={containerRef}
+        sx={{ overflowX: 'auto', width: '100%' }}
+      >
+        <svg viewBox={`0 0 ${width} 200`} width="100%" height="200" style={{ display: 'block' }}>
+          {/* Chart Label/Watermark inside the chart area */}
+          <text
+            x={labelX}
+            y={28}
+            textAnchor="start"
+            style={{
+              fontFamily: 'sans-serif',
+              pointerEvents: 'none'
+            }}
+          >
+            <tspan style={{ fontSize: '13px', fontWeight: 600, fill: '#000' }}>
+              New points per week
+            </tspan>
+            <tspan style={{ fontSize: '11px', fill: '#666', fontWeight: 400 }} dx="8">
+              (Area represents total points)
+            </tspan>
+          </text>
 
-      <ApexChart options={options} series={series} type='bar' height={height} />
-    </div>
+          {/* Baseline Label */}
+          <text
+            x={paddingLeft - 12}
+            y={164}
+            textAnchor="end"
+            style={{ fontSize: '10px', fill: '#888', fontFamily: 'sans-serif' }}
+          >
+            0
+          </text>
+
+          {/* Grid lines & Y-Axis labels */}
+          {gridVals.map((val) => {
+            const y = 160 - Math.sqrt(val) * scaleH
+            return (
+              <React.Fragment key={val}>
+                <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke="#e5e5e5" strokeDasharray="3,3" />
+                <text
+                  x={paddingLeft - 12}
+                  y={y + 4}
+                  textAnchor="end"
+                  style={{ fontSize: '10px', fill: '#888', fontFamily: 'sans-serif' }}
+                >
+                  {val}
+                </text>
+              </React.Fragment>
+            )
+          })}
+
+          {futureX !== null && (
+            <>
+              {/* Shaded future background */}
+              <rect
+                x={futureX}
+                y={10}
+                width={width - paddingRight - futureX}
+                height={150}
+                fill="rgba(0, 0, 0, 0.025)"
+                pointerEvents="none"
+              />
+              {/* "Today" vertical dashed line */}
+              <line
+                x1={futureX}
+                y1={10}
+                x2={futureX}
+                y2={160}
+                stroke="#ccc"
+                strokeDasharray="4,4"
+                pointerEvents="none"
+              />
+            </>
+          )}
+
+          {/* Render bars */}
+          {bins.map((bin, i) => {
+            const x = paddingLeft + i * step
+            const cEnt = bin.entities.length
+            const cZone = bin.zones.length
+            const cTot = cEnt + cZone
+
+            if (cTot === 0) return null
+
+            const w = Math.sqrt(cTot) * scaleW
+            const h = Math.sqrt(cTot) * scaleH
+
+            const hEnt = h * (cEnt / cTot)
+            const hZone = h * (cZone / cTot)
+
+            return (
+              <g key={i}>
+                {/* Entities (yellow/orange) at bottom */}
+                {cEnt > 0 && (
+                  <rect
+                    x={x - w / 2}
+                    y={160 - hEnt}
+                    width={w}
+                    height={hEnt}
+                    fill="#ff9800"
+                    fillOpacity={0.85}
+                  />
+                )}
+                {/* Zones (blue) stacked on top */}
+                {cZone > 0 && (
+                  <rect
+                    x={x - w / 2}
+                    y={160 - h}
+                    width={w}
+                    height={hZone}
+                    fill="#0288d1"
+                    fillOpacity={0.85}
+                  />
+                )}
+
+                {/* Transparent hit-test trigger area for hover tooltips */}
+                <rect
+                  x={x - step / 2}
+                  y={10}
+                  width={step}
+                  height={150}
+                  fill="transparent"
+                  style={{ cursor: 'pointer' }}
+                  onMouseMove={(e) => handleMouseMove(e, bin)}
+                  onMouseLeave={handleMouseLeave}
+                />
+              </g>
+            )
+          })}
+
+          {/* X-Axis labels */}
+          {bins.map((bin, i) => {
+            if (i % 7 === 0 || i === bins.length - 1) {
+              const x = paddingLeft + i * step
+              return (
+                <text
+                  key={i}
+                  x={x}
+                  y={180}
+                  textAnchor="middle"
+                  style={{ fontSize: '10px', fill: '#888', fontFamily: 'sans-serif' }}
+                >
+                  {fmtDateDayMonthZulu(bin.startAtMillis)}
+                </text>
+              )
+            }
+            return null
+          })}
+
+          {/* Baseline */}
+          <line x1={paddingLeft} y1={160} x2={width - paddingRight} y2={160} stroke="#ccc" strokeWidth={1} />
+        </svg>
+      </Box>
+
+      {/* Custom Tooltip */}
+      {hoveredBin && (
+        <Box
+          sx={{
+            position: 'fixed',
+            left: tooltipPos.x + 15,
+            top: tooltipPos.y - 15,
+            bgcolor: 'rgba(30, 30, 30, 0.95)',
+            color: '#fff',
+            p: 1.5,
+            borderRadius: 1,
+            fontSize: '0.75rem',
+            pointerEvents: 'none',
+            zIndex: 9999,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            border: '1px solid #555'
+          }}
+        >
+          <div style={{ fontWeight: 'bold', marginBottom: 4 }}>
+            {fmtDateDayMonthZulu(hoveredBin.startAtMillis)} to {fmtDateDayMonthZulu(hoveredBin.endAtMillis - ONE_DAY_IN_MILLIS)}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: '#ff9800' }} />
+            <span>Entities: <strong>{hoveredBin.entities.length}</strong> Points</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: '#0288d1' }} />
+            <span>Zones: <strong>{hoveredBin.zones.length}</strong> Points</span>
+          </div>
+        </Box>
+      )}
+    </Box>
   )
 }

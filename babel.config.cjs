@@ -17,5 +17,6 @@ if (testMode) {
 }
 
 module.exports = {
-  presets
+  presets,
+  plugins
 }
