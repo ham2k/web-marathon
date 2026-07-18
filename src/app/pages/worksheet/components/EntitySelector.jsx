@@ -7,6 +7,7 @@ import classNames from 'classnames'
 import { fmtDateTime } from '@ham2k/lib-format-tools'
 import { setSelection, selectEntrySelections } from '../../../store/entries'
 import { DATE_FORMAT } from './EntityEntry'
+import { getSelectedEntry } from '../../../tools/getSelectedEntry'
 
 const styles = {
   root: {
@@ -16,7 +17,7 @@ const styles = {
       marginLeft: 'auto',
       marginRight: 'auto',
       width: '100%',
-      maxWidth: '35rem',
+      maxWidth: '45rem',
       borderCollapse: 'collapse',
       marginTop: '1em',
       '& th': {
@@ -122,6 +123,14 @@ export function EntitySelector({
       filteredQSOs = [currentSelectedQSO, ...filteredQSOs]
     }
 
+    // Label the auto-selected QSO if no manual selection is active
+    const autoSelectedQSO = !currentSelectionKey
+      ? getSelectedEntry(defaultQSOs, currentSelectionKey, entrySelections, keyPrefix, yearQSOs)
+      : null
+    if (autoSelectedQSO) {
+      warnings[autoSelectedQSO.key] = 'Auto selected'
+    }
+
     filteredQSOs.forEach((qso) => {
       const assignedPrefixKey = Object.keys(entrySelections).find(
         (prefix) => entrySelections[prefix] === qso.key
@@ -181,13 +190,11 @@ export function EntitySelector({
     }
 
     dispatch(setSelection({ prefix: keyPrefix, key: qso.key }))
-    setSelectedPrefix('')
-  }, [dispatch, entity, keyPrefix, setSelectedPrefix, entrySelections, yearQSOs, marathonMode, activeBand])
+  }, [dispatch, entity, keyPrefix, entrySelections, yearQSOs, marathonMode, activeBand])
 
   const handleClearEntry = useCallback((qso) => {
     dispatch(setSelection({ prefix: keyPrefix, key: undefined }))
-    setSelectedPrefix('')
-  }, [dispatch, keyPrefix, setSelectedPrefix])
+  }, [dispatch, keyPrefix])
 
   return (
     <Box sx={styles.root}>
@@ -225,11 +232,11 @@ export function EntitySelector({
             </tr>
           </thead>
           <tbody>
-            {qsos.map((qso) => {
+            {qsos.map((qso, index) => {
               const isSelected = currentSelectionKey === qso.key
               const icons = []
               if (qso.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
-              if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
+              if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix' || n.about === 'duplicateQSO')) {
                 icons.push({ type: 'warning', element: renderStatusIcon('warning') })
               }
               if (qso.isGoodCall) icons.push({ type: 'good', element: renderStatusIcon('good') })
@@ -241,7 +248,7 @@ export function EntitySelector({
 
               return (
                 <tr
-                  key={qso.key}
+                  key={`${qso.key}-${index}`}
                   className={classNames(`band-${qso.band}`)}
                 >
                   <td className='col-date'>

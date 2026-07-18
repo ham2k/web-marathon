@@ -171,6 +171,9 @@ export function annotateAndGroupLog(qsos, goodCalls = [], badCalls = [], year) {
     notes: qso.notes ? [...qso.notes] : []
   }))
 
+  const uniqueYearQSOs = []
+  const seenQSOs = new Map()
+
   yearQSOs.forEach(qso => {
     qso = processOneQSO(qso)
 
@@ -218,7 +221,23 @@ export function annotateAndGroupLog(qsos, goodCalls = [], badCalls = [], year) {
         return true
       })
     }
+
+    const existing = seenQSOs.get(qso.key)
+    if (existing) {
+      existing.notes = existing.notes ?? []
+      if (!existing.notes.some(n => n.about === 'duplicateQSO')) {
+        existing.notes.push({
+          about: 'duplicateQSO',
+          note: 'This QSO was duplicated in the imported log. Redundant records were ignored.'
+        })
+      }
+    } else {
+      seenQSOs.set(qso.key, qso)
+      uniqueYearQSOs.push(qso)
+    }
   })
+
+  yearQSOs = uniqueYearQSOs
 
   const entityGroups = {}
 

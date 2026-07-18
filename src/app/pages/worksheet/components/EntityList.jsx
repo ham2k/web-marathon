@@ -108,7 +108,7 @@ function WarningsTable ({ claimedQSOs }) {
       <tbody>
         {claimedQSOs
           .filter(qso => qso.isBadCall || qso.notes?.some(n => n.about !== 'goodCall' && n.about !== 'badCall'))
-          .map((qso) => {
+          .map((qso, index) => {
             const prefix = qso.their.entityPrefix
             const entity = CQWWEntities.find(e => e.entityPrefix === prefix) || CQZones.find(z => z.entityPrefix === prefix)
             const entityName = entity ? entity.name : qso.their.entityName || ''
@@ -117,13 +117,13 @@ function WarningsTable ({ claimedQSOs }) {
 
             const icons = []
             if (qso.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
-            if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
+            if (qso.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix' || n.about === 'duplicateQSO')) {
               icons.push({ type: 'warning', element: renderStatusIcon('warning') })
             }
             const zIndexMap = { bad: 3, warning: 2, good: 1 }
 
             return (
-              <tr key={qso.key} className={classNames(`band-${qso.band}`)}>
+              <tr key={`${qso.key}-${index}`} className={classNames(`band-${qso.band}`)}>
                 <td className='col-prefix'>{prefix}</td>
                 <td className='col-name'>{flag}&nbsp;{entityName}</td>
                 <td className='col-date'>{fmtDateTime(qso.endOnMillis || qso.startAtMillis, DATE_FORMAT)}</td>
@@ -450,7 +450,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
                     num={i}
                     qsos={qsosOnBand}
                     entryKey={entrySelections[keyPrefix]}
-                    selectedPrefix={selectedPrefix}
+                    isSelected={selectedPrefix === entity.entityPrefix}
                     setSelectedPrefix={setSelectedPrefix}
                     yearQSOs={qsos}
                     marathonMode={marathonMode}
@@ -488,7 +488,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
                     num={CQWWEntities.length + i}
                     qsos={qsosOnBand}
                     entryKey={entrySelections[keyPrefix]}
-                    selectedPrefix={selectedPrefix}
+                    isSelected={selectedPrefix === zone.entityPrefix}
                     setSelectedPrefix={setSelectedPrefix}
                     yearQSOs={qsos}
                     marathonMode={marathonMode}
@@ -523,7 +523,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
                 num={i}
                 qsos={entityGroups[entity.entityPrefix]}
                 entryKey={entrySelections[entity.entityPrefix]}
-                selectedPrefix={selectedPrefix}
+                isSelected={selectedPrefix === entity.entityPrefix}
                 setSelectedPrefix={setSelectedPrefix}
                 yearQSOs={qsos}
               />
@@ -554,7 +554,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
                 num={i}
                 qsos={entityGroups[zone.entityPrefix]}
                 entryKey={entrySelections[zone.entityPrefix]}
-                selectedPrefix={selectedPrefix}
+                isSelected={selectedPrefix === zone.entityPrefix}
                 setSelectedPrefix={setSelectedPrefix}
                 yearQSOs={qsos}
               />
@@ -585,7 +585,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
                 num={i}
                 qsos={entityGroups[entity.entityPrefix]}
                 entryKey={entrySelections[entity.entityPrefix]}
-                selectedPrefix={selectedPrefix}
+                isSelected={selectedPrefix === entity.entityPrefix}
                 setSelectedPrefix={setSelectedPrefix}
                 yearQSOs={qsos}
               />

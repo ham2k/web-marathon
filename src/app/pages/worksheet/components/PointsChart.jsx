@@ -177,7 +177,7 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
                 <line x1={0} y1={y} x2={width} y2={y} stroke="#e5e5e5" strokeDasharray="3,3" />
                 <text
                   x={0}
-                  y={y - 4}
+                  y={y + 12}
                   textAnchor="start"
                   style={{ fontSize: '10px', fill: '#888', fontFamily: 'sans-serif' }}
                 >

@@ -1,7 +1,8 @@
+import React, { useState, useEffect } from 'react'
 import classNames from 'classnames'
 
 import { fmtInteger, fmtDateTime } from '@ham2k/lib-format-tools'
-import { Button, Chip, Tooltip, Typography } from '@mui/material'
+import { Button, Chip, Collapse, Tooltip, Typography } from '@mui/material'
 import {
   CheckCircleRounded,
   Error,
@@ -89,12 +90,12 @@ const renderTooltipNote = (n, i) => {
   )
 }
 
-export function EntityEntry({
+export const EntityEntry = React.memo(function EntityEntry({
   entity,
   num,
   qsos,
   entryKey,
-  selectedPrefix,
+  isSelected,
   setSelectedPrefix,
   yearQSOs,
   marathonMode,
@@ -108,8 +109,10 @@ export function EntityEntry({
   const currentKeyPrefix = marathonMode === 'challenge' && activeBand ? `${prefix}-${activeBand}` : prefix
   const entry = getSelectedEntry(qsos, entryKey, entrySelections, currentKeyPrefix, yearQSOs)
 
+  const [open, setOpen] = useState(false)
+
   const handleToggleEntityEntry = event => {
-    if (selectedPrefix === prefix) setSelectedPrefix('')
+    if (isSelected) setSelectedPrefix('')
     else setSelectedPrefix(prefix)
   }
 
@@ -143,7 +146,7 @@ export function EntityEntry({
     )
     const icons = []
     if (entry.isBadCall) icons.push({ type: 'bad', element: renderStatusIcon('bad') })
-    if (entry.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix')) {
+    if (entry.notes?.some(n => n.about === 'cqZone' || n.about === 'waeEntity' || n.about === 'entityPrefix' || n.about === 'duplicateQSO')) {
       icons.push({ type: 'warning', element: renderStatusIcon('warning') })
     }
     if (entry.isGoodCall) icons.push({ type: 'good', element: renderStatusIcon('good') })
@@ -199,7 +202,7 @@ export function EntityEntry({
     )
     cols.push(
       <td key='edit-active' className='col-edit' style={{ textAlign: 'center' }}>
-        {prefix && selectedPrefix === prefix ? (
+        {prefix && isSelected ? (
           <Button size='small' color='error' onClick={handleToggleEntityEntry} startIcon={<Clear />}>
             DONE
           </Button>
@@ -229,7 +232,7 @@ export function EntityEntry({
     )
     cols.push(
       <td key='edit-inactive' className='col-edit' style={{ textAlign: 'center' }}>
-        {prefix && selectedPrefix === prefix ? (
+        {prefix && isSelected ? (
           <Button size='small' color='error' onClick={handleToggleEntityEntry} startIcon={<Clear />}>
             DONE
           </Button>
@@ -249,23 +252,29 @@ export function EntityEntry({
         component='tr'
         sx={styles.root}
         className={classNames(
-          prefix && selectedPrefix === prefix && 'selected',
+          prefix && isSelected && 'selected',
           num % 2 === 0 ? 'even' : 'odd',
           `band-${entry?.band || 'none'}`
         )}
       >
         {cols}
       </Box>
-      {prefix && selectedPrefix === prefix && (
-        <Box
-          component='tr'
-          sx={styles.root}
-          className={classNames(
-            'selected',
-            num % 2 === 0 ? 'even' : 'odd'
-          )}
-        >
-          <td colSpan={8}>
+      <Box
+        component='tr'
+        sx={styles.root}
+        className={classNames(
+          'selected',
+          num % 2 === 0 ? 'even' : 'odd'
+        )}
+        style={{ display: isSelected || open ? 'table-row' : 'none' }}
+      >
+        <td colSpan={8} style={{ padding: 0 }}>
+          <Collapse
+            in={isSelected}
+            timeout="auto"
+            onEnter={() => setOpen(true)}
+            onExited={() => setOpen(false)}
+          >
             <EntitySelector
               entity={entity}
               qsos={qsos}
@@ -274,9 +283,9 @@ export function EntityEntry({
               marathonMode={marathonMode}
               activeBand={activeBand}
             />
-          </td>
-        </Box>
-      )}
+          </Collapse>
+        </td>
+      </Box>
     </>
   )
-}
+})
