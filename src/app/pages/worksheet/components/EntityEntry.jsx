@@ -14,7 +14,7 @@ import {
   Feedback
 } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
-import { setSelection, selectEntrySelections } from '../../../store/entries'
+
 import { getSelectedEntry } from '../../../tools/getSelectedEntry'
 import { Box } from '@mui/system'
 import { EntitySelector } from './EntitySelector'
@@ -105,9 +105,7 @@ export const EntityEntry = React.memo(function EntityEntry({
 
   const prefix = entity.entityPrefix
 
-  const entrySelections = useSelector(selectEntrySelections)
-  const currentKeyPrefix = marathonMode === 'challenge' && activeBand ? `${prefix}-${activeBand}` : prefix
-  const entry = getSelectedEntry(qsos, entryKey, entrySelections, currentKeyPrefix, yearQSOs)
+  const entry = getSelectedEntry(qsos, entryKey, undefined, undefined, yearQSOs)
 
   const [open, setOpen] = useState(false)
 

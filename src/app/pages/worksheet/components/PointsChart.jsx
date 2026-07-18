@@ -37,74 +37,94 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
   }, [])
 
   const marathonMode = useSelector(selectMarathonMode)
-  const zoneEntries = []
-  const entityEntries = []
+  const { entityEntries, zoneEntries } = React.useMemo(() => {
+    const zoneEntries = []
+    const entityEntries = []
 
-  if (marathonMode === 'challenge') {
-    const CHALLENGE_BANDS = ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m']
-    CHALLENGE_BANDS.forEach((band) => {
-      CQWWEntities.forEach((entity) => {
-        const keyPrefix = `${entity.entityPrefix}-${band}`
-        const key = entrySelections[keyPrefix]
-        const entityQSOs = (entityGroups[entity.entityPrefix] ?? []).filter((q) => q.band === band)
-        const entry = getSelectedEntry(entityQSOs, key, entrySelections, keyPrefix, qsos)
-        if (entry) {
-          entityEntries.push(entry)
-        }
-      })
-
-      CQZones.forEach((zone) => {
-        const keyPrefix = `${zone.entityPrefix}-${band}`
-        const key = entrySelections[keyPrefix]
-        const zoneQSOs = (entityGroups[zone.entityPrefix] ?? []).filter((q) => q.band === band)
-        const entry = getSelectedEntry(zoneQSOs, key, entrySelections, keyPrefix, qsos)
-        if (entry) {
-          zoneEntries.push(entry)
-        }
-      })
-    })
-  } else {
-    EntitiesAndZones.forEach((entity) => {
-      const key = entrySelections[entity.entityPrefix]
-      const entityQSOs = entityGroups[entity.entityPrefix] ?? []
-      const entry = getSelectedEntry(entityQSOs, key, entrySelections, entity.entityPrefix, qsos)
-      if (entry) {
-        if (entity.zone) zoneEntries.push(entry)
-        else entityEntries.push(entry)
+    if (marathonMode === 'challenge') {
+      const CHALLENGE_BANDS = ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m']
+      // Pre-group by prefix and band to prevent filter inside the nested loops
+      const entityGroupsByPrefixAndBand = {}
+      if (entityGroups) {
+        Object.keys(entityGroups).forEach((prefix) => {
+          const list = entityGroups[prefix] ?? []
+          list.forEach((qso) => {
+            const key = `${prefix}-${qso.band}`
+            entityGroupsByPrefixAndBand[key] = entityGroupsByPrefixAndBand[key] ?? []
+            entityGroupsByPrefixAndBand[key].push(qso)
+          })
+        })
       }
-    })
-  }
+
+      CHALLENGE_BANDS.forEach((band) => {
+        CQWWEntities.forEach((entity) => {
+          const keyPrefix = `${entity.entityPrefix}-${band}`
+          const key = entrySelections[keyPrefix]
+          const entityQSOs = entityGroupsByPrefixAndBand[`${entity.entityPrefix}-${band}`] ?? []
+          const entry = getSelectedEntry(entityQSOs, key, undefined, undefined, qsos)
+          if (entry) {
+            entityEntries.push(entry)
+          }
+        })
+
+        CQZones.forEach((zone) => {
+          const keyPrefix = `${zone.entityPrefix}-${band}`
+          const key = entrySelections[keyPrefix]
+          const zoneQSOs = entityGroupsByPrefixAndBand[`${zone.entityPrefix}-${band}`] ?? []
+          const entry = getSelectedEntry(zoneQSOs, key, undefined, undefined, qsos)
+          if (entry) {
+            zoneEntries.push(entry)
+          }
+        })
+      })
+    } else {
+      EntitiesAndZones.forEach((entity) => {
+        const key = entrySelections[entity.entityPrefix]
+        const entityQSOs = entityGroups[entity.entityPrefix] ?? []
+        const entry = getSelectedEntry(entityQSOs, key, undefined, undefined, qsos)
+        if (entry) {
+          if (entity.zone) zoneEntries.push(entry)
+          else entityEntries.push(entry)
+        }
+      })
+    }
+
+    return { entityEntries, zoneEntries }
+  }, [entrySelections, entityGroups, qsos, marathonMode])
 
   const year = settings?.year ?? guessCurrentYear()
   const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
   const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
 
-  const bins = []
-  let weekStart = yearStart
-  let weekEnd
+  const { bins, maxTotVal } = React.useMemo(() => {
+    const bins = []
+    let weekStart = yearStart
+    let weekEnd
 
-  const entityPusher = (bin) => (entry) => {
-    if (entry.startAtMillis <= weekEnd && entry.endAtMillis >= weekStart) {
-      bin.entities.push(entry)
+    const entityPusher = (bin) => (entry) => {
+      if (entry.startAtMillis <= weekEnd && entry.endAtMillis >= weekStart) {
+        bin.entities.push(entry)
+      }
     }
-  }
-  const zonePusher = (bin) => (entry) => {
-    if (entry.startAtMillis <= weekEnd && entry.endAtMillis >= weekStart) {
-      bin.zones.push(entry)
+    const zonePusher = (bin) => (entry) => {
+      if (entry.startAtMillis <= weekEnd && entry.endAtMillis >= weekStart) {
+        bin.zones.push(entry)
+      }
     }
-  }
 
-  while (weekStart <= yearEnd) {
-    weekEnd = weekStart + ONE_WEEK_IN_MILLIS
+    while (weekStart <= yearEnd) {
+      weekEnd = weekStart + ONE_WEEK_IN_MILLIS
 
-    const bin = { entities: [], zones: [], startAtMillis: weekStart, endAtMillis: weekEnd }
-    entityEntries.forEach(entityPusher(bin))
-    zoneEntries.forEach(zonePusher(bin))
-    bins.push(bin)
-    weekStart = weekEnd
-  }
+      const bin = { entities: [], zones: [], startAtMillis: weekStart, endAtMillis: weekEnd }
+      entityEntries.forEach(entityPusher(bin))
+      zoneEntries.forEach(zonePusher(bin))
+      bins.push(bin)
+      weekStart = weekEnd
+    }
 
-  const maxTotVal = Math.max(...bins.map((bin) => bin.entities.length + bin.zones.length))
+    const maxTotVal = Math.max(...bins.map((bin) => bin.entities.length + bin.zones.length))
+    return { bins, maxTotVal }
+  }, [entityEntries, zoneEntries, yearStart, yearEnd])
   const scaleH = 120 / Math.sqrt(maxTotVal || 1)
 
   const paddingLeft = 50

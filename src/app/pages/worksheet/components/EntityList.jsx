@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { selectMarathonMode } from '../../../store/settings'
 import { CQWWEntities, CQZones } from '../../../../data/entities'
 import { EntityEntry, DATE_FORMAT } from './EntityEntry'
-import { ExcelEntry } from './ExcelEntry'
 import { Typography, Tabs, Tab, Box, Button } from '@mui/material'
 import { ThumbUp, ThumbDown, Feedback } from '@mui/icons-material'
 import classNames from 'classnames'
@@ -56,7 +55,11 @@ const styles = {
       marginTop: '0.5em',
       '& th': {
         textAlign: 'left',
-        paddingRight: '1em'
+        paddingRight: '1em',
+        position: 'sticky',
+        top: '48px',
+        zIndex: 5,
+        backgroundColor: '#fff'
       },
       '& td': {
         textAlign: 'left',
@@ -163,6 +166,20 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
 
   const CHALLENGE_BANDS = useMemo(() => ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m'], [])
 
+  const entityGroupsByPrefixAndBand = useMemo(() => {
+    if (!entityGroups) return {}
+    const grouped = {}
+    Object.keys(entityGroups).forEach((prefix) => {
+      const qsosList = entityGroups[prefix] ?? []
+      qsosList.forEach((qso) => {
+        const key = `${prefix}-${qso.band}`
+        grouped[key] = grouped[key] ?? []
+        grouped[key].push(qso)
+      })
+    })
+    return grouped
+  }, [entityGroups])
+
   const challengeBandCounts = useMemo(() => {
     const bandCounts = {}
     CHALLENGE_BANDS.forEach((band) => {
@@ -175,9 +192,8 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       CHALLENGE_BANDS.forEach((band) => {
         const keyPrefix = `${entity.entityPrefix}-${band}`
         const key = entrySelections[keyPrefix]
-        const qsosList = entityGroups[entity.entityPrefix] ?? []
-        const prefixBandQSOs = qsosList.filter((q) => q.band === band)
-        const entry = getSelectedEntry(prefixBandQSOs, key, entrySelections, keyPrefix, qsos)
+        const prefixBandQSOs = entityGroupsByPrefixAndBand[`${entity.entityPrefix}-${band}`] ?? []
+        const entry = getSelectedEntry(prefixBandQSOs, key, undefined, undefined, qsos)
         if (entry) {
           bandCounts[band].entities += 1
         }
@@ -188,9 +204,8 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       CHALLENGE_BANDS.forEach((band) => {
         const keyPrefix = `${zone.entityPrefix}-${band}`
         const key = entrySelections[keyPrefix]
-        const qsosList = entityGroups[zone.entityPrefix] ?? []
-        const prefixBandQSOs = qsosList.filter((q) => q.band === band)
-        const entry = getSelectedEntry(prefixBandQSOs, key, entrySelections, keyPrefix, qsos)
+        const prefixBandQSOs = entityGroupsByPrefixAndBand[`${zone.entityPrefix}-${band}`] ?? []
+        const entry = getSelectedEntry(prefixBandQSOs, key, undefined, undefined, qsos)
         if (entry) {
           bandCounts[band].zones += 1
         }
@@ -198,7 +213,20 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
     })
 
     return bandCounts
-  }, [entityGroups, entrySelections, CHALLENGE_BANDS, qsos])
+  }, [entityGroupsByPrefixAndBand, entrySelections, CHALLENGE_BANDS, qsos, marathonMode])
+
+  const challengeGroupsByBand = useMemo(() => {
+    if (marathonMode !== 'challenge') return {}
+    const activeBand = CHALLENGE_BANDS[activeTab]
+    const grouped = {}
+    CQWWEntities.forEach(entity => {
+      grouped[entity.entityPrefix] = entityGroupsByPrefixAndBand[`${entity.entityPrefix}-${activeBand}`] || []
+    })
+    CQZones.forEach(zone => {
+      grouped[zone.entityPrefix] = entityGroupsByPrefixAndBand[`${zone.entityPrefix}-${activeBand}`] || []
+    })
+    return grouped
+  }, [entityGroupsByPrefixAndBand, activeTab, marathonMode, CHALLENGE_BANDS])
 
   const waeEntities = useMemo(() => {
     return CQWWEntities.filter((entity) => entity.entityPrefix.startsWith('*'))
@@ -269,16 +297,16 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
         CQWWEntities.forEach((entity) => {
           const keyPrefix = `${entity.entityPrefix}-${band}`
           const key = entrySelections[keyPrefix]
-          const prefixBandQSOs = (entityGroups[entity.entityPrefix] ?? []).filter((q) => q.band === band)
-          const entry = getSelectedEntry(prefixBandQSOs, key, entrySelections, keyPrefix, qsos)
+          const prefixBandQSOs = entityGroupsByPrefixAndBand[`${entity.entityPrefix}-${band}`] ?? []
+          const entry = getSelectedEntry(prefixBandQSOs, key, undefined, undefined, qsos)
           if (entry) addQSO(entry)
         })
 
         CQZones.forEach((zone) => {
           const keyPrefix = `${zone.entityPrefix}-${band}`
           const key = entrySelections[keyPrefix]
-          const prefixBandQSOs = (entityGroups[zone.entityPrefix] ?? []).filter((q) => q.band === band)
-          const entry = getSelectedEntry(prefixBandQSOs, key, entrySelections, keyPrefix, qsos)
+          const prefixBandQSOs = entityGroupsByPrefixAndBand[`${zone.entityPrefix}-${band}`] ?? []
+          const entry = getSelectedEntry(prefixBandQSOs, key, undefined, undefined, qsos)
           if (entry) addQSO(entry)
         })
       })
@@ -286,20 +314,20 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       CQWWEntities.forEach((entity) => {
         const key = entrySelections[entity.entityPrefix]
         const prefixQSOs = entityGroups[entity.entityPrefix] ?? []
-        const entry = getSelectedEntry(prefixQSOs, key, entrySelections, entity.entityPrefix, qsos)
+        const entry = getSelectedEntry(prefixQSOs, key, undefined, undefined, qsos)
         if (entry) addQSO(entry)
       })
 
       CQZones.forEach((zone) => {
         const key = entrySelections[zone.entityPrefix]
         const prefixQSOs = entityGroups[zone.entityPrefix] ?? []
-        const entry = getSelectedEntry(prefixQSOs, key, entrySelections, zone.entityPrefix, qsos)
+        const entry = getSelectedEntry(prefixQSOs, key, undefined, undefined, qsos)
         if (entry) addQSO(entry)
       })
     }
 
     return Array.from(uniqueQSOs.values())
-  }, [entrySelections, entityGroups, marathonMode, CHALLENGE_BANDS, qsos])
+  }, [entrySelections, entityGroups, entityGroupsByPrefixAndBand, marathonMode, CHALLENGE_BANDS, qsos])
 
   const { warningsCount, badCallsCount } = useMemo(() => {
     let warnings = 0
@@ -345,39 +373,17 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
 
   return (
     <Box sx={styles.root}>
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          zIndex: -100,
-          height: 1,
-          width: 1,
-          opacity: 0,
-          overflow: 'hidden'
-        }}
-      >
-        <table id='excel-table'>
-          <tbody>
-            {CQWWEntities.map((entity, i) => (
-              <ExcelEntry
-                key={entity.entityPrefix}
-                qsos={entityGroups[entity.entityPrefix]}
-                entryKey={entrySelections[entity.entityPrefix]}
-              />
-            ))}
-            {CQZones.map((zone, i) => (
-              <ExcelEntry
-                key={zone.entityPrefix}
-                qsos={entityGroups[zone.entityPrefix]}
-                entryKey={entrySelections[zone.entityPrefix]}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
 
-      <Box sx={{ borderBottom: '1px solid #ccc', mt: 3, mb: 2 }}>
+
+      <Box sx={{
+        borderBottom: '1px solid #ccc',
+        mt: 3,
+        mb: 2,
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        backgroundColor: 'background.paper'
+      }}>
         {marathonMode === 'challenge' ? (
           <Tabs
             value={activeTab}
@@ -446,7 +452,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
               {CQWWEntities.map((entity, i) => {
                 const activeBand = CHALLENGE_BANDS[activeTab]
                 const keyPrefix = marathonMode === 'challenge' ? `${entity.entityPrefix}-${activeBand}` : entity.entityPrefix
-                const qsosOnBand = (entityGroups[entity.entityPrefix] ?? []).filter(q => q.band === activeBand)
+                const qsosOnBand = challengeGroupsByBand[entity.entityPrefix] || []
                 return (
                   <EntityEntry
                     key={entity.entityPrefix}
@@ -484,7 +490,7 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
               {CQZones.map((zone, i) => {
                 const activeBand = CHALLENGE_BANDS[activeTab]
                 const keyPrefix = marathonMode === 'challenge' ? `${zone.entityPrefix}-${activeBand}` : zone.entityPrefix
-                const qsosOnBand = (entityGroups[zone.entityPrefix] ?? []).filter(q => q.band === activeBand)
+                const qsosOnBand = challengeGroupsByBand[zone.entityPrefix] || []
                 return (
                   <EntityEntry
                     key={zone.entityPrefix}

@@ -131,10 +131,16 @@ export function EntitySelector({
       warnings[autoSelectedQSO.key] = 'Auto selected'
     }
 
+    const entrySelectionsReverseMap = {}
+    Object.keys(entrySelections).forEach((prefix) => {
+      const qsoKey = entrySelections[prefix]
+      if (qsoKey) {
+        entrySelectionsReverseMap[qsoKey] = prefix
+      }
+    })
+
     filteredQSOs.forEach((qso) => {
-      const assignedPrefixKey = Object.keys(entrySelections).find(
-        (prefix) => entrySelections[prefix] === qso.key
-      )
+      const assignedPrefixKey = entrySelectionsReverseMap[qso.key]
       if (assignedPrefixKey) {
         if (assignedPrefixKey === keyPrefix) {
           warnings[qso.key] = 'Current selection'
@@ -161,10 +167,19 @@ export function EntitySelector({
   const handleSelectEntry = useCallback((qso) => {
     const selectedCall = qso?.their?.call
     if (selectedCall) {
+      const yearQsoMap = new Map()
+      if (yearQSOs) {
+        yearQSOs.forEach(q => {
+          if (q && q.key) {
+            yearQsoMap.set(q.key, q)
+          }
+        })
+      }
+
       Object.keys(entrySelections).forEach((prefixKey) => {
         const selectionKey = entrySelections[prefixKey]
         if (selectionKey && selectionKey !== 'X') {
-          const existingQSO = (yearQSOs ?? []).find(q => q.key === selectionKey)
+          const existingQSO = yearQsoMap.get(selectionKey)
           if (existingQSO && existingQSO.their?.call === selectedCall) {
             let isDifferent = false
             if (marathonMode === 'challenge' && activeBand) {

@@ -131,6 +131,23 @@ export function WorksheetPage () {
     return filtered
   }, [entityGroups, activeBandFilter, modeFilter])
 
+  const entityGroupsByPrefixAndBand = React.useMemo(() => {
+    if (!entityGroups) return {}
+    const grouped = {}
+    Object.keys(entityGroups).forEach((prefix) => {
+      let qsosList = entityGroups[prefix] ?? []
+      if (modeFilter !== 'Mixed') {
+        qsosList = qsosList.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
+      }
+      qsosList.forEach((qso) => {
+        const key = `${prefix}-${qso.band}`
+        grouped[key] = grouped[key] ?? []
+        grouped[key].push(qso)
+      })
+    })
+    return grouped
+  }, [entityGroups, modeFilter])
+
   const counts = React.useMemo(() => {
     const memoCounts = { entities: 0, zones: 0 }
     if (marathonMode === 'challenge' || !filteredEntityGroups) return memoCounts
@@ -138,7 +155,7 @@ export function WorksheetPage () {
     CQWWEntities.forEach((entity) => {
       const key = entrySelections[entity.entityPrefix]
       const entityQSOs = filteredEntityGroups[entity.entityPrefix] ?? []
-      const entry = getSelectedEntry(entityQSOs, key, entrySelections, entity.entityPrefix, qsos)
+      const entry = getSelectedEntry(entityQSOs, key, undefined, undefined, qsos)
       if (entry) {
         memoCounts.entities += 1
       }
@@ -147,7 +164,7 @@ export function WorksheetPage () {
     CQZones.forEach((zone) => {
       const key = entrySelections[zone.entityPrefix]
       const zoneQSOs = filteredEntityGroups[zone.entityPrefix] ?? []
-      const entry = getSelectedEntry(zoneQSOs, key, entrySelections, zone.entityPrefix, qsos)
+      const entry = getSelectedEntry(zoneQSOs, key, undefined, undefined, qsos)
       if (entry) {
         memoCounts.zones += 1
       }
@@ -166,12 +183,8 @@ export function WorksheetPage () {
       CQWWEntities.forEach((entity) => {
         const keyPrefix = `${entity.entityPrefix}-${band}`
         const key = entrySelections[keyPrefix]
-        let qsosList = entityGroups[entity.entityPrefix] ?? []
-        qsosList = qsosList.filter((q) => q.band === band)
-        if (modeFilter !== 'Mixed') {
-          qsosList = qsosList.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
-        }
-        const entry = getSelectedEntry(qsosList, key, entrySelections, keyPrefix, qsos)
+        const qsosList = entityGroupsByPrefixAndBand[`${entity.entityPrefix}-${band}`] ?? []
+        const entry = getSelectedEntry(qsosList, key, undefined, undefined, qsos)
         if (entry) {
           totalEntities += 1
         }
@@ -180,12 +193,8 @@ export function WorksheetPage () {
       CQZones.forEach((zone) => {
         const keyPrefix = `${zone.entityPrefix}-${band}`
         const key = entrySelections[keyPrefix]
-        let qsosList = entityGroups[zone.entityPrefix] ?? []
-        qsosList = qsosList.filter((q) => q.band === band)
-        if (modeFilter !== 'Mixed') {
-          qsosList = qsosList.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
-        }
-        const entry = getSelectedEntry(qsosList, key, entrySelections, keyPrefix, qsos)
+        const qsosList = entityGroupsByPrefixAndBand[`${zone.entityPrefix}-${band}`] ?? []
+        const entry = getSelectedEntry(qsosList, key, undefined, undefined, qsos)
         if (entry) {
           totalZones += 1
         }
@@ -193,7 +202,7 @@ export function WorksheetPage () {
     })
 
     return { entities: totalEntities, zones: totalZones }
-  }, [entrySelections, entityGroups, modeFilter, qsos])
+  }, [entrySelections, entityGroupsByPrefixAndBand, marathonMode, qsos])
 
   const activeCounts = marathonMode === 'challenge' ? challengeCounts : counts
 
