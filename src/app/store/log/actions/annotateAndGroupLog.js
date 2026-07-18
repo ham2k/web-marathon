@@ -18,6 +18,9 @@ const VALID_BANDS = {
 }
 
 function processOneQSO(qso) {
+  if (qso.key) {
+    return qso
+  }
   qso.notes = []
   qso.our = qso.our ?? {}
   qso.their = qso.their ?? {}
@@ -156,9 +159,34 @@ function matchQSOToPattern(qso, pattern) {
   return true
 }
 
+function indexPatterns(patterns) {
+  const exactMap = new Map()
+  const wildcards = []
+
+  patterns.forEach(p => {
+    if (p.callsign) {
+      if (p.callsign.startsWith('**') || p.callsign.endsWith('*')) {
+        wildcards.push(p)
+      } else {
+        let list = exactMap.get(p.callsign)
+        if (!list) {
+          list = []
+          exactMap.set(p.callsign, list)
+        }
+        list.push(p)
+      }
+    }
+  })
+
+  return { exactMap, wildcards }
+}
+
 export function annotateAndGroupLog(qsos, goodCalls = [], badCalls = [], year) {
   const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()
   const yearEnd = new Date(`${year}-12-31T23:59:59Z`).valueOf()
+
+  const indexedBadCalls = indexPatterns(badCalls)
+  const indexedGoodCalls = indexPatterns(goodCalls)
 
   let yearQSOs = qsos.filter(qso => {
     if (!VALID_BANDS[qso.band]) return false
@@ -186,30 +214,42 @@ export function annotateAndGroupLog(qsos, goodCalls = [], badCalls = [], year) {
     }
 
     // Match against bad calls first
-    for (const pattern of badCalls) {
-      if (matchQSOToPattern(qso, pattern)) {
-        qso.isBadCall = true
-        qso.badCallCategory = pattern.category // 'I' or 'B'
-        qso.notes = qso.notes ?? []
-        qso.notes.push({
-          about: 'badCall',
-          note: pattern.notes || `Invalid operation / bad spot for ${pattern.callsign}.`
-        })
-        break // Match one is enough to mark bad
-      }
+    let matchedBad = null
+    const exactBad = indexedBadCalls.exactMap.get(qso.their.call)
+    if (exactBad) {
+      matchedBad = exactBad.find(pattern => matchQSOToPattern(qso, pattern))
+    }
+    if (!matchedBad) {
+      matchedBad = indexedBadCalls.wildcards.find(pattern => matchQSOToPattern(qso, pattern))
+    }
+
+    if (matchedBad) {
+      qso.isBadCall = true
+      qso.badCallCategory = matchedBad.category // 'I' or 'B'
+      qso.notes = qso.notes ?? []
+      qso.notes.push({
+        about: 'badCall',
+        note: matchedBad.notes || `Invalid operation / bad spot for ${matchedBad.callsign}.`
+      })
     }
 
     // Match against good calls
-    for (const pattern of goodCalls) {
-      if (matchQSOToPattern(qso, pattern)) {
-        qso.isGoodCall = true
-        qso.notes = qso.notes ?? []
-        qso.notes.push({
-          about: 'goodCall',
-          note: pattern.notes || `Known active operation for ${pattern.callsign}.`
-        })
-        break
-      }
+    let matchedGood = null
+    const exactGood = indexedGoodCalls.exactMap.get(qso.their.call)
+    if (exactGood) {
+      matchedGood = exactGood.find(pattern => matchQSOToPattern(qso, pattern))
+    }
+    if (!matchedGood) {
+      matchedGood = indexedGoodCalls.wildcards.find(pattern => matchQSOToPattern(qso, pattern))
+    }
+
+    if (matchedGood) {
+      qso.isGoodCall = true
+      qso.notes = qso.notes ?? []
+      qso.notes.push({
+        about: 'goodCall',
+        note: matchedGood.notes || `Known active operation for ${matchedGood.callsign}.`
+      })
     }
 
     if (qso.notes) {

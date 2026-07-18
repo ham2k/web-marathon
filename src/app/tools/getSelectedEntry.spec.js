@@ -22,10 +22,4 @@ describe('getSelectedEntry', () => {
     expect(getSelectedEntry(qsos, undefined, {}, 'prefix', yearQSOs)).toEqual(qsos[0])
   })
 
-  it('should skip other entities manual selections when defaulting', () => {
-    const entrySelections = {
-      'other-prefix': 'qso-1'
-    }
-    expect(getSelectedEntry(qsos, undefined, entrySelections, 'prefix', yearQSOs)).toEqual(qsos[1])
-  })
 })

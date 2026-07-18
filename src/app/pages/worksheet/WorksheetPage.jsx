@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Dialog, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { Box, Button, Dialog, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress } from '@mui/material'
 import { Clear, FileDownload } from '@mui/icons-material'
 
 import { fmtNumber } from '@ham2k/lib-format-tools'
@@ -133,7 +133,7 @@ export function WorksheetPage () {
 
   const counts = React.useMemo(() => {
     const memoCounts = { entities: 0, zones: 0 }
-    if (!filteredEntityGroups) return memoCounts
+    if (marathonMode === 'challenge' || !filteredEntityGroups) return memoCounts
 
     CQWWEntities.forEach((entity) => {
       const key = entrySelections[entity.entityPrefix]
@@ -159,6 +159,7 @@ export function WorksheetPage () {
   const challengeCounts = React.useMemo(() => {
     let totalEntities = 0
     let totalZones = 0
+    if (marathonMode !== 'challenge') return { entities: totalEntities, zones: totalZones }
     const CHALLENGE_BANDS = ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m']
 
     CHALLENGE_BANDS.forEach((band) => {
@@ -197,7 +198,11 @@ export function WorksheetPage () {
   const activeCounts = marathonMode === 'challenge' ? challengeCounts : counts
 
   if (!qsos) {
-    return undefined
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+        <CircularProgress />
+      </Box>
+    )
   }
 
   return (

@@ -50,8 +50,12 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
+      immutableCheck: {
+        ignoredPaths: ['log.qsos', 'log.yearQSOs', 'log.entityGroups', 'log.ourCalls']
+      },
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'persist/REGISTER', 'persist/PAUSE', 'persist/PURGE', 'persist/FLUSH']
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'persist/REGISTER', 'persist/PAUSE', 'persist/PURGE', 'persist/FLUSH', 'log/setCurrentLogInfo'],
+        ignoredPaths: ['log.qsos', 'log.yearQSOs', 'log.entityGroups', 'log.ourCalls']
       }
     }),
   devTools: {

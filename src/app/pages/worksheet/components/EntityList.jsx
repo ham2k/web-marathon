@@ -169,6 +169,8 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       bandCounts[band] = { entities: 0, zones: 0 }
     })
 
+    if (marathonMode !== 'challenge') return bandCounts
+
     CQWWEntities.forEach((entity) => {
       CHALLENGE_BANDS.forEach((band) => {
         const keyPrefix = `${entity.entityPrefix}-${band}`
@@ -208,6 +210,8 @@ export function EntityList ({ qsos, entityGroups, entrySelections }) {
       zones: { qso: 0, qsl: 0, nil: 0 },
       wae: { qso: 0, qsl: 0, nil: 0 }
     }
+
+    if (marathonMode === 'challenge') return memoCounts
 
     CQWWEntities.forEach((entity) => {
       const key = entrySelections[entity.entityPrefix]

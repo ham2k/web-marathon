@@ -111,6 +111,7 @@ export const EntityEntry = React.memo(function EntityEntry({
 
   const [open, setOpen] = useState(false)
 
+
   const handleToggleEntityEntry = event => {
     if (isSelected) setSelectedPrefix('')
     else setSelectedPrefix(prefix)
@@ -274,6 +275,8 @@ export const EntityEntry = React.memo(function EntityEntry({
             timeout="auto"
             onEnter={() => setOpen(true)}
             onExited={() => setOpen(false)}
+            mountOnEnter
+            unmountOnExit
           >
             <EntitySelector
               entity={entity}
