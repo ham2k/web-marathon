@@ -1,13 +1,13 @@
-import React, { useCallback, useMemo, useEffect, useState } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { LogLoader } from './components/LogLoader'
 import { selectSettings } from '../../store/settings'
 import { Box, Button, Typography } from '@mui/material'
 import { QrzDialogButton } from './components/QrzDialog'
 import { selectOurCalls } from '../../store/entries'
+import { selectCountryFilesLoaded } from '../../store/log'
 import { Login } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
-import { useBuiltinCountryFile, parseCountryFile, setCountryFileData, analyzeFromCountryFile } from '@ham2k/lib-country-files'
 
 
 const styles = {
@@ -28,28 +28,7 @@ export function HomePage() {
     navigate('/worksheet')
   }
 
-  const [dataLoaded, setDataLoaded] = useState()
-  useEffect(() => {
-    fetch("https://services.ham2k.net/country-files/bigcty/cty.csv")
-      .then((response) => {
-        return response.text()
-      }).then((body) => {
-        console.log('Country Files data', body)
-        const data = parseCountryFile(body)
-
-        setCountryFileData(data)
-        const info = analyzeFromCountryFile({ call: 'VERSION' })
-        console.log(`Country Files data downloaded. Version: ${info.entityName}`)
-        window.dispatchEvent(new CustomEvent('country-files-loaded'))
-        setDataLoaded(true)
-      })
-      .catch(error => {
-        console.error('Error loading Country Files data', error)
-        useBuiltinCountryFile()
-        window.dispatchEvent(new CustomEvent('country-files-loaded'))
-        setDataLoaded(true)
-      })
-  }, [])
+  const dataLoaded = useSelector(selectCountryFilesLoaded)
 
   return (
     <Box sx={styles.root}>

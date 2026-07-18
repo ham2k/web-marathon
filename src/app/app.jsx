@@ -1,4 +1,5 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -12,6 +13,7 @@ import commonStyles from './styles/common'
 import { VersionChecker } from './components/VersionChecker'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
+import { fetchCountryFiles } from './store/log'
 
 window.currentCommit = window?.ENV?.COMMIT || ''
 window.currentEnv = window?.ENV?.NODE_ENV || 'unknown'
@@ -128,6 +130,12 @@ const styles = {
 }
 
 export function App () {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchCountryFiles())
+  }, [dispatch])
+
   return (
     <Box sx={styles.root}>
       <Header styles={styles} />

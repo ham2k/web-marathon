@@ -1,4 +1,4 @@
-import { useBuiltinCountryFile } from '@ham2k/lib-country-files'
+import { useBuiltinCountryFile, parseCountryFile, setCountryFileData } from '@ham2k/lib-country-files'
 import { createSlice } from '@reduxjs/toolkit'
 import localforage from 'localforage'
 import { setCurrentLogCalls } from '../entries'
@@ -18,7 +18,8 @@ const initialState = {
   qsos: undefined,
   yearQSOs: undefined,
   entityGroups: undefined,
-  ourCalls: undefined
+  ourCalls: undefined,
+  countryFilesLoaded: false
 }
 
 export const logSlice = createSlice({
@@ -41,11 +42,14 @@ export const logSlice = createSlice({
         state.yearQSOs = action.payload.yearQSOs
         state.entityGroups = action.payload.entityGroups
       }
+    },
+    setCountryFilesLoaded: (state, action) => {
+      state.countryFilesLoaded = action.payload
     }
   }
 })
 
-export const { setCurrentLogInfo, setCallLists } = logSlice.actions
+export const { setCurrentLogInfo, setCallLists, setCountryFilesLoaded } = logSlice.actions
 
 async function fetchCallListsFromNetwork () {
   const [goodData, badData] = await Promise.all([
@@ -232,6 +236,27 @@ const EMPTY_OBJECT = {}
 
 export const selectEntityGroups = (state) => {
   return state?.log?.entityGroups ?? EMPTY_OBJECT
+}
+
+export const selectCountryFilesLoaded = (state) => {
+  return state?.log?.countryFilesLoaded
+}
+
+export const fetchCountryFiles = () => (dispatch) => {
+  return fetch("https://services.ham2k.net/country-files/bigcty/cty.csv")
+    .then((response) => response.text())
+    .then((body) => {
+      const data = parseCountryFile(body)
+      setCountryFileData(data)
+      dispatch(setCountryFilesLoaded(true))
+      window.dispatchEvent(new CustomEvent('country-files-loaded'))
+    })
+    .catch((error) => {
+      console.error('Error loading Country Files data', error)
+      useBuiltinCountryFile()
+      dispatch(setCountryFilesLoaded(true))
+      window.dispatchEvent(new CustomEvent('country-files-loaded'))
+    })
 }
 
 export default logSlice.reducer
