@@ -12,8 +12,9 @@ import {
   ThumbDown,
   Feedback
 } from '@mui/icons-material'
-import { useDispatch } from 'react-redux'
-import { setSelection } from '../../../store/entries'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSelection, selectEntrySelections } from '../../../store/entries'
+import { getSelectedEntry } from '../../../tools/getSelectedEntry'
 import { Box } from '@mui/system'
 import { EntitySelector } from './EntitySelector'
 
@@ -95,25 +96,21 @@ export function EntityEntry({
   entryKey,
   selectedPrefix,
   setSelectedPrefix,
-  yearQSOs
+  yearQSOs,
+  marathonMode,
+  activeBand
 }) {
   const dispatch = useDispatch()
 
   const prefix = entity.entityPrefix
 
-  let entry
+  const entrySelections = useSelector(selectEntrySelections)
+  const currentKeyPrefix = marathonMode === 'challenge' && activeBand ? `${prefix}-${activeBand}` : prefix
+  const entry = getSelectedEntry(qsos, entryKey, entrySelections, currentKeyPrefix, yearQSOs)
 
   const handleToggleEntityEntry = event => {
     if (selectedPrefix === prefix) setSelectedPrefix('')
     else setSelectedPrefix(prefix)
-  }
-
-  if (entryKey === 'X') {
-    entry = undefined
-  } else if (entryKey) {
-    entry = (qsos && qsos.find(q => q.key === entryKey)) || (qsos && qsos[0])
-  } else {
-    entry = qsos && qsos[0]
   }
 
   const cols = []
@@ -274,6 +271,8 @@ export function EntityEntry({
               qsos={qsos}
               yearQSOs={yearQSOs}
               setSelectedPrefix={setSelectedPrefix}
+              marathonMode={marathonMode}
+              activeBand={activeBand}
             />
           </td>
         </Box>

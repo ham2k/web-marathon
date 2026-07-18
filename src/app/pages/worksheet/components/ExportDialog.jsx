@@ -4,6 +4,7 @@ import { DownloadForOffline, Sync } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
 import { generateDXM } from '../../../store/log/actions/generateDXM'
 import { selectOurCalls } from '../../../store/entries'
+import { selectMarathonMode } from '../../../store/settings'
 
 const FILENAME_CLEANUP_REGEX = /[^A-Z0-9]/gi
 
@@ -19,9 +20,13 @@ function compress(string) {
 export function ExportDialog({ onClose }) {
   const dispatch = useDispatch()
   const ourCalls = useSelector(selectOurCalls)
+  const marathonMode = useSelector(selectMarathonMode)
 
   const handleDownload = React.useCallback(() => {
-    const call = Object.keys(ourCalls)[0] || 'N0CALL'
+    let call = Object.keys(ourCalls)[0] || 'N0CALL'
+    if (marathonMode === 'challenge' && call && call !== 'N0CALL') {
+      call = `${call}-challenge`
+    }
 
     dispatch(generateDXM()).then((dxm) => {
       const fileName = `${call.replaceAll(FILENAME_CLEANUP_REGEX, '_')}-ham2k.dxm.xml`

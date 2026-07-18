@@ -89,12 +89,20 @@ const renderTooltipNote = (n, i) => {
   )
 }
 
-export function EntitySelector({ entity, qsos: defaultQSOs, yearQSOs, setSelectedPrefix }) {
+export function EntitySelector({
+  entity,
+  qsos: defaultQSOs,
+  yearQSOs,
+  setSelectedPrefix,
+  marathonMode,
+  activeBand
+}) {
   const [search, setSearch] = useState('')
   const dispatch = useDispatch()
   const entrySelections = useSelector(selectEntrySelections)
 
-  const currentSelectionKey = entrySelections[entity.entityPrefix]
+  const keyPrefix = marathonMode === 'challenge' && activeBand ? `${entity.entityPrefix}-${activeBand}` : entity.entityPrefix
+  const currentSelectionKey = entrySelections[keyPrefix]
 
   const [qsos, warnings] = useMemo(() => {
     let filteredQSOs = []
@@ -115,34 +123,71 @@ export function EntitySelector({ entity, qsos: defaultQSOs, yearQSOs, setSelecte
     }
 
     filteredQSOs.forEach((qso) => {
-      const assignedPrefix = Object.keys(entrySelections).find(
+      const assignedPrefixKey = Object.keys(entrySelections).find(
         (prefix) => entrySelections[prefix] === qso.key
       )
-      if (assignedPrefix) {
-        if (assignedPrefix === entity.entityPrefix) {
+      if (assignedPrefixKey) {
+        if (assignedPrefixKey === keyPrefix) {
           warnings[qso.key] = 'Current selection'
         } else {
-          warnings[qso.key] = `Selected for ${assignedPrefix}`
+          let displayLabel = assignedPrefixKey
+          if (marathonMode === 'challenge') {
+            const hyphenIndex = assignedPrefixKey.lastIndexOf('-')
+            const prefix = hyphenIndex >= 0 ? assignedPrefixKey.substring(0, hyphenIndex) : assignedPrefixKey
+            const band = hyphenIndex >= 0 ? assignedPrefixKey.substring(hyphenIndex + 1) : ''
+            displayLabel = `${prefix} on ${band}`
+          }
+          warnings[qso.key] = `Selected for ${displayLabel}`
         }
       }
     })
 
     return [filteredQSOs, warnings]
-  }, [search, yearQSOs, entity, defaultQSOs, currentSelectionKey, entrySelections])
+  }, [search, yearQSOs, entity, defaultQSOs, currentSelectionKey, entrySelections, keyPrefix, marathonMode])
 
   const handleSearchChange = useCallback((e) => {
     setSearch(e.target.value.toUpperCase())
   }, [])
 
   const handleSelectEntry = useCallback((qso) => {
-    dispatch(setSelection({ prefix: entity.entityPrefix, key: qso.key }))
+    const selectedCall = qso?.their?.call
+    if (selectedCall) {
+      Object.keys(entrySelections).forEach((prefixKey) => {
+        const selectionKey = entrySelections[prefixKey]
+        if (selectionKey && selectionKey !== 'X') {
+          const existingQSO = (yearQSOs ?? []).find(q => q.key === selectionKey)
+          if (existingQSO && existingQSO.their?.call === selectedCall) {
+            let isDifferent = false
+            if (marathonMode === 'challenge' && activeBand) {
+              const hyphenIndex = prefixKey.lastIndexOf('-')
+              const existingPrefix = hyphenIndex >= 0 ? prefixKey.substring(0, hyphenIndex) : prefixKey
+              const existingBand = hyphenIndex >= 0 ? prefixKey.substring(hyphenIndex + 1) : ''
+              
+              if (existingBand === qso.band && existingPrefix !== entity.entityPrefix) {
+                isDifferent = true
+              }
+            } else {
+              if (prefixKey !== entity.entityPrefix) {
+                isDifferent = true
+              }
+            }
+
+            if (isDifferent) {
+              dispatch(setSelection({ prefix: prefixKey, key: undefined }))
+            }
+          }
+        }
+      })
+    }
+
+    dispatch(setSelection({ prefix: keyPrefix, key: qso.key }))
     setSelectedPrefix('')
-  }, [dispatch, entity, setSelectedPrefix])
+  }, [dispatch, entity, keyPrefix, setSelectedPrefix, entrySelections, yearQSOs, marathonMode, activeBand])
 
   const handleClearEntry = useCallback((qso) => {
-    dispatch(setSelection({ prefix: entity.entityPrefix, key: 'X' }))
+    dispatch(setSelection({ prefix: keyPrefix, key: undefined }))
     setSelectedPrefix('')
-  }, [dispatch, entity, setSelectedPrefix])
+  }, [dispatch, keyPrefix, setSelectedPrefix])
 
   return (
     <Box sx={styles.root}>

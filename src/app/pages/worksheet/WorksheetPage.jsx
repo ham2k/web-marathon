@@ -8,11 +8,12 @@ import { fmtNumber } from '@ham2k/lib-format-tools'
 
 import { clearCurrentLog, fetchCurrentLog, fetchCallLists, selectEntityGroups, selectYearQSOs } from '../../store/log'
 import { selectEntrySelections, selectOurCalls } from '../../store/entries'
-import { selectSettings } from '../../store/settings'
+import { selectSettings, selectMarathonMode, setMarathonMode } from '../../store/settings'
 import { PointsChart } from './components/PointsChart'
 import { EntityList } from './components/EntityList'
 import { ExportDialog } from './components/ExportDialog'
 import { CQWWEntities, CQZones } from '../../../data/entities'
+import { getSelectedEntry } from '../../tools/getSelectedEntry'
 
 const styles = {
   root: {
@@ -53,6 +54,7 @@ export function WorksheetPage () {
   const entityGroups = useSelector(selectEntityGroups)
   const entrySelections = useSelector(selectEntrySelections)
   const ourCalls = useSelector(selectOurCalls)
+  const marathonMode = useSelector(selectMarathonMode)
 
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false)
   const [bandFilter, setBandFilter] = React.useState('All Bands')
@@ -101,23 +103,25 @@ export function WorksheetPage () {
     return counts
   }, [qsosFilteredByMode])
 
+  const activeBandFilter = marathonMode === 'challenge' ? 'All Bands' : bandFilter
+
   const filteredQSOs = React.useMemo(() => {
     let list = qsos ?? []
-    if (bandFilter !== 'All Bands') {
-      list = list.filter((q) => q.band === bandFilter)
+    if (activeBandFilter !== 'All Bands') {
+      list = list.filter((q) => q.band === activeBandFilter)
     }
     if (modeFilter !== 'Mixed') {
       list = list.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
     }
     return list
-  }, [qsos, bandFilter, modeFilter])
+  }, [qsos, activeBandFilter, modeFilter])
 
   const filteredEntityGroups = React.useMemo(() => {
     const filtered = {}
     Object.keys(entityGroups).forEach((prefix) => {
       let list = entityGroups[prefix] ?? []
-      if (bandFilter !== 'All Bands') {
-        list = list.filter((q) => q.band === bandFilter)
+      if (activeBandFilter !== 'All Bands') {
+        list = list.filter((q) => q.band === activeBandFilter)
       }
       if (modeFilter !== 'Mixed') {
         list = list.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
@@ -125,18 +129,16 @@ export function WorksheetPage () {
       filtered[prefix] = list
     })
     return filtered
-  }, [entityGroups, bandFilter, modeFilter])
+  }, [entityGroups, activeBandFilter, modeFilter])
 
   const counts = React.useMemo(() => {
-    const memoCounts = {
-      entities: 0,
-      zones: 0
-    }
+    const memoCounts = { entities: 0, zones: 0 }
+    if (!filteredEntityGroups) return memoCounts
 
     CQWWEntities.forEach((entity) => {
       const key = entrySelections[entity.entityPrefix]
-      const qsos = filteredEntityGroups[entity.entityPrefix] ?? []
-      const entry = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
+      const entityQSOs = filteredEntityGroups[entity.entityPrefix] ?? []
+      const entry = getSelectedEntry(entityQSOs, key, entrySelections, entity.entityPrefix, qsos)
       if (entry) {
         memoCounts.entities += 1
       }
@@ -144,15 +146,55 @@ export function WorksheetPage () {
 
     CQZones.forEach((zone) => {
       const key = entrySelections[zone.entityPrefix]
-      const qsos = filteredEntityGroups[zone.entityPrefix] ?? []
-      const entry = qsos.find((qso) => qso.key === key) ?? qsos[0]
+      const zoneQSOs = filteredEntityGroups[zone.entityPrefix] ?? []
+      const entry = getSelectedEntry(zoneQSOs, key, entrySelections, zone.entityPrefix, qsos)
       if (entry) {
         memoCounts.zones += 1
       }
     })
 
     return memoCounts
-  }, [entrySelections, filteredEntityGroups])
+  }, [entrySelections, filteredEntityGroups, qsos])
+
+  const challengeCounts = React.useMemo(() => {
+    let totalEntities = 0
+    let totalZones = 0
+    const CHALLENGE_BANDS = ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m']
+
+    CHALLENGE_BANDS.forEach((band) => {
+      CQWWEntities.forEach((entity) => {
+        const keyPrefix = `${entity.entityPrefix}-${band}`
+        const key = entrySelections[keyPrefix]
+        let qsosList = entityGroups[entity.entityPrefix] ?? []
+        qsosList = qsosList.filter((q) => q.band === band)
+        if (modeFilter !== 'Mixed') {
+          qsosList = qsosList.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
+        }
+        const entry = getSelectedEntry(qsosList, key, entrySelections, keyPrefix, qsos)
+        if (entry) {
+          totalEntities += 1
+        }
+      })
+
+      CQZones.forEach((zone) => {
+        const keyPrefix = `${zone.entityPrefix}-${band}`
+        const key = entrySelections[keyPrefix]
+        let qsosList = entityGroups[zone.entityPrefix] ?? []
+        qsosList = qsosList.filter((q) => q.band === band)
+        if (modeFilter !== 'Mixed') {
+          qsosList = qsosList.filter((q) => simplifyMode(q.mode) === modeFilter.toUpperCase())
+        }
+        const entry = getSelectedEntry(qsosList, key, entrySelections, keyPrefix, qsos)
+        if (entry) {
+          totalZones += 1
+        }
+      })
+    })
+
+    return { entities: totalEntities, zones: totalZones }
+  }, [entrySelections, entityGroups, modeFilter, qsos])
+
+  const activeCounts = marathonMode === 'challenge' ? challengeCounts : counts
 
   if (!qsos) {
     return undefined
@@ -183,6 +225,21 @@ export function WorksheetPage () {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3, mb: 1 }}>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <FormControl size='small' style={{ minWidth: 180 }}>
+            <InputLabel id='marathon-mode-label'>Category</InputLabel>
+            <Select
+              labelId='marathon-mode-label'
+              value={marathonMode}
+              label='Category'
+              onChange={(e) => {
+                dispatch(setMarathonMode(e.target.value))
+              }}
+            >
+              <MenuItem value='regular'>Regular Marathon</MenuItem>
+              <MenuItem value='challenge'>Marathon Challenge</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size='small' style={{ minWidth: 180 }}>
             <InputLabel id='mode-filter-label'>Mode</InputLabel>
             <Select
               labelId='mode-filter-label'
@@ -193,41 +250,43 @@ export function WorksheetPage () {
                 setBandFilter('All Bands') // Reset band filter when mode changes to prevent zero matches
               }}
             >
-              <MenuItem value='Mixed'>Mixed ({modeCounts.Mixed})</MenuItem>
-              <MenuItem value='CW'>CW ({modeCounts.CW})</MenuItem>
-              <MenuItem value='Phone'>Phone ({modeCounts.Phone})</MenuItem>
-              <MenuItem value='Digital'>Digital ({modeCounts.Digital})</MenuItem>
+              <MenuItem value='Mixed'>Mixed</MenuItem>
+              <MenuItem value='CW'>CW ({fmtNumber(modeCounts.CW)})</MenuItem>
+              <MenuItem value='Phone'>Phone ({fmtNumber(modeCounts.Phone)})</MenuItem>
+              <MenuItem value='Digital'>Digital ({fmtNumber(modeCounts.Digital)})</MenuItem>
             </Select>
           </FormControl>
 
-          <FormControl size='small' style={{ minWidth: 180 }}>
-            <InputLabel id='band-filter-label'>Band</InputLabel>
-            <Select
-              labelId='band-filter-label'
-              value={bandFilter}
-              label='Band'
-              onChange={(e) => setBandFilter(e.target.value)}
-            >
-              <MenuItem value='All Bands'>All Bands ({bandCounts['All Bands']})</MenuItem>
-              <MenuItem value='160m'>160m ({bandCounts['160m']})</MenuItem>
-              <MenuItem value='80m'>80m ({bandCounts['80m']})</MenuItem>
-              <MenuItem value='60m'>60m ({bandCounts['60m']})</MenuItem>
-              <MenuItem value='40m'>40m ({bandCounts['40m']})</MenuItem>
-              <MenuItem value='30m'>30m ({bandCounts['30m']})</MenuItem>
-              <MenuItem value='20m'>20m ({bandCounts['20m']})</MenuItem>
-              <MenuItem value='17m'>17m ({bandCounts['17m']})</MenuItem>
-              <MenuItem value='15m'>15m ({bandCounts['15m']})</MenuItem>
-              <MenuItem value='12m'>12m ({bandCounts['12m']})</MenuItem>
-              <MenuItem value='10m'>10m ({bandCounts['10m']})</MenuItem>
-              <MenuItem value='6m'>6m ({bandCounts['6m']})</MenuItem>
-            </Select>
-          </FormControl>
+          {marathonMode !== 'challenge' && (
+            <FormControl size='small' style={{ minWidth: 180 }}>
+              <InputLabel id='band-filter-label'>Band</InputLabel>
+              <Select
+                labelId='band-filter-label'
+                value={bandFilter}
+                label='Band'
+                onChange={(e) => setBandFilter(e.target.value)}
+              >
+                <MenuItem value='All Bands'>All Bands</MenuItem>
+                <MenuItem value='160m'>160m ({fmtNumber(bandCounts['160m'])})</MenuItem>
+                <MenuItem value='80m'>80m ({fmtNumber(bandCounts['80m'])})</MenuItem>
+                <MenuItem value='60m'>60m ({fmtNumber(bandCounts['60m'])})</MenuItem>
+                <MenuItem value='40m'>40m ({fmtNumber(bandCounts['40m'])})</MenuItem>
+                <MenuItem value='30m'>30m ({fmtNumber(bandCounts['30m'])})</MenuItem>
+                <MenuItem value='20m'>20m ({fmtNumber(bandCounts['20m'])})</MenuItem>
+                <MenuItem value='17m'>17m ({fmtNumber(bandCounts['17m'])})</MenuItem>
+                <MenuItem value='15m'>15m ({fmtNumber(bandCounts['15m'])})</MenuItem>
+                <MenuItem value='12m'>12m ({fmtNumber(bandCounts['12m'])})</MenuItem>
+                <MenuItem value='10m'>10m ({fmtNumber(bandCounts['10m'])})</MenuItem>
+                <MenuItem value='6m'>6m ({fmtNumber(bandCounts['6m'])})</MenuItem>
+              </Select>
+            </FormControl>
+          )}
         </Box>
 
         <Typography variant='h5' style={{ fontWeight: 'bold' }}>
-          {counts.entities + counts.zones} claimed points:&nbsp;
+          {fmtNumber(activeCounts.entities + activeCounts.zones)} claimed points:&nbsp;
           <span style={{ fontWeight: 'normal', fontSize: '0.9em', color: '#666' }}>
-            {counts.entities} Entities + {counts.zones} Zones
+            {fmtNumber(activeCounts.entities)} Entities + {fmtNumber(activeCounts.zones)} Zones
           </span>
         </Typography>
       </Box>

@@ -1,7 +1,10 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 
-import { EntitiesAndZones } from '../../../../data/entities'
+import { EntitiesAndZones, CQWWEntities, CQZones } from '../../../../data/entities'
+import { selectMarathonMode } from '../../../store/settings'
 import { dateFormatterGenerator } from '@ham2k/lib-format-tools'
+import { getSelectedEntry } from '../../../tools/getSelectedEntry'
 import guessCurrentYear from '../../../tools/guessCurrentYear'
 import { Box, Typography } from '@mui/material'
 
@@ -33,18 +36,44 @@ export function PointsChart ({ qsos, entityGroups, entrySelections, settings }) 
     return () => resizeObserver.disconnect()
   }, [])
 
+  const marathonMode = useSelector(selectMarathonMode)
   const zoneEntries = []
   const entityEntries = []
 
-  EntitiesAndZones.forEach((entity) => {
-    const key = entrySelections[entity.entityPrefix]
-    const qsos = entityGroups[entity.entityPrefix] ?? []
-    const entry = (key && qsos.find((qso) => qso.key === key)) ?? qsos[0]
-    if (entry) {
-      if (entity.zone) zoneEntries.push(entry)
-      else entityEntries.push(entry)
-    }
-  })
+  if (marathonMode === 'challenge') {
+    const CHALLENGE_BANDS = ['80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m']
+    CHALLENGE_BANDS.forEach((band) => {
+      CQWWEntities.forEach((entity) => {
+        const keyPrefix = `${entity.entityPrefix}-${band}`
+        const key = entrySelections[keyPrefix]
+        const entityQSOs = (entityGroups[entity.entityPrefix] ?? []).filter((q) => q.band === band)
+        const entry = getSelectedEntry(entityQSOs, key, entrySelections, keyPrefix, qsos)
+        if (entry) {
+          entityEntries.push(entry)
+        }
+      })
+
+      CQZones.forEach((zone) => {
+        const keyPrefix = `${zone.entityPrefix}-${band}`
+        const key = entrySelections[keyPrefix]
+        const zoneQSOs = (entityGroups[zone.entityPrefix] ?? []).filter((q) => q.band === band)
+        const entry = getSelectedEntry(zoneQSOs, key, entrySelections, keyPrefix, qsos)
+        if (entry) {
+          zoneEntries.push(entry)
+        }
+      })
+    })
+  } else {
+    EntitiesAndZones.forEach((entity) => {
+      const key = entrySelections[entity.entityPrefix]
+      const entityQSOs = entityGroups[entity.entityPrefix] ?? []
+      const entry = getSelectedEntry(entityQSOs, key, entrySelections, entity.entityPrefix, qsos)
+      if (entry) {
+        if (entity.zone) zoneEntries.push(entry)
+        else entityEntries.push(entry)
+      }
+    })
+  }
 
   const year = settings?.year ?? guessCurrentYear()
   const yearStart = new Date(`${year}-01-01T00:00:00Z`).valueOf()

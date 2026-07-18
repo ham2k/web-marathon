@@ -4,7 +4,8 @@ import { REHYDRATE } from 'redux-persist'
 import guessCurrentYear from '../../tools/guessCurrentYear'
 
 const initialState = {
-  year: guessCurrentYear()
+  year: guessCurrentYear(),
+  marathonMode: 'regular'
 }
 
 export const settingsSlice = createSlice({
@@ -14,12 +15,16 @@ export const settingsSlice = createSlice({
 
   reducers: {
     setSettingsYear: (state, action) => {
-      if (!state) return { year: guessCurrentYear() }
+      if (!state) return { year: guessCurrentYear(), marathonMode: 'regular' }
       state.year = action.payload.year ?? guessCurrentYear()
     },
 
     setQrzKey: (state, action) => {
       state.qrzKey = action.payload.qrzKey
+    },
+
+    setMarathonMode: (state, action) => {
+      state.marathonMode = action.payload ?? 'regular'
     }
   },
 
@@ -36,7 +41,7 @@ export const settingsSlice = createSlice({
   }
 })
 
-export const { setSettingsYear, setQrzKey } = settingsSlice.actions
+export const { setSettingsYear, setQrzKey, setMarathonMode } = settingsSlice.actions
 
 export const selectSettings = (state) => {
   return state?.settings
@@ -48,6 +53,10 @@ export const selectCurrentYear = (state) => {
 
 export const selectQrzKey = (state) => {
   return state?.settings?.qrzKey
+}
+
+export const selectMarathonMode = (state) => {
+  return state?.settings?.marathonMode ?? 'regular'
 }
 
 export default settingsSlice.reducer
