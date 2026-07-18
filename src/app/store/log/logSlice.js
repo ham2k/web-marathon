@@ -1,11 +1,15 @@
 import { useBuiltinCountryFile } from '@ham2k/lib-country-files'
 import { createSlice } from '@reduxjs/toolkit'
+import localforage from 'localforage'
 import { setCurrentLogCalls } from '../entries'
 import { setSettingsYear } from '../settings'
 import { logDB } from './logDB'
 import { annotateAndGroupLog } from './actions/annotateAndGroupLog'
 
 useBuiltinCountryFile()
+
+const CALL_LISTS_CACHE_KEY = 'callListsCache'
+const CALL_LISTS_TTL_MS = 60 * 60 * 1000 // 1 hour
 
 const initialState = {
   goodCalls: [],
@@ -33,10 +37,9 @@ export const logSlice = createSlice({
     setCallLists: (state, action) => {
       state.goodCalls = action.payload.goodCalls
       state.badCalls = action.payload.badCalls
-      if (state.qsos && state.year) {
-        const { yearQSOs, entityGroups } = annotateAndGroupLog(state.qsos, state.goodCalls, state.badCalls, state.year)
-        state.yearQSOs = yearQSOs
-        state.entityGroups = entityGroups
+      if (action.payload.yearQSOs !== undefined) {
+        state.yearQSOs = action.payload.yearQSOs
+        state.entityGroups = action.payload.entityGroups
       }
     }
   }
@@ -44,39 +47,150 @@ export const logSlice = createSlice({
 
 export const { setCurrentLogInfo, setCallLists } = logSlice.actions
 
-export const fetchCallLists = () => (dispatch) => {
-  Promise.all([
+async function fetchCallListsFromNetwork () {
+  const [goodData, badData] = await Promise.all([
     fetch('https://dxmarathon.com/resources/all-good-calls.json').then(res => res.json()).catch(() => ({ entries: [] })),
     fetch('https://dxmarathon.com/resources/all-bad-calls.json').then(res => res.json()).catch(() => ({ entries: [] }))
-  ]).then(([goodData, badData]) => {
-    dispatch(setCallLists({
-      goodCalls: goodData.entries || [],
-      badCalls: badData.entries || []
-    }))
+  ])
+  return {
+    goodCalls: goodData.entries || [],
+    badCalls: badData.entries || []
+  }
+}
+
+async function getCachedCallLists () {
+  try {
+    const cached = await localforage.getItem(CALL_LISTS_CACHE_KEY)
+    if (cached && cached.timestamp && (Date.now() - cached.timestamp) < CALL_LISTS_TTL_MS) {
+      return { goodCalls: cached.goodCalls, badCalls: cached.badCalls }
+    }
+  } catch (e) {
+    // Ignore cache read errors
+  }
+  return null
+}
+
+async function cacheCallLists (goodCalls, badCalls) {
+  try {
+    await localforage.setItem(CALL_LISTS_CACHE_KEY, {
+      goodCalls,
+      badCalls,
+      timestamp: Date.now()
+    })
+  } catch (e) {
+    // Ignore cache write errors
+  }
+}
+
+function fetchLogFromDB () {
+  return new Promise((resolve, reject) => {
+    logDB().then((db) => {
+      const transaction = db.transaction('logs', 'readonly')
+      const request = transaction.objectStore('logs').get('current')
+      request.onsuccess = () => resolve(request.result || null)
+      request.onerror = (event) => {
+        console.error('IndexedDB Error', event, transaction)
+        resolve(null)
+      }
+    }).catch(err => {
+      console.error('IndexedDB Error', err)
+      resolve(null)
+    })
   })
 }
 
-export const fetchCurrentLog = () => (dispatch) => {
-  logDB().then((db) => {
-    const transaction = db.transaction('logs', 'readonly')
-    const request = transaction.objectStore('logs').get('current')
-    request.onsuccess = () => {
-      if (request.result) {
-        dispatch(
-          setCurrentLogInfo({
-            qsos: request.result.qsos,
-            yearQSOs: request.result.yearQSOs,
-            entityGroups: request.result.entityGroups,
-            ourCalls: request.result.ourCalls,
-            year: request.result.year
-          })
+// Coordinated startup: load log and call lists in parallel, annotate once, dispatch once
+export const loadWorksheetData = () => async (dispatch) => {
+  const [logRecord, callLists] = await Promise.all([
+    fetchLogFromDB(),
+    getCachedCallLists().then(cached => {
+      if (cached) return { ...cached, fromCache: true }
+      return fetchCallListsFromNetwork().then(lists => ({ ...lists, fromCache: false }))
+    })
+  ])
+
+  if (!callLists.fromCache) {
+    cacheCallLists(callLists.goodCalls, callLists.badCalls)
+  }
+
+  if (logRecord) {
+    // Re-annotate the log with call lists in one pass
+    const { yearQSOs, entityGroups } = annotateAndGroupLog(
+      logRecord.qsos, callLists.goodCalls, callLists.badCalls, logRecord.year
+    )
+
+    dispatch(setCurrentLogInfo({
+      qsos: logRecord.qsos,
+      yearQSOs,
+      entityGroups,
+      ourCalls: logRecord.ourCalls,
+      year: logRecord.year
+    }))
+    dispatch(setCurrentLogCalls(logRecord.ourCalls))
+    dispatch(setSettingsYear({ year: logRecord.year }))
+  }
+
+  dispatch(setCallLists({
+    goodCalls: callLists.goodCalls,
+    badCalls: callLists.badCalls
+  }))
+
+  // If call lists came from cache, refresh in background for next load
+  if (callLists.fromCache) {
+    fetchCallListsFromNetwork().then(fresh => {
+      cacheCallLists(fresh.goodCalls, fresh.badCalls)
+      // If the log is loaded, re-annotate with fresh lists
+      if (logRecord) {
+        const { yearQSOs, entityGroups } = annotateAndGroupLog(
+          logRecord.qsos, fresh.goodCalls, fresh.badCalls, logRecord.year
         )
-        dispatch(setCurrentLogCalls(request.result.ourCalls))
-        dispatch(setSettingsYear({ year: request.result.year }))
+        dispatch(setCallLists({
+          goodCalls: fresh.goodCalls,
+          badCalls: fresh.badCalls,
+          yearQSOs,
+          entityGroups
+        }))
+      } else {
+        dispatch(setCallLists({
+          goodCalls: fresh.goodCalls,
+          badCalls: fresh.badCalls
+        }))
       }
-    }
-    request.onerror = (event) => {
-      console.error('IndexedDB Error', event, transaction)
+    })
+  }
+}
+
+// Keep fetchCallLists for use after log imports (loadADIFLog reads goodCalls/badCalls from state)
+export const fetchCallLists = () => async (dispatch, getState) => {
+  const lists = await getCachedCallLists() || await fetchCallListsFromNetwork()
+  if (!await getCachedCallLists()) {
+    cacheCallLists(lists.goodCalls, lists.badCalls)
+  }
+  const { log: logState } = getState()
+  if (logState.qsos && logState.year) {
+    const { yearQSOs, entityGroups } = annotateAndGroupLog(
+      logState.qsos, lists.goodCalls, lists.badCalls, logState.year
+    )
+    dispatch(setCallLists({ goodCalls: lists.goodCalls, badCalls: lists.badCalls, yearQSOs, entityGroups }))
+  } else {
+    dispatch(setCallLists({ goodCalls: lists.goodCalls, badCalls: lists.badCalls }))
+  }
+}
+
+export const fetchCurrentLog = () => (dispatch) => {
+  fetchLogFromDB().then((result) => {
+    if (result) {
+      dispatch(
+        setCurrentLogInfo({
+          qsos: result.qsos,
+          yearQSOs: result.yearQSOs,
+          entityGroups: result.entityGroups,
+          ourCalls: result.ourCalls,
+          year: result.year
+        })
+      )
+      dispatch(setCurrentLogCalls(result.ourCalls))
+      dispatch(setSettingsYear({ year: result.year }))
     }
   })
 }

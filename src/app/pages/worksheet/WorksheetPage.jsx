@@ -6,7 +6,7 @@ import { Clear, FileDownload } from '@mui/icons-material'
 
 import { fmtNumber } from '@ham2k/lib-format-tools'
 
-import { clearCurrentLog, fetchCurrentLog, fetchCallLists, selectEntityGroups, selectYearQSOs } from '../../store/log'
+import { clearCurrentLog, loadWorksheetData, selectEntityGroups, selectYearQSOs } from '../../store/log'
 import { selectEntrySelections, selectOurCalls } from '../../store/entries'
 import { selectSettings, selectMarathonMode, setMarathonMode } from '../../store/settings'
 import { PointsChart } from './components/PointsChart'
@@ -61,8 +61,7 @@ export function WorksheetPage () {
   const [modeFilter, setModeFilter] = React.useState('Mixed')
 
   useEffect(() => {
-    dispatch(fetchCallLists())
-    dispatch(fetchCurrentLog())
+    dispatch(loadWorksheetData())
   }, [dispatch])
 
   const handleClearLog = (event) => {
