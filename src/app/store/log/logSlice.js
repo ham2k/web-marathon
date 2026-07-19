@@ -19,7 +19,9 @@ const initialState = {
   yearQSOs: undefined,
   entityGroups: undefined,
   ourCalls: undefined,
-  countryFilesLoaded: false
+  countryFilesLoaded: false,
+  callListsLoaded: false,
+  callListsUpdated: undefined
 }
 
 export const logSlice = createSlice({
@@ -38,6 +40,8 @@ export const logSlice = createSlice({
     setCallLists: (state, action) => {
       state.goodCalls = action.payload.goodCalls
       state.badCalls = action.payload.badCalls
+      state.callListsLoaded = true
+      state.callListsUpdated = action.payload.updated || state.callListsUpdated
       if (action.payload.yearQSOs !== undefined) {
         state.yearQSOs = action.payload.yearQSOs
         state.entityGroups = action.payload.entityGroups
@@ -51,22 +55,23 @@ export const logSlice = createSlice({
 
 export const { setCurrentLogInfo, setCallLists, setCountryFilesLoaded } = logSlice.actions
 
-async function fetchCallListsFromNetwork () {
+async function fetchCallListsFromNetwork() {
   const [goodData, badData] = await Promise.all([
     fetch('https://dxmarathon.com/resources/all-good-calls.json').then(res => res.json()).catch(() => ({ entries: [] })),
     fetch('https://dxmarathon.com/resources/all-bad-calls.json').then(res => res.json()).catch(() => ({ entries: [] }))
   ])
   return {
     goodCalls: goodData.entries || [],
-    badCalls: badData.entries || []
+    badCalls: badData.entries || [],
+    timestamp: Date.now()
   }
 }
 
-async function getCachedCallLists () {
+async function getCachedCallLists() {
   try {
     const cached = await localforage.getItem(CALL_LISTS_CACHE_KEY)
     if (cached && cached.timestamp && (Date.now() - cached.timestamp) < CALL_LISTS_TTL_MS) {
-      return { goodCalls: cached.goodCalls, badCalls: cached.badCalls }
+      return { goodCalls: cached.goodCalls, badCalls: cached.badCalls, timestamp: cached.timestamp }
     }
   } catch (e) {
     // Ignore cache read errors
@@ -74,7 +79,7 @@ async function getCachedCallLists () {
   return null
 }
 
-async function cacheCallLists (goodCalls, badCalls) {
+async function cacheCallLists(goodCalls, badCalls) {
   try {
     await localforage.setItem(CALL_LISTS_CACHE_KEY, {
       goodCalls,
@@ -86,7 +91,7 @@ async function cacheCallLists (goodCalls, badCalls) {
   }
 }
 
-function fetchLogFromDB () {
+function fetchLogFromDB() {
   return new Promise((resolve, reject) => {
     logDB().then((db) => {
       const transaction = db.transaction('logs', 'readonly')
@@ -136,7 +141,8 @@ export const loadWorksheetData = () => async (dispatch) => {
 
   dispatch(setCallLists({
     goodCalls: callLists.goodCalls,
-    badCalls: callLists.badCalls
+    badCalls: callLists.badCalls,
+    updated: callLists.timestamp
   }))
 
   // If call lists came from cache, refresh in background for next load
@@ -152,12 +158,14 @@ export const loadWorksheetData = () => async (dispatch) => {
           goodCalls: fresh.goodCalls,
           badCalls: fresh.badCalls,
           yearQSOs,
-          entityGroups
+          entityGroups,
+          updated: fresh.timestamp
         }))
       } else {
         dispatch(setCallLists({
           goodCalls: fresh.goodCalls,
-          badCalls: fresh.badCalls
+          badCalls: fresh.badCalls,
+          updated: fresh.timestamp
         }))
       }
     })
@@ -175,9 +183,9 @@ export const fetchCallLists = () => async (dispatch, getState) => {
     const { yearQSOs, entityGroups } = annotateAndGroupLog(
       logState.qsos, lists.goodCalls, lists.badCalls, logState.year
     )
-    dispatch(setCallLists({ goodCalls: lists.goodCalls, badCalls: lists.badCalls, yearQSOs, entityGroups }))
+    dispatch(setCallLists({ goodCalls: lists.goodCalls, badCalls: lists.badCalls, yearQSOs, entityGroups, updated: lists.timestamp }))
   } else {
-    dispatch(setCallLists({ goodCalls: lists.goodCalls, badCalls: lists.badCalls }))
+    dispatch(setCallLists({ goodCalls: lists.goodCalls, badCalls: lists.badCalls, updated: lists.timestamp }))
   }
 }
 
@@ -242,8 +250,16 @@ export const selectCountryFilesLoaded = (state) => {
   return state?.log?.countryFilesLoaded
 }
 
+export const selectCallListsLoaded = (state) => {
+  return state?.log?.callListsLoaded
+}
+
+export const selectCallListsUpdated = (state) => {
+  return state?.log?.callListsUpdated
+}
+
 export const fetchCountryFiles = () => (dispatch) => {
-  return fetch("https://services.ham2k.net/country-files/bigcty/cty.csv")
+  return fetch("https://services.ham2k.net/country-files.com/bigcty/cty.csv")
     .then((response) => response.text())
     .then((body) => {
       const data = parseCountryFile(body)

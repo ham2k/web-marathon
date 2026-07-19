@@ -10,7 +10,9 @@ describe('log reducer', () => {
       yearQSOs: undefined,
       entityGroups: undefined,
       ourCalls: undefined,
-      countryFilesLoaded: false
+      countryFilesLoaded: false,
+      callListsLoaded: false,
+      callListsUpdated: undefined
     })
   })
 })
