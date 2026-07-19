@@ -76,7 +76,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'start',
-        alignItems: 'baseline'
+        alignItems: 'center'
       },
       '& h1': {
         fontWeight: '500 !important'
