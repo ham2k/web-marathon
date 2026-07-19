@@ -71,7 +71,7 @@ const styles = {
     justifyContent: 'space-between',
     '& header': {
       zIndex: 1,
-      '& .MuiToolbar-root div': {
+      '& .MuiToolbar-root > div': {
         flexGrow: 1,
         display: 'flex',
         flexDirection: 'row',
