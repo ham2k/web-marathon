@@ -57,7 +57,7 @@ export function Header ({ styles }) {
               Version { packageJson.version }
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', gap: 3, fontSize: '0.875rem', pr: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', fontSize: '0.8rem', pr: 1, gap: 0.5 }}>
             <Link
               href='https://www.country-files.com/big-cty/'
               target='_blank'
@@ -65,6 +65,7 @@ export function Header ({ styles }) {
               color='inherit'
               underline='hover'
               title='View Country Files website'
+              sx={{ lineHeight: 1.2 }}
             >
               Country Files: {ctyVersion}
             </Link>
@@ -75,6 +76,7 @@ export function Header ({ styles }) {
               color='inherit'
               underline='hover'
               title='View Callsign Notes'
+              sx={{ lineHeight: 1.2 }}
             >
               Good & Bad Calls: {callListsLoaded ? formatDate(callListsUpdated) : 'Loading…'}
             </Link>

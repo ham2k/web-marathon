@@ -13,7 +13,7 @@ import commonStyles from './styles/common'
 import { VersionChecker } from './components/VersionChecker'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
-import { fetchCountryFiles } from './store/log'
+import { fetchCountryFiles, fetchCallLists } from './store/log'
 
 window.currentCommit = window?.ENV?.COMMIT || ''
 window.currentEnv = window?.ENV?.NODE_ENV || 'unknown'
@@ -134,6 +134,7 @@ export function App () {
 
   useEffect(() => {
     dispatch(fetchCountryFiles())
+    dispatch(fetchCallLists())
   }, [dispatch])
 
   return (
